@@ -294,6 +294,8 @@ const FText UPTerminalWidget::GetPaletteCategory()
 {
 	return FText::FromString(TEXT("Peacegate OS"));
 }
+#endif
+
 TSharedRef<SWidget> UPTerminalWidget::RebuildWidget()
 {
 	return Super::RebuildWidget();
@@ -431,5 +433,4 @@ bool UPTerminalWidget::ParseEscape(TCHAR character, uint8 & termFont, uint8 & te
 		return true;
 	}
 }
-#endif
 

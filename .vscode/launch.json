@@ -1,0 +1,106 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "ProjectOglowia (Debug)",
+			"request": "launch",
+			"preLaunchTask": "ProjectOglowia Linux Debug Build",
+			"program": "/home/riolu/Repos/peacenet-ue 4.20/Binaries/Linux/ProjectOglowia-Linux-Debug",
+			"args": [
+			],
+			"cwd": "/opt/unreal-engine",
+			"type": "lldb"
+		},
+		{
+			"name": "ProjectOglowia (DebugGame)",
+			"request": "launch",
+			"preLaunchTask": "ProjectOglowia Linux DebugGame Build",
+			"program": "/home/riolu/Repos/peacenet-ue 4.20/Binaries/Linux/ProjectOglowia-Linux-DebugGame",
+			"args": [
+			],
+			"cwd": "/opt/unreal-engine",
+			"type": "lldb"
+		},
+		{
+			"name": "ProjectOglowia (Development)",
+			"request": "launch",
+			"preLaunchTask": "ProjectOglowia Linux Development Build",
+			"program": "/home/riolu/Repos/peacenet-ue 4.20/Binaries/Linux/ProjectOglowia",
+			"args": [
+			],
+			"cwd": "/opt/unreal-engine",
+			"type": "lldb"
+		},
+		{
+			"name": "ProjectOglowia (Shipping)",
+			"request": "launch",
+			"preLaunchTask": "ProjectOglowia Linux Shipping Build",
+			"program": "/home/riolu/Repos/peacenet-ue 4.20/Binaries/Linux/ProjectOglowia-Linux-Shipping",
+			"args": [
+			],
+			"cwd": "/opt/unreal-engine",
+			"type": "lldb"
+		},
+		{
+			"name": "ProjectOglowia (Test)",
+			"request": "launch",
+			"preLaunchTask": "ProjectOglowia Linux Test Build",
+			"program": "/home/riolu/Repos/peacenet-ue 4.20/Binaries/Linux/ProjectOglowia-Linux-Test",
+			"args": [
+			],
+			"cwd": "/opt/unreal-engine",
+			"type": "lldb"
+		},
+		{
+			"name": "ProjectOglowiaEditor (Debug)",
+			"request": "launch",
+			"preLaunchTask": "ProjectOglowiaEditor Linux Debug Build",
+			"program": "/opt/unreal-engine/Engine/Binaries/Linux/UE4Editor-Linux-Debug",
+			"args": [
+				"/home/riolu/Repos/peacenet-ue 4.20/ProjectOglowia.uproject",
+				"-debug"
+			],
+			"cwd": "/opt/unreal-engine",
+			"type": "lldb"
+		},
+		{
+			"name": "ProjectOglowiaEditor (DebugGame)",
+			"request": "launch",
+			"preLaunchTask": "ProjectOglowiaEditor Linux DebugGame Build",
+			"program": "/opt/unreal-engine/Engine/Binaries/Linux/UE4Editor",
+			"args": [
+				"/home/riolu/Repos/peacenet-ue 4.20/ProjectOglowia.uproject",
+				"-debug"
+			],
+			"cwd": "/opt/unreal-engine",
+			"type": "lldb"
+		},
+		{
+			"name": "ProjectOglowiaEditor (Development)",
+			"request": "launch",
+			"preLaunchTask": "ProjectOglowiaEditor Linux Development Build",
+			"program": "/opt/unreal-engine/Engine/Binaries/Linux/UE4Editor",
+			"args": [
+				"/home/riolu/Repos/peacenet-ue 4.20/ProjectOglowia.uproject"
+			],
+			"cwd": "/opt/unreal-engine",
+			"type": "lldb"
+		},
+		{
+			"name": "Generate Project Files",
+			"type": "mono",
+			"request": "launch",
+			"program": "/opt/unreal-engine/Engine/Binaries/DotNET/UnrealBuildTool.exe",
+			"console": "internalConsole",
+			"args": [
+				"-projectfiles",
+				"-vscode",
+				"-project=\"/home/riolu/Repos/peacenet-ue 4.20/ProjectOglowia.uproject\"",
+				"-game",
+				"-engine"
+			],
+			"internalConsoleOptions": "openOnSessionStart",
+			"cwd": "/opt/unreal-engine"
+		}
+	]
+}

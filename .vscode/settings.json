@@ -1,0 +1,9 @@
+{
+	"files.exclude": {
+		"/home/riolu/Repos/peacenet-ue 4.20/.git": true,
+		"/home/riolu/Repos/peacenet-ue 4.20/.vscode": true,
+		"/home/riolu/Repos/peacenet-ue 4.20/Content": true,
+		"/home/riolu/Repos/peacenet-ue 4.20/Intermediate": true,
+		"/home/riolu/Repos/peacenet-ue 4.20/Saved": true
+	}
+}

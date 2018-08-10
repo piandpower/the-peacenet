@@ -2,6 +2,7 @@
 
 #include "PTerminalWidget.h"
 #include "FConsoleReadLineLatentAction.h"
+#include "Rendering/DrawElements.h"
 
 
 UPTerminalWidget::UPTerminalWidget(const FObjectInitializer& ObjectInitializer)
@@ -29,23 +30,20 @@ UPTerminalWidget::UPTerminalWidget(const FObjectInitializer& ObjectInitializer)
 
 }
 
-void UPTerminalWidget::ReadLine(struct FLatentActionInfo LatentInfo, FString& OutText)
+void UPTerminalWidget::ReadLine(UObject* WorldContextObject, struct FLatentActionInfo LatentInfo, FString& OutText)
 {
-	//You might have an issue here, with getting the world from a UObject, if I remember correctly
-	//The Uobject needs to implement a GetWorld(); function
-	//UObject, has a blank GetWorld(); function by default
-	//If you know exactly what the object is, you would be better off using that instead of the 
-	//Generic UObject class! (Because it likely already has a GetWorld() setup.....
-	//UWorld* world = GEngine->GetWorldFromContextObject(WorldContextObject);
-	UWorld* world = this->GetWorld();
-	if (world)
+	if (WorldContextObject) 
 	{
-		FLatentActionManager& LatentActionManager = world->GetLatentActionManager();
-		if (LatentActionManager.FindExistingAction<FConsoleReadLineLatentAction>(LatentInfo.CallbackTarget, LatentInfo.UUID) == NULL)
+		UWorld* world = WorldContextObject->GetWorld();
+		if (world)
 		{
+			FLatentActionManager& LatentActionManager = world->GetLatentActionManager();
+			if (LatentActionManager.FindExistingAction<FConsoleReadLineLatentAction>(LatentInfo.CallbackTarget, LatentInfo.UUID) == NULL)
+			{
 
-			//Here in a second, once I confirm the project loads, we need to see whats wrong with this
-			LatentActionManager.AddNewAction(LatentInfo.CallbackTarget, LatentInfo.UUID, new FConsoleReadLineLatentAction(this, LatentInfo, OutText));
+				//Here in a second, once I confirm the project loads, we need to see whats wrong with this
+				LatentActionManager.AddNewAction(LatentInfo.CallbackTarget, LatentInfo.UUID, new FConsoleReadLineLatentAction(this, LatentInfo, OutText));
+			}
 		}
 	}
 }
@@ -99,13 +97,10 @@ void UPTerminalWidget::NativeConstruct()
 	Super::NativeConstruct();
 }
 
-void UPTerminalWidget::NativePaint(FPaintContext& context) const
+int32 UPTerminalWidget::NativePaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const
 {
-	// Get the alotted geometry for the paint context.
-	FGeometry geometry = context.AllottedGeometry;
-
 	// Get the size in pixels of the geometry so we know how big our widget is.
-	FVector2D size = geometry.GetLocalSize();
+	FVector2D size = AllottedGeometry.GetLocalSize();
 
 	uint8 term_font = 0; // What kind of font are we using?
 	uint8 term_bg_color = 0; //What entry in the color palette are we using for the background?
@@ -116,8 +111,20 @@ void UPTerminalWidget::NativePaint(FPaintContext& context) const
 
 	bool bSkipEscape = false; //Should we skip reading an escape sequence when we come across a char '`'?
 
-	//This fills the entire widget with a black background.
-	UWidgetBlueprintLibrary::DrawBox(context, FVector2D(0.f, 0.f), size, TerminalBrush, FLinearColor(0.f, 0.f, 0.f, 1.f));
+	//Draws the background of the terminal.
+	LayerId++;
+
+	if (TerminalBrush)
+	{
+		FSlateDrawElement::MakeBox(
+			OutDrawElements,
+			LayerId,
+			AllottedGeometry.ToPaintGeometry(FVector2D::ZeroVector, size),
+			&TerminalBrush->Brush,
+			ESlateDrawEffect::None,
+			FLinearColor::Black);
+	}
+
 
 	UFont* font = this->GetUnrealFont(term_font); //Grab the regular font.
 
@@ -200,8 +207,23 @@ void UPTerminalWidget::NativePaint(FPaintContext& context) const
 		//update font from font code
 		font = this->GetUnrealFont(term_font);
 
-		//Render it.
-		UWidgetBlueprintLibrary::DrawTextFormatted(context, FText::FromString(FString::Chr(c)), FVector2D(char_x, char_y), font, 22, ((FName)(L"Regular")), ColorPalette[term_fg_color]);
+		if (font)
+		{
+			LayerId++;
+
+			//TODO UMG Create a font asset usable as a UFont or as a slate font asset.
+			FSlateFontInfo FontInfo(font, 22, ((FName)(L"Regular")));
+
+			FSlateDrawElement::MakeText(
+				OutDrawElements,
+				LayerId,
+				AllottedGeometry.ToOffsetPaintGeometry(FVector2D(char_x, char_y)),
+				FText::FromString(FString::Chr(c)),
+				FontInfo,
+				ESlateDrawEffect::None,
+				ColorPalette[term_fg_color]);
+		}
+
 
 		//Advance the x coordinate by a single char.
 		char_x += char_w;
@@ -214,7 +236,20 @@ void UPTerminalWidget::NativePaint(FPaintContext& context) const
 		char_y += char_h;
 	}
 
-	UWidgetBlueprintLibrary::DrawBox(context, FVector2D(char_x, char_y), FVector2D(char_w, char_h), TerminalBrush, ColorPalette[term_fg_color]);
+	LayerId++;
+
+	if (TerminalBrush)
+	{
+		FSlateDrawElement::MakeBox(
+			OutDrawElements,
+			LayerId,
+			AllottedGeometry.ToPaintGeometry(FVector2D(char_x, char_y), FVector2D(char_w, char_h)),
+			&TerminalBrush->Brush,
+			ESlateDrawEffect::None,
+			ColorPalette[term_fg_color]);
+	}
+
+	return LayerId;
 }
 
 void UPTerminalWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)

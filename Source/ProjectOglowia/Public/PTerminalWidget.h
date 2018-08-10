@@ -81,8 +81,8 @@ class PROJECTOGLOWIA_API UPTerminalWidget : public UUserWidget
 			bool EchoInputText = true;
 		
 			UFUNCTION(BlueprintCallable, Category = "Console IO|Input",
-				meta = (Latent, LatentInfo = "LatentInfo"))
-			virtual void ReadLine(struct FLatentActionInfo LatentInfo, FString& OutText);
+				meta = (Latent, LatentInfo = "LatentInfo", HidePin="WorldContextObject", DefaultToSelf="WorldContextObject"))
+			virtual void ReadLine(UObject* WorldContextObject, struct FLatentActionInfo LatentInfo, FString& OutText);
 			 
 			UFUNCTION(BlueprintCallable, Category="Console IO|Output")
 			void Write(FString InText);
@@ -106,7 +106,7 @@ class PROJECTOGLOWIA_API UPTerminalWidget : public UUserWidget
 			virtual void ReleaseSlateResources(bool bReleaseChildren) override;
 			virtual FReply NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent) override;
 			virtual void NativeConstruct() override;
-			virtual void NativePaint(FPaintContext& Context) const override;
+			virtual int32 NativePaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const override;
 			virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 			virtual FReply NativeOnMouseWheel(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 			virtual FReply NativeOnKeyChar(const FGeometry& InGeometry, const FCharacterEvent& InCharEvent) override;

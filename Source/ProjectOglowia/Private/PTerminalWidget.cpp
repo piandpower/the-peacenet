@@ -30,6 +30,11 @@ UPTerminalWidget::UPTerminalWidget(const FObjectInitializer& ObjectInitializer)
 
 }
 
+void UPTerminalWidget::Exit()
+{
+	OnExit.Broadcast();
+}
+
 void UPTerminalWidget::ReadLine(UObject* WorldContextObject, struct FLatentActionInfo LatentInfo, FString& OutText)
 {
 	if (WorldContextObject) 

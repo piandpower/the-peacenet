@@ -32,12 +32,15 @@ class PROJECTOGLOWIA_API UPTerminalWidget : public UUserWidget
 		public:
 			UPTerminalWidget(const FObjectInitializer& ObjectInitializer);
 		
+			DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnExitEvent);
 			DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStdInCharWrittenEvent, const FText&, Character);
 			DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStdInLineWrittenEvent, const FText&, Text);
 			DECLARE_DYNAMIC_DELEGATE_RetVal(UFont*, FGetFont);
 		
 		public:
 		 
+			UFUNCTION(BlueprintCallable)
+			void Exit();
 		
 			UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Fonts and Colors")
 			UFont* RegularTextFont;
@@ -69,6 +72,11 @@ class PROJECTOGLOWIA_API UPTerminalWidget : public UUserWidget
 		
 		
 		public:
+			/** Called when a command or user requests to "exit" this Terminal. */
+			UPROPERTY(BlueprintAssignable, Category = "Widget Event", meta = (DisplayName = "On Exit"))
+			FOnExitEvent OnExit;
+
+
 			/** Called when a character is written to the standard input stream. */
 			UPROPERTY(BlueprintAssignable, Category="Widget Event", meta=(DisplayName = "On Standard Input Character Written"))
 			FOnStdInCharWrittenEvent OnStdInCharWritten;
@@ -123,7 +131,7 @@ class PROJECTOGLOWIA_API UPTerminalWidget : public UUserWidget
 		
 			UFUNCTION(BlueprintCallable)
 			FString& GetInputText() { return TextInputBuffer; }
-			void ClearInput() { TextInputBuffer.Empty(); }
+			void ClearInput() { TextInputBuffer = TEXT(""); }
 		
 		protected:
 			TSharedPtr<SPeacegateTerminalWidget> MyPeacegateTerminalWidget;

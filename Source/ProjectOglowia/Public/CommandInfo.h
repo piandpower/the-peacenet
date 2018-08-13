@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "TerminalCommand.h"
 #include "CommandInfo.generated.h"
 
 USTRUCT(BlueprintType)
@@ -15,8 +16,8 @@ struct PROJECTOGLOWIA_API FCommandInfoS
 		FName CommandName;
 
 	// should be the class of command which the player runs, given the command name.
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(MustImplement = "TerminalCommand")) //@note(lambda): MustImplement must be the same as your interface object name in the content browser - C++ interfaces drop the prefix 'I' or 'U'.
-		TSubclassOf<UObject> CommandClass;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) //@note(lambda): MustImplement must be the same as your interface object name in the content browser - C++ interfaces drop the prefix 'I' or 'U'.
+		TSubclassOf<UTerminalCommand> CommandClass;
 };
 
 UCLASS(Blueprintable)

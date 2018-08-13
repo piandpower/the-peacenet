@@ -7,7 +7,7 @@
 
 UPTerminalWidget::UPTerminalWidget(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
-{
+{ 
 	//Initialize color palette
 	ColorPalette = TArray<FLinearColor>();
 	ColorPalette.Add(FLinearColor::Black);

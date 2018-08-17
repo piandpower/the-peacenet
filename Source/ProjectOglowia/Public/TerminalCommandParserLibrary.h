@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "Regex.h"
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "TerminalCommandParserLibrary.generated.h"
@@ -52,4 +53,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Bash, meta = (DisplayName = "Tokenize"))
 	static TArray<FString> Tokenize(const FString& InCommand, FString& OutputError);
 	
+	UFUNCTION(BlueprintCallable, Category="Docopt")
+	static TArray<FString> TokensFromPattern(const FString& InSource);
+
 };

@@ -70,7 +70,13 @@ class PROJECTOGLOWIA_API UPTerminalWidget : public UUserWidget
 			UPROPERTY()
 				FGetFont BoldItalicTextFontDelegate;
 		
-		
+			//The width and height in pixels of a character.
+			UPROPERTY(BlueprintReadOnly)
+			float CharacterWidth;
+			
+			UPROPERTY(BlueprintReadOnly)
+			float CharacterHeight;
+
 		public:
 			/** Called when a command or user requests to "exit" this Terminal. */
 			UPROPERTY(BlueprintAssignable, Category = "Widget Event", meta = (DisplayName = "On Exit"))
@@ -93,16 +99,16 @@ class PROJECTOGLOWIA_API UPTerminalWidget : public UUserWidget
 			virtual void ReadLine(UObject* WorldContextObject, struct FLatentActionInfo LatentInfo, FString& OutText);
 			 
 			UFUNCTION(BlueprintCallable, Category="Console IO|Output")
-			void Write(FString InText);
+			UPTerminalWidget* Write(FString InText);
 			
 			UFUNCTION(BlueprintCallable, Category = "Console IO|Output")
-			void WriteLine(FString InText);
+			UPTerminalWidget* WriteLine(FString InText);
 			
 			UFUNCTION(BlueprintCallable, Category = "Console IO|Output")
-			void OverwriteLine(FString InText);
+			UPTerminalWidget* OverwriteLine(FString InText);
 			
 			UFUNCTION(BlueprintCallable, Category = "Console IO|Output")
-			void Clear();
+			UPTerminalWidget* Clear();
 		
 			UPROPERTY(BlueprintReadOnly)
 			FVector2D GeometrySize;
@@ -147,9 +153,7 @@ class PROJECTOGLOWIA_API UPTerminalWidget : public UUserWidget
 			FString TextBuffer;
 			FString TextInputBuffer;
 		
-			//The width and height in pixels of a character.
-			float CharacterWidth;
-			float CharacterHeight;
+			bool NewTextAdded = false;
 		
 			// The scroll offset used when rendering text.
 			float ScrollOffsetY;

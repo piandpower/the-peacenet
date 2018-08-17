@@ -4,9 +4,10 @@
 
 #include "PTerminalWidget.h"
 #include "CoreMinimal.h"
+#include "DocoptBlueprintAPI.h"
 #include "TerminalCommand.generated.h"
 /**
- * 
+ * A simple Unreal object containing functions needed to run a Peacegate OS Terminal command.
  */
 UCLASS(Blueprintable)
 class PROJECTOGLOWIA_API UTerminalCommand : public UObject
@@ -18,5 +19,5 @@ public:
 	~UTerminalCommand();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Terminal Command")
-	void OnRunCommand(const UPTerminalWidget* InConsole);
+	void OnRunCommand(const UPTerminalWidget* InConsole, const TMap<FString, FDocoptValue>& InArguments);
 };

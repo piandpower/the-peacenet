@@ -1,0 +1,17 @@
+{
+	"FileVersion": 3,
+	"FriendlyName": "Docopt for Unreal Engine 4",
+	"Version": 1,
+	"VersionName": "1.0",
+	"Description": "Exposes the power of docopt, the language for creating beautiful command-line interfaces, to Unreal Engine 4.",
+	"Category": "Docopt",
+	"CreatedBy": "Alkaline Thunder",
+	"CreatedByURL": "https://github.com/TheFuzzyRiolu",
+	"Modules": [
+		{
+			"Name": "Docopt",
+			"Type": "Runtime",
+			"LoadingPhase": "PreDefault"
+		}
+	]
+}

@@ -53,24 +53,28 @@ void UPTerminalWidget::ReadLine(UObject* WorldContextObject, struct FLatentActio
 	}
 }
 
-void UPTerminalWidget::Write(FString InText)
+UPTerminalWidget* UPTerminalWidget::Write(FString InText)
 {
 	TextBuffer.Append(InText);
+	NewTextAdded = true;
+	return this;
 }
 
-void UPTerminalWidget::WriteLine(FString InText)
+UPTerminalWidget* UPTerminalWidget::WriteLine(FString InText)
 {
-	Write(InText + TEXT("\n"));
+	return Write(InText + TEXT("\n"));
 }
 
-void UPTerminalWidget::OverwriteLine(FString InText)
+UPTerminalWidget* UPTerminalWidget::OverwriteLine(FString InText)
 {
-	Write(InText + TEXT("\r"));
+	return Write(InText + TEXT("\r"));
 }
 
-void UPTerminalWidget::Clear()
+UPTerminalWidget* UPTerminalWidget::Clear()
 {
 	TextBuffer.Empty(0);
+	NewTextAdded = true;
+	return this;
 }
 
 void UPTerminalWidget::SynchronizeProperties()
@@ -93,6 +97,19 @@ FReply UPTerminalWidget::NativeOnFocusReceived(const FGeometry & InGeometry, con
 
 void UPTerminalWidget::NativeConstruct()
 {
+	if (RegularTextFont)
+	{
+		//This is where we set the initial character size if we have a regular text font.
+		//If we don't have a regular text font at this point then fuck the frontend devs.
+		RegularTextFont->GetCharSize(TEXT('#'), CharacterWidth, CharacterHeight);
+
+		//Set the desired size so we're an 80x15 terminal.
+		SetDesiredSizeInViewport(FVector2D(80 * CharacterWidth, 15 * CharacterHeight));
+	}
+	else {
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, TEXT("WARNING: Terminal Emulator::Initialize(): Regular font not set, couldn't measure default character size. (Did you forget to set your fonts in the UMG designer?)"));
+	}
+
 	SetVisibility(ESlateVisibility::Visible);
 
 	APlayerController* ctrl = GetOwningPlayer();
@@ -217,7 +234,7 @@ int32 UPTerminalWidget::NativePaint(const FPaintArgs& Args, const FGeometry& All
 			LayerId++;
 
 			//TODO UMG Create a font asset usable as a UFont or as a slate font asset.
-			FSlateFontInfo FontInfo(font, 22, ((FName)(L"Regular")));
+			FSlateFontInfo FontInfo = font->GetLegacySlateFontInfo();
 
 			FSlateDrawElement::MakeText(
 				OutDrawElements,
@@ -270,8 +287,9 @@ void UPTerminalWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime
 
 	FVector2D gSize = MyGeometry.GetLocalSize();
 
-	if (GeometrySize != gSize)
+	if (GeometrySize != gSize || NewTextAdded)
 	{
+		NewTextAdded = false;
 		GeometrySize = gSize;
 
 		float h = GetLineHeight();
@@ -280,6 +298,8 @@ void UPTerminalWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime
 
 		ScrollOffsetY = MaxScrollOffset;
 	}
+
+
 
 }
 
@@ -310,6 +330,7 @@ FReply UPTerminalWidget::NativeOnKeyChar(const FGeometry & InGeometry, const FCh
 			if (EchoInputText)
 			{
 				TextBuffer.RemoveAt(TextBuffer.Len() - 1, 1, true);
+				NewTextAdded = true;
 			}
 		}
 	}
@@ -317,12 +338,14 @@ FReply UPTerminalWidget::NativeOnKeyChar(const FGeometry & InGeometry, const FCh
 	{
 		TextInputBuffer = TextInputBuffer.AppendChar(TEXT('\n'));
 		TextBuffer = TextBuffer.AppendChar(TEXT('\n'));
+		NewTextAdded = true;
 	}
 	else {
 		TextInputBuffer = TextInputBuffer.AppendChar(c);
 		if (EchoInputText)
 		{
 			TextBuffer = TextBuffer.AppendChar(c);
+			NewTextAdded = true;
 		}
 	}
 

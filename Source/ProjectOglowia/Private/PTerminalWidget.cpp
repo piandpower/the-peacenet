@@ -3,6 +3,7 @@
 #include "PTerminalWidget.h"
 #include "FConsoleReadLineLatentAction.h"
 #include "Rendering/DrawElements.h"
+#include "FTerminalSlowTypeLatentAction.h"
 
 
 UPTerminalWidget::UPTerminalWidget(const FObjectInitializer& ObjectInitializer)
@@ -51,6 +52,36 @@ void UPTerminalWidget::ReadLine(UObject* WorldContextObject, struct FLatentActio
 			}
 		}
 	}
+}
+
+UPTerminalWidget * UPTerminalWidget::SlowlyWriteText(UObject * WorldContextObject, FLatentActionInfo LatentInfo, const FString & InText, float InDelayTime)
+{
+	if (WorldContextObject)
+	{
+		UWorld* world = WorldContextObject->GetWorld();
+		if (world)
+		{
+			FLatentActionManager& LatentActionManager = world->GetLatentActionManager();
+			if (LatentActionManager.FindExistingAction<FTerminalSlowTypeLatentAction>(LatentInfo.CallbackTarget, LatentInfo.UUID) == NULL)
+			{
+
+				//Here in a second, once I confirm the project loads, we need to see whats wrong with this
+				LatentActionManager.AddNewAction(LatentInfo.CallbackTarget, LatentInfo.UUID, new FTerminalSlowTypeLatentAction(this, LatentInfo, InText, InDelayTime));
+			}
+		}
+	}
+	return this;
+
+}
+
+UPTerminalWidget * UPTerminalWidget::SlowlyWriteLine(UObject * WorldContextObject, FLatentActionInfo LatentInfo, const FString & InText, float InDelayTime)
+{
+	return SlowlyWriteText(WorldContextObject, LatentInfo, InText + TEXT("\n"), InDelayTime);
+}
+
+UPTerminalWidget * UPTerminalWidget::SlowlyOverwriteLine(UObject * WorldContextObject, FLatentActionInfo LatentInfo, const FString & InText, float InDelayTime)
+{
+	return SlowlyWriteText(WorldContextObject, LatentInfo, InText + TEXT("\r"), InDelayTime);
 }
 
 UPTerminalWidget* UPTerminalWidget::Write(FString InText)
@@ -103,8 +134,6 @@ void UPTerminalWidget::NativeConstruct()
 		//If we don't have a regular text font at this point then fuck the frontend devs.
 		RegularTextFont->GetCharSize(TEXT('#'), CharacterWidth, CharacterHeight);
 
-		//Set the desired size so we're an 80x15 terminal.
-		SetDesiredSizeInViewport(FVector2D(80 * CharacterWidth, 15 * CharacterHeight));
 	}
 	else {
 		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, TEXT("WARNING: Terminal Emulator::Initialize(): Regular font not set, couldn't measure default character size. (Did you forget to set your fonts in the UMG designer?)"));

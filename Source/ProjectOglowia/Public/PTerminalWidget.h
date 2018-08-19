@@ -98,6 +98,20 @@ class PROJECTOGLOWIA_API UPTerminalWidget : public UUserWidget
 				meta = (Latent, LatentInfo = "LatentInfo", HidePin="WorldContextObject", DefaultToSelf="WorldContextObject"))
 			virtual void ReadLine(UObject* WorldContextObject, struct FLatentActionInfo LatentInfo, FString& OutText);
 			 
+
+			UFUNCTION(BlueprintCallable, Category = "Console IO|Fancy Output",
+				meta = (Latent, LatentInfo = "LatentInfo", HidePin = "WorldContextObject", DefaultToSelf = "WorldContextObject"))
+			virtual UPTerminalWidget* SlowlyWriteText(UObject* WorldContextObject, struct FLatentActionInfo LatentInfo, const FString& InText, float InDelayTime = 0.05);
+
+			UFUNCTION(BlueprintCallable, Category = "Console IO|Fancy Output",
+				meta = (Latent, LatentInfo = "LatentInfo", HidePin = "WorldContextObject", DefaultToSelf = "WorldContextObject"))
+				virtual UPTerminalWidget* SlowlyWriteLine(UObject* WorldContextObject, struct FLatentActionInfo LatentInfo, const FString& InText, float InDelayTime = 0.05);
+
+			UFUNCTION(BlueprintCallable, Category = "Console IO|Fancy Output",
+				meta = (Latent, LatentInfo = "LatentInfo", HidePin = "WorldContextObject", DefaultToSelf = "WorldContextObject"))
+				virtual UPTerminalWidget* SlowlyOverwriteLine(UObject* WorldContextObject, struct FLatentActionInfo LatentInfo, const FString& InText, float InDelayTime = 0.05);
+
+
 			UFUNCTION(BlueprintCallable, Category="Console IO|Output")
 			UPTerminalWidget* Write(FString InText);
 			
@@ -162,9 +176,10 @@ class PROJECTOGLOWIA_API UPTerminalWidget : public UUserWidget
 			float MaxScrollOffset;
 		
 			float GetLineHeight();
-		
+		public:
 			bool ParseEscape(TCHAR character, uint8& termFont, uint8& termForegroundColorCode) const;
 		
+		private:
 			TArray<FLinearColor> ColorPalette;	
 	
 	

@@ -7,7 +7,7 @@ void FTerminalSlowTypeLatentAction::UpdateOperation(FLatentResponse & Response)
 {
 	if (CharIndex >= TextToWrite.Num())
 	{
-		Response.DoneIf(true);
+		Response.FinishAndTriggerIf(true, ExecutionFunction, OutputLink, CallbackTarget);
 		return;
 	}
 

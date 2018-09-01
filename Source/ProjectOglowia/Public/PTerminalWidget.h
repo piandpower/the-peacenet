@@ -78,6 +78,9 @@ class PROJECTOGLOWIA_API UPTerminalWidget : public UUserWidget
 			float CharacterHeight;
 
 		public:
+			UPROPERTY(BlueprintReadWrite, EditAnywhere)
+			int CommandLayer = 0;
+
 			/** Called when a command or user requests to "exit" this Terminal. */
 			UPROPERTY(BlueprintAssignable, Category = "Widget Event", meta = (DisplayName = "On Exit"))
 			FOnExitEvent OnExit;
@@ -130,6 +133,8 @@ class PROJECTOGLOWIA_API UPTerminalWidget : public UUserWidget
 			UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Appearance")
 			USlateBrushAsset * TerminalBrush;
 		
+		
+
 			virtual void SynchronizeProperties() override;
 			virtual void ReleaseSlateResources(bool bReleaseChildren) override;
 			virtual FReply NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent) override;

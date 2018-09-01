@@ -154,6 +154,8 @@ FPeacegateCommandInstruction UTerminalCommandParserLibrary::GetCommandList(const
 
 TArray<FString> UTerminalCommandParserLibrary::Tokenize(const FString& InCommand, FString& OutputError) 
 {
+	FString HomeDirectory = TEXT("/home");
+
 	TArray<FString> tokens;
 	FString current = TEXT("");
 	bool escaping = false;
@@ -184,6 +186,9 @@ TArray<FString> UTerminalCommandParserLibrary::Tokenize(const FString& InCommand
 			case TEXT(' '):
 				current.AppendChar(TEXT(' '));
 				break;
+			case TEXT('~'):
+				current.AppendChar(TEXT('~'));
+				break;
 			case TEXT('n'):
 				current.AppendChar(TEXT('\n'));
 				break;
@@ -202,6 +207,14 @@ TArray<FString> UTerminalCommandParserLibrary::Tokenize(const FString& InCommand
 			}
 			escaping = false;
 			continue;
+		}
+		if (c == TEXT('~'))
+		{
+			if (inQuote == false && current.IsEmpty())
+			{
+				current = current.Append(HomeDirectory);
+				continue;
+			}
 		}
 		if (c == TEXT(' '))
 		{

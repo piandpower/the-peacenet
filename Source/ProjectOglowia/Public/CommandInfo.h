@@ -56,6 +56,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FCommandInfoS Info;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool UnlockedByDefault = true;
+
 	UFUNCTION(BlueprintCallable, Category="Peacenet Utility Functions")
 	static FString BuildManualPage(const FCommandInfoS& InCommandInfo);
 

@@ -21,6 +21,8 @@ public class ProjectOglowia : ModuleRules
 		// To include OnlineSubsystemSteam, add it to the plugins section in your uproject file with the Enabled attribute set to true
 
 		// Add the Docopt module
-		PrivateDependencyModuleNames.Add("Docopt");
-	}
+		PrivateDependencyModuleNames.Add("DocoptForUnreal");
+
+        bEnableExceptions = true;
+    }
 }

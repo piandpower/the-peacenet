@@ -305,5 +305,9 @@
 			"Name": "Paper2D",
 			"Enabled": false
 		}
+	],
+	"TargetPlatforms": [
+		"LinuxNoEditor",
+		"WindowsNoEditor"
 	]
 }

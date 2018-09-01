@@ -85,6 +85,16 @@ protected:
 	}
 };
 
+UCLASS(Blueprintable, EditInlineNew)
+class UObjectiveEvent : public UObject
+{
+	GENERATED_BODY()
+
+public:
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	void Trigger(const APlayerController* Player);
+};
+
 USTRUCT(BlueprintType)
 struct FObjectiveInfo
 {
@@ -102,6 +112,16 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Instanced)
 	UObjectiveHintWidget* ObjectiveHintWidget;
+
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Instanced)
+	UObjectiveEvent* OnStartEvent;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Instanced)
+	UObjectiveEvent* OnCompletedEvent;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Instanced)
+	UObjectiveEvent* OnFailedEvent;
 };
 
 

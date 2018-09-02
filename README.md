@@ -12,3 +12,8 @@ licenses provided by their original owners.
 
 The game also uses Unreal Engine 4, which is a registered trademark of 
 Epic Games. See [`UE-LICENSE`](UE-LICENSE) for details.
+
+
+### Fun fact:
+
+This game uses Contemporary throughout the UI.

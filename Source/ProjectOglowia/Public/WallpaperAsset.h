@@ -18,7 +18,7 @@ public:
 	FName InternalID;
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FString FriendlyName;
+	FText FriendlyName;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UTexture2D * WallpaperTexture;

@@ -50,10 +50,6 @@
 			"Enabled": false
 		},
 		{
-			"Name": "MediaCompositing",
-			"Enabled": false
-		},
-		{
 			"Name": "MagicLeap",
 			"Enabled": false,
 			"SupportedTargetPlatforms": [
@@ -146,10 +142,6 @@
 			"Enabled": false
 		},
 		{
-			"Name": "WindowsMoviePlayer",
-			"Enabled": false
-		},
-		{
 			"Name": "MobilePatchingUtils",
 			"Enabled": false
 		},
@@ -187,10 +179,6 @@
 		},
 		{
 			"Name": "LinearTimecode",
-			"Enabled": false
-		},
-		{
-			"Name": "WmfMedia",
 			"Enabled": false
 		},
 		{
@@ -258,10 +246,6 @@
 			"Enabled": false
 		},
 		{
-			"Name": "MediaPlayerEditor",
-			"Enabled": false
-		},
-		{
 			"Name": "ProxyLODPlugin",
 			"Enabled": false
 		},
@@ -304,10 +288,29 @@
 		{
 			"Name": "Paper2D",
 			"Enabled": false
+		},
+		{
+			"Name": "MediaFrameworkUtilities",
+			"Enabled": true
+		},
+		{
+			"Name": "MfMedia",
+			"Enabled": true
+		},
+		{
+			"Name": "SoundVisualizations",
+			"Enabled": true
+		},
+		{
+			"Name": "SoundUtilities",
+			"Enabled": true
+		},
+		{
+			"Name": "WebBrowserWidget",
+			"Enabled": true
 		}
 	],
 	"TargetPlatforms": [
-		"LinuxNoEditor",
 		"WindowsNoEditor"
 	]
 }

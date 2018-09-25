@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "VirtualMachine.h"
+#include "ECountry.h"
 #include "UCommandProcessor.h"
+#include "WallpaperAsset.h"
+#include "FComputer.h"
 #include "SystemContext.generated.h"
-
 
 USTRUCT(BlueprintType)
 struct FUserInfo
@@ -23,7 +24,7 @@ public:
 };
 
 // This class does not need to be modified.
-UINTERFACE(MinimalAPI)
+UINTERFACE(MinimalAPI, Blueprintable)
 class USystemContext : public UInterface
 {
 	GENERATED_BODY()
@@ -45,6 +46,12 @@ public:
 	float GetGovernmentAlertLevelPercentage();
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "System Context")
+	UPeacegateFileSystem* GetFilesystem();
+	
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = " System Context")
+	TScriptInterface<ICommandSeeker> GetCommandSeeker();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "System Context")
 	ECountry GetCurrentCountry();
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "System Context")
@@ -55,4 +62,29 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "System Context")
 	void ReportCommandRun(const FCommandRunInstruction InCommand);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "System Context")
+	UWallpaperAsset* GetWallpaper();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "System Context")
+	void SetWallpaper(FName InWallpaperID);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "System Context")
+		void ShowWindowOnWorkspace(const UProgram* InProgram);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "System Context")
+	EUserDomain GetUserDomain(int InUserID);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "System Context")
+	FText GetUsername(int InUserID);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "System Context")
+	FString GetUserHomeDirectory(int UserID);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hacking")
+	bool Authenticate(const FString& Username, const FString& Password, int& UserID);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hacking")
+	void SetAlertLevel(float InAlertLevel);
+
 };

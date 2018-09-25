@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "VirtualMachine.h"
+#include "ECountry.h"
 #include "TutorialBase.h"
 #include "UGameTypeAsset.generated.h"
 
@@ -13,6 +13,9 @@ struct PROJECTOGLOWIA_API FPeacenetGameTypeInfo
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FText DefaultPlayerCharacterName;
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FString Name;
 
@@ -55,4 +58,13 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<ATutorialBase> TutorialActor;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool EnablePeacegateFirstTimeSetupIntroText = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FText> PeacegateFirstTimeSetupIntroText;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FText> PeacegatePostSetupIntroText;
 };

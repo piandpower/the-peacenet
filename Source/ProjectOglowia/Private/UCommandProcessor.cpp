@@ -74,6 +74,17 @@ TArray<FCommandRunInstruction> UCommandProcessor::ProcessCommand(TScriptInterfac
 			{
 				UPiperContext* Ctx = NewObject<UPiperContext>();
 				Ctx->Input = LastPiper;
+				if (LastPiper)
+				{
+					Ctx->UserID = LastPiper->UserID;
+					Ctx->SystemContext = LastPiper->SystemContext;
+				}
+				else
+				{
+					Ctx->UserID = InConsole->UserID;
+					Ctx->SystemContext = InConsole->SystemContext;
+				}
+				
 				NewInst.IntendedContext = Ctx;
 				LastPiper = Ctx;
 			}
@@ -82,6 +93,16 @@ TArray<FCommandRunInstruction> UCommandProcessor::ProcessCommand(TScriptInterfac
 				UPiperContext* Ctx = NewObject<UPiperContext>();
 				Ctx->Input = LastPiper;
 				Ctx->Output = InConsole;
+				if (LastPiper)
+				{
+					Ctx->UserID = LastPiper->UserID;
+					Ctx->SystemContext = LastPiper->SystemContext;
+				}
+				else
+				{
+					Ctx->UserID = InConsole->UserID;
+					Ctx->SystemContext = InConsole->SystemContext;
+				}
 				NewInst.IntendedContext = Ctx;
 			}
 

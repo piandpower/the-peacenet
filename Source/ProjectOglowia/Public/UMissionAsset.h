@@ -137,8 +137,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FMissionInfo MissionInfo;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Instanced)
+	UObjectiveEvent* OnUnlockEvent;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<TSubclassOf<UMissionAsset>> RequiredMissions;
+	TArray<UMissionAsset*> RequiredMissions;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FObjectiveInfo> Objectives;

@@ -55,6 +55,12 @@ FString UPeacegateFileSystem::ResolveToAbsolute(const FString Path)
 
 void UPeacegateFileSystem::BuildFolderNavigator()
 {
+	if (FolderTree.Num()==0)
+	{
+		UFileUtilities::FormatFilesystem(FolderTree);
+		FilesystemModified.Broadcast();
+	}
+
 	Root = NewObject<UFolderNavigator>();
 
 	BuildChildNavigators(Root);
@@ -209,4 +215,44 @@ TArray<FString> UPeacegateFileSystem::GetFiles(const FString & InPath)
 	}
 
 	return Ret;
+}
+
+bool UPeacegateFileSystem::IsValidAsFileName(const FString & InFileName)
+{
+	if (InFileName.IsEmpty())
+		return false;
+
+	TArray<TCHAR> CharsInString = InFileName.GetCharArray();
+
+	FString AllowedCharString = TEXT("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_- ");
+
+	int index = 0;
+
+	for (auto& Character : CharsInString)
+	{
+		if (!AllowedCharString.FindChar(Character, index))
+			return false;
+	}
+
+	return true;
+}
+
+bool UPeacegateFileSystem::IsValidAsUserName(const FString & InUserName)
+{
+	if (InUserName.IsEmpty())
+		return false;
+
+	TArray<TCHAR> CharsInString = InUserName.GetCharArray();
+
+	FString AllowedCharString = TEXT("abcdefghijklmnopqrstuvwxyz0123456789_-");
+
+	int index = 0;
+
+	for (auto& Character : CharsInString)
+	{
+		if (!AllowedCharString.FindChar(Character, index))
+			return false;
+	}
+
+	return true;
 }

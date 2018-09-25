@@ -26,10 +26,22 @@ public:
 	UPROPERTY(BlueprintAssignable, BlueprintCallable)
 	FCommandCompletedEvent Completed;
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Terminal Command")
-	void OnRunCommand(const UConsoleContext* InConsole, const TScriptInterface<ICommandSeeker>& InSeeker, const TScriptInterface<ISystemContext>& InSystemContext, const TMap<FString, FDocoptValue>& InArguments);
+	UFUNCTION(BlueprintCallable, Category = "Terminal Command")
+	virtual void RunCommand(UPARAM(Ref) UConsoleContext* InConsole, const TScriptInterface<ICommandSeeker> InSeeker, const TMap<FString, FDocoptValue> InArguments);
 
 protected:
+	UFUNCTION(BlueprintImplementableEvent, Category = "Terminal Command")
+	void OnRunCommand(const UConsoleContext* InConsole, const TScriptInterface<ICommandSeeker>& InSeeker, const TMap<FString, FDocoptValue>& InArguments);
+
 	UFUNCTION(BlueprintCallable, Category="Terminal Command")
 	void Complete() { Completed.Broadcast(); }
+};
+
+UCLASS(Blueprintable)
+class PROJECTOGLOWIA_API UAdminTerminalCommand : public UTerminalCommand
+{
+	GENERATED_BODY()
+
+public:
+	virtual void RunCommand(UConsoleContext* InConsole, const TScriptInterface<ICommandSeeker> InSeeker, const TMap<FString, FDocoptValue> InArguments) override;
 };

@@ -4,6 +4,13 @@
 
 int32 UWorldGenerator::GetSeedFromString(const FString& InSeedString)
 {
+	if (InSeedString.IsNumeric())
+	{
+		return FCString::Atoi(*InSeedString);
+	}
+
+	TArray<TCHAR> Chars = InSeedString.GetCharArray();
+
 	return 0;
 }
 

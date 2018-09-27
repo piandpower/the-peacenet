@@ -6,6 +6,8 @@
 #include "Math/RandomStream.h"
 #include "FPeacenetIdentity.h"
 #include "FComputer.h"
+#include "CString.h"
+#include "Parse.h"
 #include "UWorldGenerator.generated.h"
 
 /**

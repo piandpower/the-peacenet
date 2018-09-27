@@ -21,7 +21,7 @@ int32 UWorldGenerator::GetSeedFromString(const FString& InSeedString)
 
 	for (int i = 0; i < charCount; i++)
 	{
-		uint8 c = (uint8)Chars[charCount];
+		uint8 c = (uint8)Chars[i];
 		result ^= c << (((i + 1) & 3) << 3);
 	}
 

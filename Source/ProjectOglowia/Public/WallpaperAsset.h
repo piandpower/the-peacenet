@@ -26,4 +26,7 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	bool UnlockedByDefault;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	bool IsMultiplayerOnly = false;
+
 };

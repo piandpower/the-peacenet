@@ -73,6 +73,9 @@ void UWorldGenerator::GenerateCharacters(UPARAM(Ref) TArray<FPeacenetIdentity>& 
 		PersonalComputer.ID = ComputerArray.Num();
 		Identity.ID = CharacterArray.Num();
 
+		// These are all NPCs.
+		Identity.CharacterType = EIdentityType::NonPlayer;
+
 		// Set default alert stuff
 		Identity.AlertLevel = 0.f;
 		Identity.ActiveGovernmentWatch = false;

@@ -33,5 +33,5 @@ public:
 	static FString GenerateRandomName(const FRandomStream& InGenerator, const TArray<FString> InFirstNames, TArray<FString> InLastNames);
 
 	UFUNCTION(BlueprintCallable, Category = "World Generation")
-	static void GenerateCharacters(UPARAM(Ref) TArray<FPeacenetIdentity>& CharacterArray, UPARAM(Ref) TArray<FComputer>& ComputerArray, const FRandomStream& InGenerator, int32 InCharacterCount, const TArray<FString> InFirstNames, TArray<FString> InLastNames);
+	static void GenerateCharacters(UPARAM(Ref) TArray<FPeacenetIdentity> CharacterArray, UPARAM(Ref) TArray<FComputer> ComputerArray, const FRandomStream& InGenerator, int32 InCharacterCount, const TArray<FString> InFirstNames, TArray<FString> InLastNames);
 };

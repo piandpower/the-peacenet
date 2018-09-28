@@ -6,6 +6,7 @@
 #include "Math/RandomStream.h"
 #include "FPeacenetIdentity.h"
 #include "FComputer.h"
+#include "ECountry.h"
 #include "CString.h"
 #include "Parse.h"
 #include "UWorldGenerator.generated.h"
@@ -26,5 +27,8 @@ public:
 	static FRandomStream GetRandomNumberGenerator(int32 InSeed);
 
 	UFUNCTION(BlueprintCallable, Category = "World Generation")
-	static void GenerateCharacters(UPARAM(Ref) TArray<FPeacenetIdentity> CharacterArray, UPARAM(Ref) TArray<FComputer> ComputerArray, const FRandomStream& InGenerator, int32 InCharacterCount);
+	FString GenerateRandomName(const FRandomStream& InGenerator, const TArray<FString> InFirstNames, TArray<FString> InLastNames);
+
+	UFUNCTION(BlueprintCallable, Category = "World Generation")
+	static void GenerateCharacters(UPARAM(Ref) TArray<FPeacenetIdentity> CharacterArray, UPARAM(Ref) TArray<FComputer> ComputerArray, const FRandomStream& InGenerator, int32 InCharacterCount, const TArray<FString> InFirstNames, TArray<FString> InLastNames);
 };

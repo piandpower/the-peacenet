@@ -43,16 +43,16 @@ class PROJECTOGLOWIA_API UPTerminalWidget : public UUserWidget
 			void Exit();
 		
 			UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Fonts and Colors")
-			UFont* RegularTextFont;
+			FSlateFontInfo RegularTextFont;
 		
 			UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fonts and Colors")
-			UFont* BoldTextFont;
+			FSlateFontInfo BoldTextFont;
 			
 			UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fonts and Colors")
-			UFont* ItalicTextFont;
+			FSlateFontInfo ItalicTextFont;
 			
 			UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fonts and Colors")
-			UFont* BoldItalicTextFont;
+			FSlateFontInfo BoldItalicTextFont;
 		
 			/** The time in milliseconds between each cursor blink. */
 			UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cursor")
@@ -167,7 +167,10 @@ class PROJECTOGLOWIA_API UPTerminalWidget : public UUserWidget
 			PROPERTY_BINDING_IMPLEMENTATION(FSlateFontInfo, BoldItalicTextFont);
 		
 		private:
-			UFont* GetUnrealFont(uint8 fontType) const;
+			bool bCursorActive = true;
+			float cursorTime = 0;
+
+			FSlateFontInfo GetUnrealFont(uint8 fontType) const;
 		
 			FString TextBuffer;
 			FString TextInputBuffer;

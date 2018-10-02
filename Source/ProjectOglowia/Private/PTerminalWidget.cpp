@@ -88,6 +88,10 @@ UPTerminalWidget* UPTerminalWidget::Write(FString InText)
 {
 	TextBuffer.Append(InText);
 	NewTextAdded = true;
+
+	bCursorActive = true;
+	cursorTime = 0;
+
 	return this;
 }
 
@@ -122,17 +126,22 @@ void UPTerminalWidget::ReleaseSlateResources(bool bReleaseChildren)
 
 FReply UPTerminalWidget::NativeOnFocusReceived(const FGeometry & InGeometry, const FFocusEvent & InFocusEvent)
 {
+	cursorTime = 0;
+	bCursorActive = true;
+
 	GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Green, TEXT("Terminal Emulator: Received focus."));
 	return FReply::Handled();
 }
 
 void UPTerminalWidget::NativeConstruct()
 {
-	if (RegularTextFont)
+	const UFont* RegularUnrealFont = Cast<UFont>(RegularTextFont.FontObject);
+	
+	if(RegularUnrealFont)
 	{
 		//This is where we set the initial character size if we have a regular text font.
 		//If we don't have a regular text font at this point then fuck the frontend devs.
-		RegularTextFont->GetCharSize(TEXT('#'), CharacterWidth, CharacterHeight);
+		RegularUnrealFont->GetCharSize(TEXT('#'), CharacterWidth, CharacterHeight);
 
 	}
 	else {
@@ -140,10 +149,6 @@ void UPTerminalWidget::NativeConstruct()
 	}
 
 	SetVisibility(ESlateVisibility::Visible);
-
-	APlayerController* ctrl = GetOwningPlayer();
-
-	ctrl->SetInputMode(FInputModeUIOnly());
 
 	Super::NativeConstruct();
 }
@@ -177,7 +182,7 @@ int32 UPTerminalWidget::NativePaint(const FPaintArgs& Args, const FGeometry& All
 	}
 
 
-	UFont* font = this->GetUnrealFont(term_font); //Grab the regular font.
+	FSlateFontInfo font = this->GetUnrealFont(term_font); //Grab the regular font.
 
 	//The width of a character.
 	float char_w = CharacterWidth;
@@ -255,25 +260,31 @@ int32 UPTerminalWidget::NativePaint(const FPaintArgs& Args, const FGeometry& All
 			char_y += char_h;
 		}
 
+		//If char_y is < 0, there is no reason to do any of this except move char_x by char_w.
+		if (char_y < 0.f)
+		{
+			char_x += char_w;
+			continue;
+		}
+
+		//if char_y is >= our control's height, we have NO REASON to continue rendering.
+		if (char_y >= size.Y)
+			break;
+
 		//update font from font code
 		font = this->GetUnrealFont(term_font);
 
-		if (font)
-		{
-			LayerId++;
+		LayerId++;
 
-			//TODO UMG Create a font asset usable as a UFont or as a slate font asset.
-			FSlateFontInfo FontInfo = font->GetLegacySlateFontInfo();
+		FSlateDrawElement::MakeText(
+			OutDrawElements,
+			LayerId,
+			AllottedGeometry.ToOffsetPaintGeometry(FVector2D(char_x, char_y)),
+			FText::FromString(FString::Chr(c)),
+			font,
+			ESlateDrawEffect::None,
+			ColorPalette[term_fg_color]);
 
-			FSlateDrawElement::MakeText(
-				OutDrawElements,
-				LayerId,
-				AllottedGeometry.ToOffsetPaintGeometry(FVector2D(char_x, char_y)),
-				FText::FromString(FString::Chr(c)),
-				FontInfo,
-				ESlateDrawEffect::None,
-				ColorPalette[term_fg_color]);
-		}
 
 
 		//Advance the x coordinate by a single char.
@@ -287,10 +298,11 @@ int32 UPTerminalWidget::NativePaint(const FPaintArgs& Args, const FGeometry& All
 		char_y += char_h;
 	}
 
-	LayerId++;
 
-	if (TerminalBrush)
+	if (TerminalBrush && bCursorActive)
 	{
+		LayerId++;
+
 		FSlateDrawElement::MakeBox(
 			OutDrawElements,
 			LayerId,
@@ -298,7 +310,22 @@ int32 UPTerminalWidget::NativePaint(const FPaintArgs& Args, const FGeometry& All
 			&TerminalBrush->Brush,
 			ESlateDrawEffect::None,
 			ColorPalette[term_fg_color]);
+
+		if (!HasAnyUserFocus())
+		{
+			LayerId++;
+
+			FSlateDrawElement::MakeBox(
+				OutDrawElements,
+				LayerId,
+				AllottedGeometry.ToPaintGeometry(FVector2D(char_x+2, char_y+2), FVector2D(char_w-4, char_h-4)),
+				&TerminalBrush->Brush,
+				ESlateDrawEffect::None,
+				ColorPalette[term_bg_color]);
+
+		}
 	}
+
 
 	return LayerId;
 }
@@ -307,12 +334,34 @@ void UPTerminalWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
 
+	if (HasAnyUserFocus())
+	{
+		cursorTime += InDeltaTime;
+		if (cursorTime >= CursorBlinkTimeMS)
+		{
+			cursorTime = 0;
+			bCursorActive = !bCursorActive;
+		}
+	}
+	else {
+		cursorTime = 0;
+		bCursorActive = true;
+	}
+
 	//Grab the width and height in pixels of the char '#'. Ideally, all terminals use monospace fonts, so, every character should just be the same size.
 	//I could program this to grab the size of every character as I render them but I don't want to do that.
 	//Plus this will kinda make things faster.
 	//
 	//Just use a fucking monospace font, god.
-	RegularTextFont->GetCharSize(TEXT('#'), CharacterWidth, CharacterHeight);
+	const UFont* RegularUnrealFont = Cast<UFont>(RegularTextFont.FontObject);
+
+	if (RegularUnrealFont)
+	{
+		//This is where we set the initial character size if we have a regular text font.
+		//If we don't have a regular text font at this point then fuck the frontend devs.
+		RegularUnrealFont->GetCharSize(TEXT('#'), CharacterWidth, CharacterHeight);
+
+	}
 
 	FVector2D gSize = MyGeometry.GetLocalSize();
 
@@ -378,6 +427,9 @@ FReply UPTerminalWidget::NativeOnKeyChar(const FGeometry & InGeometry, const FCh
 		}
 	}
 
+	bCursorActive = true;
+	cursorTime = 0;
+
 	return FReply::Handled();
 }
 
@@ -393,7 +445,7 @@ TSharedRef<SWidget> UPTerminalWidget::RebuildWidget()
 	return Super::RebuildWidget();
 }
 
-UFont* UPTerminalWidget::GetUnrealFont(uint8 fontType) const
+FSlateFontInfo UPTerminalWidget::GetUnrealFont(uint8 fontType) const
 {
 	switch (fontType)
 	{
@@ -407,7 +459,7 @@ UFont* UPTerminalWidget::GetUnrealFont(uint8 fontType) const
 		return BoldItalicTextFont;
 	}
 
-	return nullptr;
+	return RegularTextFont;
 }
 
 float UPTerminalWidget::GetLineHeight()

@@ -1,0 +1,6 @@
+Made by AShifter.
+Border.png - Used for left, right and bottom sides of the window as well as bottom corners.
+WindowTop.png - Used for the decorative textured section of the window.
+WindowTopNoLine.png - Used under context buttons and title text.
+Corner.png - Used for the left and right sides of the top of the window.
+The rest are self-explanitory.

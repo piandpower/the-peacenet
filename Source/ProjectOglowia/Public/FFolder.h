@@ -5,23 +5,6 @@
 #include "CoreMinimal.h"
 #include "FFolder.generated.h"
 
-UENUM(Blueprintable)
-enum class EFileType : uint8
-{
-	RawText,
-	Program,
-	Picture,
-	Audio,
-	ShellScript,
-	Contact,
-	ChatLog,
-	EmailLog,
-	Database,
-	PeacegateTheme,
-	SystemFile
-};
-
-
 USTRUCT(BlueprintType)
 struct FFile
 {
@@ -30,9 +13,6 @@ struct FFile
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString FileName;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EFileType FileType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString FileContent;

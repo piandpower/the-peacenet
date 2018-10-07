@@ -2,6 +2,16 @@
 
 #include "UPeacegateFileSystem.h"
 
+void UPeacegateFileSystem::RecursiveDelete(FFolder& InFolder)
+{
+	for (auto& Subfolder : InFolder.SubFolders)
+	{
+		FFolder& SubRecord = FolderTree[Subfolder];
+		RecursiveDelete(SubRecord);
+	}
+	FolderTree.RemoveAt(InFolder.FolderID);
+}
+
 void UPeacegateFileSystem::BuildChildNavigators(UFolderNavigator * RootNav)
 {
 	FFolder Folder = FolderTree[RootNav->FolderIndex];
@@ -142,11 +152,78 @@ bool UPeacegateFileSystem::DirectoryExists(const FString InPath)
 
 bool UPeacegateFileSystem::FileExists(const FString InPath)
 {
+	FString ResolvedPath = ResolveToAbsolute(InPath);
+	TArray<FString> Parts;
+	ResolvedPath.ParseIntoArray(Parts, TEXT("/"), true);
+	UFolderNavigator* Navigator = Root;
+
+	if (Parts.Num() == 0)
+		return false;
+
+	for (int i = 0; i < Parts.Num() - 1; i++)
+	{
+		auto& Part = Parts[i];
+
+		if (Navigator->SubFolders.Contains(Part))
+		{
+			Navigator = Navigator->SubFolders[Part];
+		}
+		else {
+			return false;
+		}
+	}
+
+	FString Filename = Parts[Parts.Num() - 1];
+
+	FFolder& FileParent = FolderTree[Navigator->FolderIndex];
+
+	for (auto& FileRecord : FileParent.Files)
+	{
+		if (FileRecord.FileName == Filename)
+			return true;
+
+	}
+
 	return false;
 }
 
 void UPeacegateFileSystem::Delete(const FString InPath)
 {
+	if (DirectoryExists(InPath))
+	{
+		FString ResolvedPath = ResolveToAbsolute(InPath);
+		TArray<FString> Parts;
+		ResolvedPath.ParseIntoArray(Parts, TEXT("/"), true);
+		UFolderNavigator* Navigator = Root;
+		
+		if (Parts.Num() == 0)
+			return;
+		
+		for (auto& Part : Parts)
+		{
+			if (Navigator->SubFolders.Contains(Part))
+			{
+				Navigator = Navigator->SubFolders[Part];
+			}
+		}
+
+		FFolder& FolderToDelete = FolderTree[Navigator->FolderIndex];
+
+		int ParentID = FolderToDelete.ParentID;
+		int FolderID = FolderToDelete.FolderID;
+
+		RecursiveDelete(FolderToDelete);
+
+		FFolder& Parent = FolderTree[ParentID];
+		Parent.SubFolders.Remove(FolderID);
+		FolderTree[ParentID] = Parent;
+
+		BuildFolderNavigator();
+
+		FilesystemOperation.Broadcast(EFilesystemEventType::DeleteDirectory, ResolvedPath);
+		FilesystemModified.Broadcast();
+
+	}
 }
 
 TArray<FString> UPeacegateFileSystem::GetDirectories(const FString & InPath)

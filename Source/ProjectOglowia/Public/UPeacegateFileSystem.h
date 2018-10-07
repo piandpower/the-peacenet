@@ -92,4 +92,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Filesystem")
 	static bool IsValidAsUserName(const FString& InUserName);
 
+private:
+	void RecursiveDelete(FFolder& InFolder);
 };

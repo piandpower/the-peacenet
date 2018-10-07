@@ -16,6 +16,25 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ExposeOnSpawn = "true"))
 	UWindow* Window;
 
+	UFUNCTION(BlueprintCallable, Category = "Infobox")
+		void ShowInfoWithCallbacks(const FText& InTitle, const FText& InMessage, const EInfoboxIcon InIcon, const EInfoboxButtonLayout ButtonLayout, const bool ShowTextInput, const FInfoboxDismissedEvent& OnDismissed, const FInfoboxInputValidator& ValidatorFunction)
+	{
+		Window->ShowInfoWithCallbacks(InTitle, InMessage, InIcon, ButtonLayout, ShowTextInput, OnDismissed, ValidatorFunction);
+	}
+
+	UFUNCTION(BlueprintCallable, Category = "Infobox")
+		void ShowInfo(const FText& InTitle, const FText& InMessage, const EInfoboxIcon InIcon)
+	{
+		Window->ShowInfo(InTitle, InMessage, InIcon);
+	}
+
+	UFUNCTION(BlueprintCallable, Category = "File Management")
+		void AskForFile(const FString InBaseDirectory, const FString InFilter, const EFileDialogType InDialogType, const FFileDialogDismissedEvent& OnDismissed)
+	{
+		Window->AskForFile(InBaseDirectory, InFilter, InDialogType, OnDismissed);
+	}
+
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ExposeOnSpawn = "true"))
 	TScriptInterface<ISystemContext> SystemContext;
 

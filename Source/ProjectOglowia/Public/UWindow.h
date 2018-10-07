@@ -34,8 +34,16 @@ enum class EInfoboxIcon : uint8
 	Warning
 };
 
+UENUM(BlueprintType)
+enum class EFileDialogType : uint8
+{
+	Open,
+	Save
+};
+
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FInfoboxDismissedEvent, EDialogResult, DialogResult, FText, UserTextInput);
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FInfoboxInputValidator, FText, UserTextInput, FText&, OutError);
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FFileDialogDismissedEvent, bool, FileSelected, FString, FilePath);
 
 /**
  * Contains useful functionality for a Peacegate OS window.
@@ -51,6 +59,9 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Infobox")
 	void ShowInfo(const FText& InTitle, const FText& InMessage, const EInfoboxIcon InIcon);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "File Management")
+	void AskForFile(const FString& InBaseDirectory, const FString& InFilter, const EFileDialogType InDialogType, const FFileDialogDismissedEvent& OnDismissed);
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ExposeOnSpawn = "true"))
 	FText WindowTitle;

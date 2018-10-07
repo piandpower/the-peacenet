@@ -6,19 +6,67 @@ void UPeacegateFileSystem::RecursiveDelete(FFolder& InFolder)
 {
 	for (auto& Subfolder : InFolder.SubFolders)
 	{
-		FFolder& SubRecord = FolderTree[Subfolder];
+		FFolder SubRecord = GetFolderByID(Subfolder);
 		RecursiveDelete(SubRecord);
 	}
-	FolderTree.RemoveAt(InFolder.FolderID);
+	
+	for (int i = 0; i < FolderTree.Num(); i++)
+	{
+		if (FolderTree[i].FolderID == InFolder.FolderID)
+		{
+			FolderTree.RemoveAt(i);
+			return;
+		}
+	}
+}
+
+FFolder UPeacegateFileSystem::GetFolderByID(int FolderID)
+{
+	for (auto& Folder : FolderTree)
+	{
+		if (Folder.FolderID == FolderID)
+			return Folder;
+	}
+
+	return FFolder();
+}
+
+void UPeacegateFileSystem::SetFolderByID(int FolderID, FFolder Folder)
+{
+	for (int i = 0; i < FolderTree.Num(); i++)
+	{
+		FFolder ExFolder = FolderTree[i];
+
+		if (ExFolder.FolderID == FolderID)
+		{
+			FolderTree[i] = Folder;
+			return;
+		}
+	}
+}
+
+int UPeacegateFileSystem::GetNewFolderID()
+{
+	int ID = 0;
+
+	for (auto& Folder : FolderTree)
+	{
+		if (Folder.FolderID > ID)
+		{
+			ID = Folder.FolderID;
+		}
+	}
+
+	return ID+1;
 }
 
 void UPeacegateFileSystem::BuildChildNavigators(UFolderNavigator * RootNav)
 {
-	FFolder Folder = FolderTree[RootNav->FolderIndex];
+	FFolder Folder = GetFolderByID(RootNav->FolderIndex);
 
 	for (auto SubfolderIndex : Folder.SubFolders)
 	{
-		FFolder SubFolder = FolderTree[SubfolderIndex];
+		FFolder SubFolder = GetFolderByID(SubfolderIndex);
 		UFolderNavigator* ChildNav = NewObject<UFolderNavigator>();
 		ChildNav->FolderIndex = SubFolder.FolderID;
 		RootNav->SubFolders.Add(SubFolder.FolderName, ChildNav);
@@ -93,18 +141,17 @@ void UPeacegateFileSystem::CreateDirectory(const FString InPath)
 			Navigator = Navigator->SubFolders[Part];
 		}
 		else {
-			int FolderCount = FolderTree.Num();
 			FFolder NewFolder;
 			NewFolder.FolderName = Part;
-			NewFolder.FolderID = FolderCount;
+			NewFolder.FolderID = GetNewFolderID();
 			NewFolder.ParentID = Navigator->FolderIndex;
 			FolderTree.Add(NewFolder);
 
-			FFolder CurrFolder = FolderTree[Navigator->FolderIndex];
+			FFolder CurrFolder = GetFolderByID(Navigator->FolderIndex);
 
 			CurrFolder.SubFolders.Add(NewFolder.FolderID);;
 
-			FolderTree[Navigator->FolderIndex] = CurrFolder;
+			SetFolderByID(Navigator->FolderIndex, CurrFolder);
 
 			UFolderNavigator* NewNav = NewObject<UFolderNavigator>();
 
@@ -175,7 +222,7 @@ bool UPeacegateFileSystem::FileExists(const FString InPath)
 
 	FString Filename = Parts[Parts.Num() - 1];
 
-	FFolder& FileParent = FolderTree[Navigator->FolderIndex];
+	FFolder FileParent = GetFolderByID(Navigator->FolderIndex);
 
 	for (auto& FileRecord : FileParent.Files)
 	{
@@ -207,21 +254,67 @@ void UPeacegateFileSystem::Delete(const FString InPath)
 			}
 		}
 
-		FFolder& FolderToDelete = FolderTree[Navigator->FolderIndex];
+		FFolder FolderToDelete = GetFolderByID(Navigator->FolderIndex);
 
 		int ParentID = FolderToDelete.ParentID;
 		int FolderID = FolderToDelete.FolderID;
 
 		RecursiveDelete(FolderToDelete);
 
-		FFolder& Parent = FolderTree[ParentID];
+		FFolder Parent = GetFolderByID(ParentID);
 		Parent.SubFolders.Remove(FolderID);
-		FolderTree[ParentID] = Parent;
+		SetFolderByID(ParentID, Parent);
 
 		BuildFolderNavigator();
 
 		FilesystemOperation.Broadcast(EFilesystemEventType::DeleteDirectory, ResolvedPath);
 		FilesystemModified.Broadcast();
+
+	}
+	else if (FileExists(InPath))
+	{
+		FString FolderPath;
+		FString FileName;
+
+		if (!InPath.Split(TEXT("/"), &FolderPath, &FileName, ESearchCase::IgnoreCase, ESearchDir::FromEnd))
+			return;
+
+		FString ResolvedPath = ResolveToAbsolute(FolderPath);
+		TArray<FString> Parts;
+		ResolvedPath.ParseIntoArray(Parts, TEXT("/"), true);
+		UFolderNavigator* Navigator = Root;
+
+		for (auto& Part : Parts)
+		{
+			if (Navigator->SubFolders.Contains(Part))
+			{
+				Navigator = Navigator->SubFolders[Part];
+			}
+		}
+
+		FFolder FolderToAlter = GetFolderByID(Navigator->FolderIndex);
+
+		bool Write = false;
+
+		for (int i = 0; i < FolderToAlter.Files.Num(); i++)
+		{
+			FFile File = FolderToAlter.Files[i];
+			if (File.FileName == FileName)
+			{
+				Write = true;
+				FolderToAlter.Files.RemoveAt(i);
+				break;
+			}
+		}
+
+		if (Write)
+		{
+			SetFolderByID(Navigator->FolderIndex, FolderToAlter);
+		
+			FilesystemOperation.Broadcast(EFilesystemEventType::DeleteFile, ResolvedPath + TEXT("/") + FileName);
+			FilesystemModified.Broadcast();
+
+		}
 
 	}
 }
@@ -280,7 +373,7 @@ TArray<FString> UPeacegateFileSystem::GetFiles(const FString & InPath)
 	}
 
 	TArray<FString> Ret;
-	FFolder Folder = FolderTree[Navigator->FolderIndex];
+	FFolder Folder = GetFolderByID(Navigator->FolderIndex);
 
 	for (auto File : Folder.Files)
 	{
@@ -327,7 +420,7 @@ void UPeacegateFileSystem::WriteText(const FString & InPath, const FString & InT
 		}
 	}
 
-	FFolder Folder = FolderTree[Navigator->FolderIndex];
+	FFolder Folder = GetFolderByID(Navigator->FolderIndex);
 
 	bool FoundFile = false;
 
@@ -352,7 +445,7 @@ void UPeacegateFileSystem::WriteText(const FString & InPath, const FString & InT
 		Folder.Files.Add(NewFile);
 	}
 
-	FolderTree[Navigator->FolderIndex] = Folder;
+	SetFolderByID(Navigator->FolderIndex, Folder);
 
 	FilesystemOperation.Broadcast(EFilesystemEventType::WriteFile, ResolvedPath + TEXT("/") + FileName);
 	FilesystemModified.Broadcast();
@@ -388,7 +481,7 @@ FString UPeacegateFileSystem::ReadText(const FString & InPath)
 		}
 	}
 
-	FFolder Folder = FolderTree[Navigator->FolderIndex];
+	FFolder Folder = GetFolderByID(Navigator->FolderIndex);
 
 	for (int i = 0; i < Folder.Files.Num(); i++)
 	{

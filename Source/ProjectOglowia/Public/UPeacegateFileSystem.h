@@ -100,4 +100,8 @@ public:
 
 private:
 	void RecursiveDelete(FFolder& InFolder);
+
+	FFolder GetFolderByID(int FolderID);
+	void SetFolderByID(int FolderID, FFolder Folder);
+	int GetNewFolderID();
 };

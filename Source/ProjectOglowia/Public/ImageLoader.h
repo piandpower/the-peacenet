@@ -5,6 +5,7 @@
 
 #include "CoreMinimal.h"
 #include "PixelFormat.h"
+#include "ThreadSafeBool.h"
 #include "ImageLoader.generated.h"
 
 class UTexture2D;
@@ -50,4 +51,24 @@ private:
 
 	/** Holds the future value which represents the asynchronous loading operation. */ 
 	TFuture<UTexture2D*> Future;
+
+	struct FImageWriter
+	{
+		FImageWriter(const TSharedPtr<class IImageWrapper>& InWrapper)
+		{
+			ImageWrapper = InWrapper;
+		}
+
+		TSharedPtr<class IImageWrapper> ImageWrapper;
+		mutable FThreadSafeBool bInUse;
+	};
+
+
+public:
+	/** Generates bitmap data out of a texture object and returns the binary data of the bitmap. */
+	UFUNCTION(BlueprintCallable, Category = ImageLoader)
+	static TArray<uint8> GetBitmapData(UPARAM(Ref) UTexture2D* InTexture);
+
+	template<typename TPixelType>
+	static bool SaveImage(const TArray<TPixelType>& Bitmap, const FIntPoint& BitmapSize, TArray<uint8>& OutBitmapData);
 };

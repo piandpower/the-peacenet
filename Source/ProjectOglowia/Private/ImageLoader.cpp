@@ -7,6 +7,8 @@
 #include "IImageWrapper.h"
 #include "IImageWrapperModule.h"
 #include "RenderUtils.h"
+#include "PixelFormat.h"
+#include "HighResScreenshot.h"
 #include "ModuleManager.h"
 #include "UPeacegateFileSystem.h"
 #include "Engine/Texture2D.h"
@@ -131,4 +133,137 @@ UTexture2D* UImageLoader::CreateTexture(UObject* Outer, const TArray<uint8>& Pix
 
 	NewTexture->UpdateResource();
 	return NewTexture;
+}
+
+TArray<uint8> UImageLoader::GetBitmapData(UTexture2D * InTexture)
+{
+	// Retrieve the texture's current compression and mipmap settings, we need to nuke 'em temporarily.
+	TextureCompressionSettings prevCompression = InTexture->CompressionSettings;
+	TextureMipGenSettings prevMipSettings = InTexture->MipGenSettings;
+	InTexture->CompressionSettings = TextureCompressionSettings::TC_VectorDisplacementmap;
+	InTexture->MipGenSettings = TextureMipGenSettings::TMGS_NoMipmaps;
+
+
+	// Update texture resources.
+	InTexture->UpdateResource();
+
+	// Get the first mipmap of the texture
+	FTexture2DMipMap* Mip = &InTexture->PlatformData->Mips[0];
+
+	// Array of colors, for pixel data
+	TArray<FColor> Pixels;
+	
+	// The texture's width and height
+	int w = Mip->SizeX;
+	int h = Mip->SizeY;
+
+	// Zero out the array.
+	Pixels.InsertZeroed(0, w * h);
+
+	// Get the raw data of the texture
+	FByteBulkData* RawData = &Mip->BulkData;
+
+	// Retrieve the color data from the texture
+	FColor* FormattedData = static_cast<FColor*>(RawData->Lock(LOCK_READ_ONLY));
+
+	// Copy each pixel from the texture to the bitmap.
+	for (int i = 0; i < Pixels.Num(); i++)
+	{
+		Pixels[i] = FormattedData[i];
+	}
+
+	// Unlock the texture
+	RawData->Unlock();
+
+	// Destination size
+	FIntPoint DestSize(w, h);
+
+	TArray<uint8> Ret;
+	if (UImageLoader::SaveImage(Pixels, DestSize, Ret))
+		return Ret;
+
+	// Revert the texture settings
+	InTexture->CompressionSettings = prevCompression;
+	InTexture->MipGenSettings = prevMipSettings;
+
+	return TArray<uint8>();
+}
+
+// -------------------
+// Re-implementation of FHighResScreenshotConfig::SaveImage(), which saves to an in-memory byte buffer instead.
+// -------------------
+
+
+template<typename> struct FPixelTypeTraits {};
+
+template<> struct FPixelTypeTraits<FColor>
+{
+	static const ERGBFormat SourceChannelLayout = ERGBFormat::BGRA;
+
+	static FORCEINLINE bool IsWritingHDRImage(const bool)
+	{
+		return false;
+	}
+};
+
+template<> struct FPixelTypeTraits<FFloat16Color>
+{
+	static const ERGBFormat SourceChannelLayout = ERGBFormat::RGBA;
+
+	static FORCEINLINE bool IsWritingHDRImage(const bool bCaptureHDR)
+	{
+		static const auto CVarDumpFramesAsHDR = IConsoleManager::Get().FindTConsoleVariableDataInt(TEXT("r.BufferVisualizationDumpFramesAsHDR"));
+		return bCaptureHDR || CVarDumpFramesAsHDR->GetValueOnAnyThread();
+	}
+};
+
+template<> struct FPixelTypeTraits<FLinearColor>
+{
+	static const ERGBFormat SourceChannelLayout = ERGBFormat::RGBA;
+
+	static FORCEINLINE bool IsWritingHDRImage(const bool bCaptureHDR)
+	{
+		static const auto CVarDumpFramesAsHDR = IConsoleManager::Get().FindTConsoleVariableDataInt(TEXT("r.BufferVisualizationDumpFramesAsHDR"));
+		return bCaptureHDR || CVarDumpFramesAsHDR->GetValueOnAnyThread();
+	}
+};
+
+
+template<typename TPixelType>
+bool UImageLoader::SaveImage(const TArray<TPixelType>& Bitmap, const FIntPoint& BitmapSize, TArray<uint8>& OutBitmapData)
+{
+	typedef FPixelTypeTraits<TPixelType> Traits;
+
+	static_assert(ARE_TYPES_EQUAL(TPixelType, FFloat16Color) || ARE_TYPES_EQUAL(TPixelType, FColor) || ARE_TYPES_EQUAL(TPixelType, FLinearColor), "Source format must be either FColor, FLinearColor or FFloat16Color");
+	const int32 x = BitmapSize.X;
+	const int32 y = BitmapSize.Y;
+
+	bool bSuccess = false;
+
+	if (Bitmap.Num() == x * y)
+	{
+		const size_t BitsPerPixel = (sizeof(TPixelType) / 4) * 8;
+
+		FImageWriter ImageWriter(ImageWrapperModule.CreateImageWrapper(EImageFormat::PNG));
+		
+		if (ImageWriter.ImageWrapper.IsValid() &&
+			ImageWriter.ImageWrapper->SetRaw((void*)&Bitmap[0], sizeof(TPixelType)* x * y, x, y, Traits::SourceChannelLayout, BitsPerPixel))
+		{
+			EImageCompressionQuality LocalCompressionQuality = EImageCompressionQuality::Default;
+
+			// Compress and write image
+			OutBitmapData = ImageWriter.ImageWrapper->GetCompressed((int32)LocalCompressionQuality);
+			
+			bSuccess = true;
+		}
+
+		ImageWriter.bInUse = false;
+	}
+	else
+	{
+		UIL_LOG(Error, TEXT("Failed to write bitmap data."));
+	}
+
+	return bSuccess;
+
 }

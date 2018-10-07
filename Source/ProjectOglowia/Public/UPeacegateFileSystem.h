@@ -85,6 +85,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Filesystem")
 	TArray<FString> GetFiles(const FString& InPath);
 
+	UFUNCTION(BlueprintCallable, Category = "Filesystem")
+	void WriteText(const FString& InPath, const FString& InText);
+
+	UFUNCTION(BlueprintCallable, Category = "Filesystem")
+	FString ReadText(const FString& InPath);
+
 public:
 	UFUNCTION(BlueprintCallable, Category="Filesystem")
 	static bool IsValidAsFileName(const FString& InFileName);

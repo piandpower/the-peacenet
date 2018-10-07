@@ -7,8 +7,11 @@ public class ProjectOglowia : ModuleRules
 	public ProjectOglowia(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Slate", "SlateCore" });
+
+        // Makes the filesystem in Peacegate able to load textures.
+        PublicDependencyModuleNames.AddRange(new string[] { "ImageWrapper", "RenderCore" });
+
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Slate", "SlateCore" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
@@ -23,6 +26,7 @@ public class ProjectOglowia : ModuleRules
 		// Add the Docopt module
 		PrivateDependencyModuleNames.Add("DocoptForUnreal");
 
+        
         bEnableExceptions = true;
     }
 }

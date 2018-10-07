@@ -91,6 +91,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Filesystem")
 	FString ReadText(const FString& InPath);
 
+	UFUNCTION(BlueprintCallable, Category = "Filesystem")
+	TArray<uint8> ReadBinary(const FString& InPath);
+
+
 public:
 	UFUNCTION(BlueprintCallable, Category="Filesystem")
 	static bool IsValidAsFileName(const FString& InFileName);

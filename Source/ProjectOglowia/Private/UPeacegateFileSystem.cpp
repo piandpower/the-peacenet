@@ -498,6 +498,54 @@ FString UPeacegateFileSystem::ReadText(const FString & InPath)
 	return FString();
 }
 
+TArray<uint8> UPeacegateFileSystem::ReadBinary(const FString & InPath)
+{
+	if (!FileExists(InPath))
+		return TArray<uint8>();
+
+	FString FolderPath;
+	FString FileName;
+
+	if (!InPath.Split(TEXT("/"), &FolderPath, &FileName, ESearchCase::IgnoreCase, ESearchDir::FromEnd))
+		return TArray<uint8>();
+
+	if (!DirectoryExists(FolderPath))
+		return TArray<uint8>();
+
+	FString ResolvedPath = ResolveToAbsolute(FolderPath);
+	TArray<FString> Parts;
+	ResolvedPath.ParseIntoArray(Parts, TEXT("/"), true);
+	UFolderNavigator* Navigator = this->Root;
+
+	for (auto& Part : Parts)
+	{
+		if (Navigator->SubFolders.Contains(Part))
+		{
+			Navigator = Navigator->SubFolders[Part];
+		}
+		else {
+			return TArray<uint8>();
+		}
+	}
+
+	FFolder Folder = GetFolderByID(Navigator->FolderIndex);
+
+	for (int i = 0; i < Folder.Files.Num(); i++)
+	{
+		FFile File = Folder.Files[i];
+
+		if (File.FileName == FileName)
+		{
+			TArray<uint8> Ret;
+			FBase64::Decode(File.FileContent, Ret);
+			return Ret;
+		}
+	}
+
+	return TArray<uint8>();
+}
+
+
 bool UPeacegateFileSystem::IsValidAsFileName(const FString & InFileName)
 {
 	if (InFileName.IsEmpty())

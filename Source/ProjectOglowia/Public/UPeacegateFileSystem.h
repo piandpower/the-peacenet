@@ -89,6 +89,9 @@ public:
 	void WriteText(const FString& InPath, const FString& InText);
 
 	UFUNCTION(BlueprintCallable, Category = "Filesystem")
+	void WriteBinary(const FString& InPath, TArray<uint8> InBinary);
+
+	UFUNCTION(BlueprintCallable, Category = "Filesystem")
 	FString ReadText(const FString& InPath);
 
 	UFUNCTION(BlueprintCallable, Category = "Filesystem")

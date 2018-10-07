@@ -451,6 +451,71 @@ void UPeacegateFileSystem::WriteText(const FString & InPath, const FString & InT
 	FilesystemModified.Broadcast();
 }
 
+void UPeacegateFileSystem::WriteBinary(const FString & InPath, TArray<uint8> InBinary)
+{
+	if (InPath.EndsWith(TEXT("/")))
+		return;
+
+	if (DirectoryExists(InPath))
+		return;
+
+	FString FolderPath;
+	FString FileName;
+
+	if (!InPath.Split(TEXT("/"), &FolderPath, &FileName, ESearchCase::IgnoreCase, ESearchDir::FromEnd))
+		return;
+
+	if (!DirectoryExists(FolderPath))
+		return;
+
+	FString ResolvedPath = ResolveToAbsolute(FolderPath);
+	TArray<FString> Parts;
+	ResolvedPath.ParseIntoArray(Parts, TEXT("/"), true);
+	UFolderNavigator* Navigator = this->Root;
+
+	for (auto& Part : Parts)
+	{
+		if (Navigator->SubFolders.Contains(Part))
+		{
+			Navigator = Navigator->SubFolders[Part];
+		}
+		else {
+			return;
+		}
+	}
+
+	FFolder Folder = GetFolderByID(Navigator->FolderIndex);
+
+	bool FoundFile = false;
+
+	for (int i = 0; i < Folder.Files.Num(); i++)
+	{
+		FFile File = Folder.Files[i];
+
+		if (File.FileName == FileName)
+		{
+			File.FileContent = FBase64::Encode(InBinary);
+			Folder.Files[i] = File;
+			FoundFile = true;
+			break;
+		}
+	}
+
+	if (!FoundFile)
+	{
+		FFile NewFile;
+		NewFile.FileName = FileName;
+		NewFile.FileContent = FBase64::Encode(InBinary);
+		Folder.Files.Add(NewFile);
+	}
+
+	SetFolderByID(Navigator->FolderIndex, Folder);
+
+	FilesystemOperation.Broadcast(EFilesystemEventType::WriteFile, ResolvedPath + TEXT("/") + FileName);
+	FilesystemModified.Broadcast();
+}
+
+
 FString UPeacegateFileSystem::ReadText(const FString & InPath)
 {
 	if (!FileExists(InPath))

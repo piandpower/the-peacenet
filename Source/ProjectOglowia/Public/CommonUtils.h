@@ -8,6 +8,7 @@
 
 
 
+
 /**
  * Common utilities used throughout the entire game.
  */
@@ -17,7 +18,9 @@ class PROJECTOGLOWIA_API UCommonUtils : public UObject
 	GENERATED_BODY()
 
 public:
-	
 	UFUNCTION(BlueprintCallable, Category = "Peacegate", BlueprintPure)
 	static FText GetFriendlyFilesystemStatusCode(const EFilesystemStatusCode InStatusCode);
+
+	UFUNCTION(BlueprintCallable, Category = "Peacegate")
+	static UPeacegateFileSystem* CreateFilesystem(UPARAM(Ref) TScriptInterface<IFolderRepository> InFolderRepo, int InUserID);
 };

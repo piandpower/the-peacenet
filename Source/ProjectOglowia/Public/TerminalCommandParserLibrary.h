@@ -51,9 +51,6 @@ public:
 	static FPeacegateCommandInstruction GetCommandList(const FString& InCommand, FString& OutputError);
 
 	UFUNCTION(BlueprintCallable, Category = Bash, meta = (DisplayName = "Tokenize"))
-	static TArray<FString> Tokenize(const FString& InCommand, FString& OutputError);
+	static TArray<FString> Tokenize(const FString& InCommand, const FString& Home, FString& OutputError);
 	
-	UFUNCTION(BlueprintCallable, Category="Docopt")
-	static TArray<FString> TokensFromPattern(const FString& InSource);
-
 };

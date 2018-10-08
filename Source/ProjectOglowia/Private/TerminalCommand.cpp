@@ -8,12 +8,14 @@ UTerminalCommand::UTerminalCommand()
 
 UTerminalCommand::~UTerminalCommand()
 {
-}void UTerminalCommand::RunCommand(UConsoleContext* InConsole, const TScriptInterface<ICommandSeeker> InSeeker, const TMap<FString, FDocoptValue> InArguments)
+}void UTerminalCommand::RunCommand(UConsoleContext* InConsole, const TMap<FString, FDocoptValue> InArguments)
 {
+	TScriptInterface<ICommandSeeker> InSeeker = ISystemContext::Execute_GetCommandSeeker(InConsole->SystemContext.GetObject());
+
 	OnRunCommand(InConsole, InSeeker, InArguments);
 }
 
-void UAdminTerminalCommand::RunCommand(UConsoleContext* InConsole, const TScriptInterface<ICommandSeeker> InSeeker, const TMap<FString, FDocoptValue> InArguments)
+void UAdminTerminalCommand::RunCommand(UConsoleContext* InConsole, const TMap<FString, FDocoptValue> InArguments)
 {
 	if (ISystemContext::Execute_GetUserDomain(InConsole->SystemContext.GetObject(), InConsole->UserID) != EUserDomain::Administrator)
 	{
@@ -21,5 +23,6 @@ void UAdminTerminalCommand::RunCommand(UConsoleContext* InConsole, const TScript
 		this->Complete();
 		return;
 	}
-	OnRunCommand(InConsole, InSeeker, InArguments);
+
+	Super::RunCommand(InConsole, InArguments);
 }

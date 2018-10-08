@@ -27,8 +27,7 @@ public:
 	FCommandCompletedEvent Completed;
 
 	UFUNCTION(BlueprintCallable, Category = "Terminal Command")
-	virtual void RunCommand(UPARAM(Ref) UConsoleContext* InConsole, const TScriptInterface<ICommandSeeker> InSeeker, const TMap<FString, FDocoptValue> InArguments);
-
+	virtual void RunCommand(UPARAM(Ref) UConsoleContext* InConsole, const TMap<FString, FDocoptValue> InArguments);
 protected:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Terminal Command")
 	void OnRunCommand(const UConsoleContext* InConsole, const TScriptInterface<ICommandSeeker>& InSeeker, const TMap<FString, FDocoptValue>& InArguments);
@@ -43,5 +42,5 @@ class PROJECTOGLOWIA_API UAdminTerminalCommand : public UTerminalCommand
 	GENERATED_BODY()
 
 public:
-	virtual void RunCommand(UConsoleContext* InConsole, const TScriptInterface<ICommandSeeker> InSeeker, const TMap<FString, FDocoptValue> InArguments) override;
+	virtual void RunCommand(UConsoleContext* InConsole, const TMap<FString, FDocoptValue> InArguments) override;
 };

@@ -46,7 +46,7 @@ public:
 	float GetGovernmentAlertLevelPercentage();
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "System Context")
-	UPeacegateFileSystem* GetFilesystem();
+	UPeacegateFileSystem* GetFilesystem(const int UserID);
 	
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = " System Context")
 	TScriptInterface<ICommandSeeker> GetCommandSeeker();

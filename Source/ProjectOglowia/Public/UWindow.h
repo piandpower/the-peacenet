@@ -57,7 +57,7 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Infobox")
 		void ShowInfoWithCallbacks(const FText& InTitle, const FText& InMessage, const EInfoboxIcon InIcon, const EInfoboxButtonLayout ButtonLayout, const bool ShowTextInput, const FInfoboxDismissedEvent& OnDismissed, const FInfoboxInputValidator& ValidatorFunction);
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Infobox")
+	UFUNCTION(BlueprintCallable, Category = "Infobox")
 	void ShowInfo(const FText& InTitle, const FText& InMessage, const EInfoboxIcon InIcon);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "File Management")
@@ -82,38 +82,20 @@ public:
 	bool EnableMinimizeAndMaximize = true;
 
 	UFUNCTION(BlueprintCallable)
-		void Close()
-	{
-		OnWindowClosed();
-	}
+	void Close();
+	
+	UFUNCTION(BlueprintCallable)
+	void Minimize();
 
 	UFUNCTION(BlueprintCallable)
-		void Minimize()
-	{
-		OnWindowMinimized();
-	}
-
+	void Maximize();
+	
 	UFUNCTION(BlueprintCallable)
-		void Maximize()
-	{
-		OnWindowMaximized();
-	}
+	void Restore();
 
-	UFUNCTION(BlueprintCallable)
-		void Restore()
-	{
-		OnWindowRestored();
-	}
+	void AddWindowToClientSlot(const UUserWidget* InClientWidget);
 
-	void AddWindowToClientSlot(const UUserWidget* InClientWidget)
-	{
-		OnAddWindowToClientSlot(InClientWidget);
-	}
-
-	void SetClientMinimumSize(const FVector2D& InSize)
-	{
-		OnSetClientMinimumSize(InSize);
-	}
+	void SetClientMinimumSize(const FVector2D& InSize);
 
 protected:
 	UFUNCTION(BlueprintImplementableEvent)

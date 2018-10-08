@@ -7,53 +7,52 @@
 #include "SystemContext.h"
 #include "UPeacegateProgramAsset.generated.h"
 
+class UConsoleContext;
+class UPTerminalWidget;
+
 UCLASS(Blueprintable)
 class PROJECTOGLOWIA_API UProgram : public UUserWidget
 {
 	GENERATED_BODY()
 
 public:
+	UFUNCTION(BlueprintCallable, Category = "Peacegate")
+	static UProgram* CreateProgram(const TSubclassOf<UWindow> InWindowClass, const TSubclassOf<UProgram> InProgramClass, const TScriptInterface<ISystemContext> InSystem, const int InUserID, UWindow*& OutWindow);
+
+	UFUNCTION(BlueprintCallable, Category = "Peacegate")
+	UConsoleContext* CreateConsole(UPARAM(Ref) UPTerminalWidget* InTerminalWidget);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Wallpaper")
+	UWallpaperAsset* GetWallpaper();
+
+	UFUNCTION(BlueprintCallable, Category = "Wallpaper")
+	void SetWallpaper(FName InWallpaperID);
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ExposeOnSpawn = "true"))
 	UWindow* Window;
 
 	UFUNCTION(BlueprintCallable, Category = "Infobox")
-		void ShowInfoWithCallbacks(const FText& InTitle, const FText& InMessage, const EInfoboxIcon InIcon, const EInfoboxButtonLayout ButtonLayout, const bool ShowTextInput, const FInfoboxDismissedEvent& OnDismissed, const FInfoboxInputValidator& ValidatorFunction)
-	{
-		Window->ShowInfoWithCallbacks(InTitle, InMessage, InIcon, ButtonLayout, ShowTextInput, OnDismissed, ValidatorFunction);
-	}
-
+	void ShowInfoWithCallbacks(const FText& InTitle, const FText& InMessage, const EInfoboxIcon InIcon, const EInfoboxButtonLayout ButtonLayout, const bool ShowTextInput, const FInfoboxDismissedEvent& OnDismissed, const FInfoboxInputValidator& ValidatorFunction);
+	
 	UFUNCTION(BlueprintCallable, Category = "Infobox")
-		void ShowInfo(const FText& InTitle, const FText& InMessage, const EInfoboxIcon InIcon)
-	{
-		Window->ShowInfo(InTitle, InMessage, InIcon);
-	}
+	void ShowInfo(const FText& InTitle, const FText& InMessage, const EInfoboxIcon InIcon);
 
 	UFUNCTION(BlueprintCallable, Category = "File Management")
-		void AskForFile(const FString InBaseDirectory, const FString InFilter, const EFileDialogType InDialogType, const FFileDialogDismissedEvent& OnDismissed)
-	{
-		Window->AskForFile(InBaseDirectory, InFilter, InDialogType, OnDismissed);
-	}
-
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ExposeOnSpawn = "true"))
-	TScriptInterface<ISystemContext> SystemContext;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ExposeOnSpawn = "true"))
-	int UserID;
+	void AskForFile(const FString InBaseDirectory, const FString InFilter, const EFileDialogType InDialogType, const FFileDialogDismissedEvent& OnDismissed);
+	
+	void SetupContexts();
 
 	UFUNCTION(BlueprintCallable)
-		void SetWindowMinimumSize(FVector2D InSize)
-	{
-		Window->SetClientMinimumSize(InSize);
-	}
+	void SetWindowMinimumSize(FVector2D InSize);
 
-	UFUNCTION(BlueprintCallable)
-	void InjectIntoWindow()
-	{
-		Window->SystemContext = this->SystemContext;
-		Window->UserID = this->UserID;
-		Window->AddWindowToClientSlot(this);
-	}
+protected:
+	// Filesystem context for the program.
+	UPROPERTY(BlueprintReadOnly, Category = "Program")
+	class UPeacegateFileSystem* Filesystem;
+
+	// The console allows the program to output to a Terminal, or run Terminal Commands as its user.
+	UPROPERTY(BlueprintReadOnly, Category = "Program")
+	UConsoleContext* Console;
 };
 
 USTRUCT(BlueprintType)

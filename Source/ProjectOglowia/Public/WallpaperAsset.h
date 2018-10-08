@@ -3,10 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Engine/DataAsset.h"
 #include "WallpaperAsset.generated.h"
 
 /**
- * 
+ * Represents a Peacegate OS wallpaper.
  */
 UCLASS(Blueprintable)
 class PROJECTOGLOWIA_API UWallpaperAsset : public UDataAsset

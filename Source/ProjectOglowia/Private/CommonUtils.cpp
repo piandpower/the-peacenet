@@ -22,3 +22,11 @@ FText UCommonUtils::GetFriendlyFilesystemStatusCode(const EFilesystemStatusCode 
 		return NSLOCTEXT("Peacegate", "UnknownError", "An unknown error has occurred.");
 	}
 }
+
+UPeacegateFileSystem * UCommonUtils::CreateFilesystem(UPARAM(Ref)TScriptInterface<IFolderRepository> InFolderRepo, int InUserID)
+{
+	UPeacegateFileSystem* FS = NewObject<UPeacegateFileSystem>();
+	FS->FolderRepo = InFolderRepo;
+	FS->Initialize(InUserID);
+	return FS;
+}

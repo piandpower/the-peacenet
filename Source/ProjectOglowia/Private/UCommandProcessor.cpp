@@ -1,6 +1,7 @@
 // Copyright (c) 2018 The Peacenet & Alkaline Thunder.
 
 #include "UCommandProcessor.h"
+#include "SystemContext.h"
 #include "TerminalCommandParserLibrary.h"
 
 TArray<FCommandRunInstruction> UCommandProcessor::ProcessCommand(TScriptInterface<ICommandSeeker> InCommandSeeker, UConsoleContext* InConsole, const FString& InCommand)
@@ -35,9 +36,18 @@ TArray<FCommandRunInstruction> UCommandProcessor::ProcessCommand(TScriptInterfac
 	
 		FString CommandText = Instruction.Commands[i];
 
+		FString Home;
+		if (LastPiper)
+		{
+			Home = LastPiper->HomeDirectory;
+		}
+		else {
+			Home = InConsole->HomeDirectory;
+		}
+
 		FString TokenError;
 
-		TArray<FString> Tokens = UTerminalCommandParserLibrary::Tokenize(CommandText, TokenError);
+		TArray<FString> Tokens = UTerminalCommandParserLibrary::Tokenize(CommandText, Home, TokenError);
 
 		if (!TokenError.IsEmpty())
 		{
@@ -76,14 +86,18 @@ TArray<FCommandRunInstruction> UCommandProcessor::ProcessCommand(TScriptInterfac
 				Ctx->Input = LastPiper;
 				if (LastPiper)
 				{
+					Ctx->HomeDirectory = LastPiper->HomeDirectory;
 					Ctx->UserID = LastPiper->UserID;
 					Ctx->SystemContext = LastPiper->SystemContext;
 				}
 				else
 				{
+					Ctx->HomeDirectory = InConsole->HomeDirectory;
 					Ctx->UserID = InConsole->UserID;
 					Ctx->SystemContext = InConsole->SystemContext;
 				}
+
+				Ctx->Filesystem = ISystemContext::Execute_GetFilesystem(Ctx->SystemContext.GetObject(), Ctx->UserID);
 				
 				NewInst.IntendedContext = Ctx;
 				LastPiper = Ctx;
@@ -95,14 +109,19 @@ TArray<FCommandRunInstruction> UCommandProcessor::ProcessCommand(TScriptInterfac
 				Ctx->Output = InConsole;
 				if (LastPiper)
 				{
+					Ctx->HomeDirectory = LastPiper->HomeDirectory;
 					Ctx->UserID = LastPiper->UserID;
 					Ctx->SystemContext = LastPiper->SystemContext;
 				}
 				else
 				{
+					Ctx->HomeDirectory = InConsole->HomeDirectory;
 					Ctx->UserID = InConsole->UserID;
 					Ctx->SystemContext = InConsole->SystemContext;
 				}
+
+				Ctx->Filesystem = ISystemContext::Execute_GetFilesystem(Ctx->SystemContext.GetObject(), Ctx->UserID);
+
 				NewInst.IntendedContext = Ctx;
 			}
 

@@ -1,6 +1,7 @@
 // Copyright (c) 2018 The Peacenet & Alkaline Thunder.
 
 #include "UPeacegateFileSystem.h"
+#include "Base64.h"
 
 bool UPeacegateFileSystem::GetFile(FFolder Parent, FString FileName, int & Index, FFile & File)
 {
@@ -20,12 +21,17 @@ bool UPeacegateFileSystem::GetFile(FFolder Parent, FString FileName, int & Index
 
 void UPeacegateFileSystem::RecursiveDelete(FFolder& InFolder)
 {
+
 	for (auto& Subfolder : InFolder.SubFolders)
 	{
 		FFolder SubRecord = GetFolderByID(Subfolder);
 		RecursiveDelete(SubRecord);
 	}
 	
+	TArray<FFolder> FolderTree;
+
+	IFolderRepository::Execute_GetFolderTree(FolderRepo.GetObject(), FolderTree);
+
 	for (int i = 0; i < FolderTree.Num(); i++)
 	{
 		if (FolderTree[i].FolderID == InFolder.FolderID)
@@ -34,10 +40,15 @@ void UPeacegateFileSystem::RecursiveDelete(FFolder& InFolder)
 			return;
 		}
 	}
+
+	IFolderRepository::Execute_PushFolderTree(FolderRepo.GetObject(), FolderTree);
 }
 
 FFolder UPeacegateFileSystem::GetFolderByID(int FolderID)
 {
+	TArray<FFolder> FolderTree;
+	IFolderRepository::Execute_GetFolderTree(FolderRepo.GetObject(), FolderTree);
+
 	for (auto& Folder : FolderTree)
 	{
 		if (Folder.FolderID == FolderID)
@@ -49,6 +60,9 @@ FFolder UPeacegateFileSystem::GetFolderByID(int FolderID)
 
 void UPeacegateFileSystem::SetFolderByID(int FolderID, FFolder Folder)
 {
+	TArray<FFolder> FolderTree;
+	IFolderRepository::Execute_GetFolderTree(FolderRepo.GetObject(), FolderTree);
+
 	for (int i = 0; i < FolderTree.Num(); i++)
 	{
 		FFolder ExFolder = FolderTree[i];
@@ -56,6 +70,7 @@ void UPeacegateFileSystem::SetFolderByID(int FolderID, FFolder Folder)
 		if (ExFolder.FolderID == FolderID)
 		{
 			FolderTree[i] = Folder;
+			IFolderRepository::Execute_PushFolderTree(FolderRepo.GetObject(), FolderTree);
 			return;
 		}
 	}
@@ -63,6 +78,8 @@ void UPeacegateFileSystem::SetFolderByID(int FolderID, FFolder Folder)
 
 int UPeacegateFileSystem::GetNewFolderID()
 {
+	TArray<FFolder> FolderTree;
+	IFolderRepository::Execute_GetFolderTree(FolderRepo.GetObject(), FolderTree);
 	int ID = 0;
 
 	for (auto& Folder : FolderTree)
@@ -177,16 +194,25 @@ FString UPeacegateFileSystem::ResolveToAbsolute(const FString Path)
 
 void UPeacegateFileSystem::BuildFolderNavigator()
 {
+	TArray<FFolder> FolderTree;
+	IFolderRepository::Execute_GetFolderTree(FolderRepo.GetObject(), FolderTree);
+
 	if (FolderTree.Num()==0)
 	{
 		UFileUtilities::FormatFilesystem(FolderTree);
-		FilesystemModified.Broadcast();
+		IFolderRepository::Execute_PushFolderTree(FolderRepo.GetObject(), FolderTree);
 	}
 
 	Root = NewObject<UFolderNavigator>();
 
 	BuildChildNavigators(Root);
 
+}
+
+void UPeacegateFileSystem::Initialize(int InUserID)
+{
+	UserID = InUserID;
+	BuildFolderNavigator();
 }
 
 bool UPeacegateFileSystem::CreateDirectory(const FString InPath, EFilesystemStatusCode& OutStatusCode)
@@ -223,6 +249,9 @@ bool UPeacegateFileSystem::CreateDirectory(const FString InPath, EFilesystemStat
 		return false;
 	}
 
+	TArray<FFolder> FolderTree;
+	IFolderRepository::Execute_GetFolderTree(FolderRepo.GetObject(), FolderTree);
+
 	// Allocate a new Folder structure in memory
 	FFolder NewFolder;
 
@@ -237,6 +266,9 @@ bool UPeacegateFileSystem::CreateDirectory(const FString InPath, EFilesystemStat
 
 	// Add the new folder to the filesystem
 	FolderTree.Add(NewFolder);
+
+	// Alert the save system over in Blueprint land of the change too, so the game saves
+	IFolderRepository::Execute_PushFolderTree(FolderRepo.GetObject(), FolderTree);
 
 	// Retrieve the filesystem entry for the parent folder
 	FFolder CurrFolder = GetFolderByID(ParentNav->FolderIndex);
@@ -258,9 +290,6 @@ bool UPeacegateFileSystem::CreateDirectory(const FString InPath, EFilesystemStat
 
 	// Tell Peacegate that we created a directory - the mission system can consume this event.
 	FilesystemOperation.Broadcast(EFilesystemEventType::CreateDirectory, ResolvedPath);
-
-	// Alert the save system over in Blueprint land of the change too, so the game saves
-	FilesystemModified.Broadcast();
 
 	// Success.
 	return true;
@@ -424,7 +453,6 @@ bool UPeacegateFileSystem::Delete(const FString InPath, const bool InRecursive, 
 
 	// Alert the Blueprint land.
 	FilesystemOperation.Broadcast(EventType, ResolvedPath);
-	FilesystemModified.Broadcast();
 
 	return true;
 }
@@ -549,7 +577,6 @@ void UPeacegateFileSystem::WriteText(const FString & InPath, const FString & InT
 	SetFolderByID(Navigator->FolderIndex, Folder);
 
 	FilesystemOperation.Broadcast(EFilesystemEventType::WriteFile, ResolvedPath + TEXT("/") + FileName);
-	FilesystemModified.Broadcast();
 }
 
 void UPeacegateFileSystem::WriteBinary(const FString & InPath, TArray<uint8> InBinary)
@@ -613,7 +640,6 @@ void UPeacegateFileSystem::WriteBinary(const FString & InPath, TArray<uint8> InB
 	SetFolderByID(Navigator->FolderIndex, Folder);
 
 	FilesystemOperation.Broadcast(EFilesystemEventType::WriteFile, ResolvedPath + TEXT("/") + FileName);
-	FilesystemModified.Broadcast();
 }
 
 
@@ -664,7 +690,7 @@ bool UPeacegateFileSystem::ReadText(const FString & InPath, FString& OutText, EF
 	return true;
 }
 
-bool UPeacegateFileSystem::ReadBinary(const FString& InPath, TArray<uint8> OutBinary, EFilesystemStatusCode& OutStatusCode)
+bool UPeacegateFileSystem::ReadBinary(const FString& InPath, TArray<uint8>& OutBinary, EFilesystemStatusCode& OutStatusCode)
 {
 	// used for logging.
 	FString ResolvedPath;
@@ -786,8 +812,6 @@ bool UPeacegateFileSystem::MoveFile(const FString & Source, const FString & Dest
 	SetFolderByID(SourceNav->FolderIndex, SourceFolder);
 	SetFolderByID(DestNav->FolderIndex, DestFolder);
 
-	FilesystemModified.Broadcast();
-
 	return true;
 }
 
@@ -881,9 +905,6 @@ bool UPeacegateFileSystem::MoveFolder(const FString & Source, const FString & De
 	//Update FS
 	SetFolderByID(SourceChildData.FolderID, SourceChildData);
 
-	// Broadcast
-	FilesystemModified.Broadcast();
-
 	return true;
 }
 
@@ -959,8 +980,6 @@ bool UPeacegateFileSystem::CopyFile(const FString & Source, const FString & Dest
 	// update FS
 	SetFolderByID(SourceNav->FolderIndex, SourceFolder);
 	SetFolderByID(DestNav->FolderIndex, DestFolder);
-
-	FilesystemModified.Broadcast();
 
 	return true;
 }

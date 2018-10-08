@@ -15,28 +15,38 @@ class PROJECTOGLOWIA_API UConsoleContext : public UObject
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ExposeOnSpawn = "true"))
+	UPROPERTY(BlueprintReadOnly)
 	int UserID;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ExposeOnSpawn = "true"))
+	UPROPERTY(BlueprintReadOnly)
+	FString HomeDirectory;
+
+	UPROPERTY()
 	TScriptInterface<class ISystemContext> SystemContext;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ExposeOnSpawn = "true"))
+	UPROPERTY()
 	UPTerminalWidget* Terminal;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FString WorkingDirectory = TEXT("/home");
+	UPROPERTY(BlueprintReadOnly)
+	FString WorkingDirectory;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ExposeOnSpawn = "true"))
+	UPROPERTY(BlueprintReadOnly)
 	UPeacegateFileSystem* Filesystem;
 
-	UFUNCTION(BlueprintCallable, Category="Filesystem")
-	FString CombineWithWorkingDirectory(const FString& InPath)
-	{
-		if (InPath.StartsWith("/"))
-			return Filesystem->ResolveToAbsolute(InPath);
-		return Filesystem->ResolveToAbsolute(WorkingDirectory + TEXT("/") + InPath);
-	}
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Console Context")
+	FString GetHostname();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Console Context")
+	FString GetUsername();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Console Context")
+	FString GetUserTypeDisplay();
+
+	UFUNCTION(BlueprintCallable, Category = "Console Context")
+	void SetWorkingDirectory(const FString& InPath);
+
+	UFUNCTION(BlueprintCallable, Category = "Filesystem")
+	FString CombineWithWorkingDirectory(const FString& InPath);
 
 	UFUNCTION(BlueprintCallable, Category = "Bash", meta = (Pure))
 	FString GetDisplayWorkingDirectory();

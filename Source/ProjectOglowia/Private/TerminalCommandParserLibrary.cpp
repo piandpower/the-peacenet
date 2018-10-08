@@ -152,10 +152,8 @@ FPeacegateCommandInstruction UTerminalCommandParserLibrary::GetCommandList(const
 	return FPeacegateCommandInstruction(commands, fileName, shouldOverwriteOnFileRedirect);
 }
 
-TArray<FString> UTerminalCommandParserLibrary::Tokenize(const FString& InCommand, FString& OutputError) 
+TArray<FString> UTerminalCommandParserLibrary::Tokenize(const FString& InCommand, const FString& Home, FString& OutputError) 
 {
-	FString HomeDirectory = TEXT("/home");
-
 	TArray<FString> tokens;
 	FString current = TEXT("");
 	bool escaping = false;
@@ -212,7 +210,7 @@ TArray<FString> UTerminalCommandParserLibrary::Tokenize(const FString& InCommand
 		{
 			if (inQuote == false && current.IsEmpty())
 			{
-				current = current.Append(HomeDirectory);
+				current = current.Append(Home);
 				continue;
 			}
 		}
@@ -267,56 +265,3 @@ TArray<FString> UTerminalCommandParserLibrary::Tokenize(const FString& InCommand
 	}
 	return tokens;
 }
-
-TArray<FString> UTerminalCommandParserLibrary::TokensFromPattern(const FString & InSource)
-{
-	FRegexPattern re_separators{
-		TEXT("(?:\\s*)") // any spaces (non-matching subgroup)
-		TEXT("(")
-		TEXT("[\\[\\]\\(\\)\\|]") // one character of brackets or parens or pipe character
-		TEXT("|")
-		TEXT("\\.\\.\\.")  // elipsis
-		TEXT(")") };
-
-	FRegexPattern re_strings{
-		TEXT("(?:\\s*)") // any spaces (non-matching subgroup)
-		TEXT("(")
-		TEXT("\\S*<.*?>")  // strings, but make sure to keep "< >" strings together
-		TEXT("|")
-		TEXT("[^<>\\s]+")     // string without <>
-		TEXT(")") };
-
-
-	TArray<FString> tokens;
-
-	FRegexMatcher match(re_separators, InSource);
-
-	while (match.FindNext())
-	{
-		int b = match.GetMatchBeginning();
-		int e = match.GetMatchEnding();
-		FString sub = InSource.Mid(b, e);
-
-		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::White, FString::FromInt(b) + TEXT("-") + FString::FromInt(e) + TEXT(" ") + sub);
-
-		FRegexMatcher sMatch(re_strings, InSource);
-
-		while (sMatch.FindNext())
-		{
-			int sB = sMatch.GetMatchBeginning();
-			int sE = sMatch.GetMatchEnding();
-			FString sSub = InSource.Mid(sB, sE);
-
-			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::White, FString::FromInt(sB) + TEXT("-") + FString::FromInt(sE) + TEXT(" ") + sSub);
-
-			tokens.Add(sSub);
-		}
-
-
-		tokens.Add(sub);
-	}
-
-
-	return tokens;
-}
-

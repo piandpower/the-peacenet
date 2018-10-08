@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "FFolder.h"
+#include "FComputer.h"
+#include "FolderRepository.h"
 #include "UPeacegateFileSystem.generated.h"
 
 UENUM(BlueprintType)
@@ -32,8 +34,6 @@ public:
 	int FolderIndex = 0;
 };
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FFilesystemModifiedEvent);
-
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FFilesystemOperationEvent, EFilesystemEventType, InType, FString, InPath);
 
 UENUM(BlueprintType)
@@ -59,7 +59,17 @@ class PROJECTOGLOWIA_API UPeacegateFileSystem : public UObject
 private:
 	void BuildChildNavigators(UFolderNavigator* RootNav);
 
+	int UserID = 0;
+	
 public:
+	void BuildFolderNavigator();
+
+	UFUNCTION(BlueprintCallable, Category = "Filesystem")
+	void Initialize(int InUserID);
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta=(ExposeOnSpawn="true"))
+	TScriptInterface<IFolderRepository> FolderRepo;
+
 	UPROPERTY()
 	UFolderNavigator* Root;
 
@@ -67,16 +77,7 @@ public:
 	FString ResolveToAbsolute(const FString Path);
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable)
-	FFilesystemModifiedEvent FilesystemModified;
-
-	UPROPERTY(BlueprintAssignable, BlueprintCallable)
 	FFilesystemOperationEvent FilesystemOperation;
-
-	UPROPERTY(BlueprintReadOnly, meta=(ExposeOnSpawn = "true"))
-	TArray<FFolder> FolderTree;
-
-	UFUNCTION(BlueprintCallable, Category = "Filesystem")
-	void BuildFolderNavigator();
 
 	UFUNCTION(BlueprintCallable, Category = "Filesystem")
 	bool CreateDirectory(const FString InPath, EFilesystemStatusCode& OutStatusCode);
@@ -106,7 +107,7 @@ public:
 	bool ReadText(const FString& InPath, FString& OutText, EFilesystemStatusCode& OutStatusCode);
 
 	UFUNCTION(BlueprintCallable, Category = "Filesystem")
-	bool ReadBinary(const FString& InPath, TArray<uint8> OutBinary, EFilesystemStatusCode& OutStatusCode);
+	bool ReadBinary(const FString& InPath, TArray<uint8>& OutBinary, EFilesystemStatusCode& OutStatusCode);
 
 	UFUNCTION(BlueprintCallable, Category = "Filesystem")
 	bool MoveFile(const FString& Source, const FString& Destination, const bool InOverwrite, EFilesystemStatusCode& OutStatusCode);

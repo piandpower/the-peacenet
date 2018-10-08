@@ -56,16 +56,18 @@ TFuture<UTexture2D*> UImageLoader::LoadImageFromDiskAsync(UPeacegateFileSystem* 
 
 UTexture2D* UImageLoader::LoadImageFromDisk(UPeacegateFileSystem* InFilesystem, UObject* Outer, const FString& ImagePath) 
 { 
+	// Load the compressed byte data from the file 
+	TArray<uint8> FileData;
+
+	EFilesystemStatusCode StatusCode;
+
 	// Check if the file exists first 
-	if (!InFilesystem->FileExists(ImagePath)) 
+	if (!InFilesystem->ReadBinary(ImagePath, FileData, StatusCode)) 
 	{ 
-		UIL_LOG(Error, TEXT("File not found: %s"), *ImagePath); 
+		UIL_LOG(Error, TEXT("File not found or couldn't be read: %s"), *ImagePath); 
 		return nullptr;
 	}
 
-	// Load the compressed byte data from the file 
-	TArray<uint8> FileData = InFilesystem->ReadBinary(ImagePath);
-	
 	// Detect the image type using the ImageWrapper module 
 	EImageFormat ImageFormat = ImageWrapperModule.DetectImageFormat(FileData.GetData(), FileData.Num());
 	

@@ -2,6 +2,22 @@
 
 #include "UPeacegateFileSystem.h"
 
+bool UPeacegateFileSystem::GetFile(FFolder Parent, FString FileName, int & Index, FFile & File)
+{
+	for (int i = 0; i < Parent.Files.Num(); i++)
+	{
+		FFile F = Parent.Files[i];
+		if (F.FileName == FileName)
+		{
+			File = F;
+			Index = i;
+			return true;
+		}
+	}
+
+	return false;
+}
+
 void UPeacegateFileSystem::RecursiveDelete(FFolder& InFolder)
 {
 	for (auto& Subfolder : InFolder.SubFolders)
@@ -58,6 +74,54 @@ int UPeacegateFileSystem::GetNewFolderID()
 	}
 
 	return ID+1;
+}
+
+bool UPeacegateFileSystem::TraversePath(const TArray<FString>& PathParts, UFolderNavigator *& OutNavigator)
+{
+	return TraversePath(PathParts, PathParts.Num(), OutNavigator);
+}
+
+bool UPeacegateFileSystem::TraversePath(const TArray<FString>& PathParts, const int Count, UFolderNavigator* &OutNavigator)
+{
+	UFolderNavigator* Navigator = Root;
+
+	if (!Navigator)
+	{
+		// The filesystem is not ready.
+		OutNavigator = nullptr;
+		return false;
+	}
+
+	// Go through each part of the path that we want to.
+	for (int i = 0; i < PathParts.Num() && i < Count; i++)
+	{
+		// Get the current path part.
+		FString FolderName = PathParts[i];
+
+		if (Navigator->SubFolders.Contains(FolderName))
+		{
+			// Traverse down the Navigation Graph.
+			Navigator = Navigator->SubFolders[FolderName];
+		}
+		else
+		{
+			// Directory not found.
+			OutNavigator = nullptr;
+			return false;
+		}
+	}
+
+	// Let the caller know where we ended up
+	OutNavigator = Navigator;
+	return true;
+}
+
+TArray<FString> UPeacegateFileSystem::GetPathParts(FString InPath, FString& ResolvedPath)
+{
+	ResolvedPath = ResolveToAbsolute(InPath);
+	TArray<FString> Parts;
+	ResolvedPath.ParseIntoArray(Parts, TEXT("/"), true);
+	return Parts;
 }
 
 void UPeacegateFileSystem::BuildChildNavigators(UFolderNavigator * RootNav)
@@ -125,53 +189,84 @@ void UPeacegateFileSystem::BuildFolderNavigator()
 
 }
 
-void UPeacegateFileSystem::CreateDirectory(const FString InPath)
+bool UPeacegateFileSystem::CreateDirectory(const FString InPath, EFilesystemStatusCode& OutStatusCode)
 {
-	FString ResolvedPath = ResolveToAbsolute(InPath);
-	TArray<FString> Parts;
-	ResolvedPath.ParseIntoArray(Parts, TEXT("/"), true);
-	UFolderNavigator* Navigator = Root;
+	// Used for logging.
+	FString ResolvedPath;
 
-	bool DirectoryCreated = false;
+	// Resolve path and split into parts.
+	TArray<FString> Parts = GetPathParts(InPath, ResolvedPath);
 
-	for (auto& Part : Parts)
+	// Don't try to create /.
+	if (Parts.Num() == 0)
 	{
-		if (Navigator->SubFolders.Contains(Part))
-		{
-			Navigator = Navigator->SubFolders[Part];
-		}
-		else {
-			FFolder NewFolder;
-			NewFolder.FolderName = Part;
-			NewFolder.FolderID = GetNewFolderID();
-			NewFolder.ParentID = Navigator->FolderIndex;
-			FolderTree.Add(NewFolder);
-
-			FFolder CurrFolder = GetFolderByID(Navigator->FolderIndex);
-
-			CurrFolder.SubFolders.Add(NewFolder.FolderID);;
-
-			SetFolderByID(Navigator->FolderIndex, CurrFolder);
-
-			UFolderNavigator* NewNav = NewObject<UFolderNavigator>();
-
-			NewNav->FolderIndex = NewFolder.FolderID;
-
-			Navigator->SubFolders.Add(NewFolder.FolderName, NewNav);
-
-			Navigator = NewNav;
-
-			DirectoryCreated = true;
-		}
-
+		OutStatusCode = EFilesystemStatusCode::FileOrDirectoryExists;
+		return false;
 	}
 
-	if (DirectoryCreated)
+	// The navigator which points to the parent directory of the one we want to create.
+	UFolderNavigator* ParentNav = nullptr;
+
+	// If we can't traverse to the parent, return FileOrDirectoryNotFound.
+	if (!TraversePath(Parts, Parts.Num() - 1, ParentNav))
 	{
-		FilesystemOperation.Broadcast(EFilesystemEventType::CreateDirectory, ResolvedPath);
-		FilesystemModified.Broadcast();
+		OutStatusCode = EFilesystemStatusCode::FileOrDirectoryNotFound;
+		return false;
 	}
+
+	FString FolderName = Parts[Parts.Num() - 1]; // New folder name
+	
+	// Does a folder with this name exist here?
+	if (ParentNav->SubFolders.Contains(FolderName))
+	{
+		OutStatusCode = EFilesystemStatusCode::FileOrDirectoryExists;
+		return false;
+	}
+
+	// Allocate a new Folder structure in memory
+	FFolder NewFolder;
+
+	// Name it.
+	NewFolder.FolderName = FolderName;
+
+	// Give it a new Peacegate Folder ID.
+	NewFolder.FolderID = GetNewFolderID();
+
+	// The Parent ID becomes the ID of ParentNav, for when we rebuild the NavigationGraph again.
+	NewFolder.ParentID = ParentNav->FolderIndex;
+
+	// Add the new folder to the filesystem
+	FolderTree.Add(NewFolder);
+
+	// Retrieve the filesystem entry for the parent folder
+	FFolder CurrFolder = GetFolderByID(ParentNav->FolderIndex);
+
+	// Add the ID of the new folder as a subfolder of its parent
+	CurrFolder.SubFolders.Add(NewFolder.FolderID);;
+
+	// Update the data in the filesystem
+	SetFolderByID(ParentNav->FolderIndex, CurrFolder);
+
+	// Create a new folder navigator so we can update the Navigation Graph
+	UFolderNavigator* NewNav = NewObject<UFolderNavigator>();
+
+	// Folder index matches the new folder ID
+	NewNav->FolderIndex = NewFolder.FolderID;
+
+	// Add it to the parent navigator to link it all up.
+	ParentNav->SubFolders.Add(NewFolder.FolderName, NewNav);
+
+	// Tell Peacegate that we created a directory - the mission system can consume this event.
+	FilesystemOperation.Broadcast(EFilesystemEventType::CreateDirectory, ResolvedPath);
+
+	// Alert the save system over in Blueprint land of the change too, so the game saves
+	FilesystemModified.Broadcast();
+
+	// Success.
+	return true;
 }
+
+
 
 bool UPeacegateFileSystem::DirectoryExists(const FString InPath)
 {
@@ -234,157 +329,163 @@ bool UPeacegateFileSystem::FileExists(const FString InPath)
 	return false;
 }
 
-void UPeacegateFileSystem::Delete(const FString InPath)
+bool UPeacegateFileSystem::Delete(const FString InPath, const bool InRecursive, EFilesystemStatusCode& OutStatusCode)
 {
-	if (DirectoryExists(InPath))
+	// Used for logging.
+	FString ResolvedPath;
+
+	EFilesystemEventType EventType = EFilesystemEventType::DeleteDirectory;
+
+	TArray<FString> Parts = GetPathParts(InPath, ResolvedPath);
+
+	// If the path part list is empty, user tried to delete root. Not allowed.
+	if (Parts.Num() == 0)
 	{
-		FString ResolvedPath = ResolveToAbsolute(InPath);
-		TArray<FString> Parts;
-		ResolvedPath.ParseIntoArray(Parts, TEXT("/"), true);
-		UFolderNavigator* Navigator = Root;
-		
-		if (Parts.Num() == 0)
-			return;
-		
-		for (auto& Part : Parts)
+		OutStatusCode = EFilesystemStatusCode::PermissionDenied;
+		return false;
+	}
+
+	// Parent directory to look inside.
+	UFolderNavigator* ParentNav = nullptr;
+
+	// Do we even have an existing parent?
+	if (!TraversePath(Parts, Parts.Num() - 1, ParentNav))
+	{
+		// There's nothing to delete.
+		OutStatusCode = EFilesystemStatusCode::FileOrDirectoryNotFound;
+		return false;
+	}
+
+	// File name could also be a folder name, we'll check in a second.
+	FString Filename = Parts[Parts.Num() - 1];
+
+	// If the filename is a folder...
+	if (ParentNav->SubFolders.Contains(Filename))
+	{
+		// Get the folder's navigator so we know what to delete and can check it.
+		UFolderNavigator* NavToDelete = ParentNav->SubFolders[Filename];
+
+		// Get the folder data from the filesystem
+		FFolder FolderToDelete = GetFolderByID(NavToDelete->FolderIndex);
+
+		// If we have subfolders...
+		if (NavToDelete->SubFolders.Num() > 0)
 		{
-			if (Navigator->SubFolders.Contains(Part))
+			// Make sure the delete operation is recursive
+			if (!InRecursive)
 			{
-				Navigator = Navigator->SubFolders[Part];
+				OutStatusCode = EFilesystemStatusCode::DirectoryNotEmpty;
+				return false;
 			}
 		}
 
-		FFolder FolderToDelete = GetFolderByID(Navigator->FolderIndex);
-
-		int ParentID = FolderToDelete.ParentID;
-		int FolderID = FolderToDelete.FolderID;
-
+		// Recursively delete everything inside the folder.
 		RecursiveDelete(FolderToDelete);
 
-		FFolder Parent = GetFolderByID(ParentID);
-		Parent.SubFolders.Remove(FolderID);
-		SetFolderByID(ParentID, Parent);
+		// Get the parent folder data
+		FFolder ParentFolder = GetFolderByID(ParentNav->FolderIndex);
 
-		BuildFolderNavigator();
+		// Remove the just-deleted folder from the parent.
+		ParentFolder.SubFolders.Remove(NavToDelete->FolderIndex);
 
-		FilesystemOperation.Broadcast(EFilesystemEventType::DeleteDirectory, ResolvedPath);
-		FilesystemModified.Broadcast();
+		// Update the FS.
+		SetFolderByID(ParentNav->FolderIndex, ParentFolder);
 
+		// Remove the just deleted navigator from its parent
+		ParentNav->SubFolders.Remove(Filename);
 	}
-	else if (FileExists(InPath))
+	else
 	{
-		FString FolderPath;
-		FString FileName;
+		// Get the parent folder data.
+		FFolder ParentFolder = GetFolderByID(ParentNav->FolderIndex);
 
-		if (!InPath.Split(TEXT("/"), &FolderPath, &FileName, ESearchCase::IgnoreCase, ESearchDir::FromEnd))
-			return;
+		// Info about the file
+		int FileIndex;
+		FFile FileToDelete;
 
-		FString ResolvedPath = ResolveToAbsolute(FolderPath);
-		TArray<FString> Parts;
-		ResolvedPath.ParseIntoArray(Parts, TEXT("/"), true);
-		UFolderNavigator* Navigator = Root;
-
-		for (auto& Part : Parts)
+		// Try to find the file.
+		if (!GetFile(ParentFolder, Filename, FileIndex, FileToDelete))
 		{
-			if (Navigator->SubFolders.Contains(Part))
-			{
-				Navigator = Navigator->SubFolders[Part];
-			}
+			// File or directory not found.
+			OutStatusCode = EFilesystemStatusCode::FileOrDirectoryNotFound;
+			return false;
 		}
 
-		FFolder FolderToAlter = GetFolderByID(Navigator->FolderIndex);
+		// Remove the file at the found index. I'm not wasting CPU cycles comparing file structures.
+		ParentFolder.Files.RemoveAt(FileIndex);
 
-		bool Write = false;
-
-		for (int i = 0; i < FolderToAlter.Files.Num(); i++)
-		{
-			FFile File = FolderToAlter.Files[i];
-			if (File.FileName == FileName)
-			{
-				Write = true;
-				FolderToAlter.Files.RemoveAt(i);
-				break;
-			}
-		}
-
-		if (Write)
-		{
-			SetFolderByID(Navigator->FolderIndex, FolderToAlter);
-		
-			FilesystemOperation.Broadcast(EFilesystemEventType::DeleteFile, ResolvedPath + TEXT("/") + FileName);
-			FilesystemModified.Broadcast();
-
-		}
-
+		// Update the FS.
+		SetFolderByID(ParentNav->FolderIndex, ParentFolder);
+	
+		// Change event type
+		EventType = EFilesystemEventType::DeleteFile;
 	}
+
+
+	// Alert the Blueprint land.
+	FilesystemOperation.Broadcast(EventType, ResolvedPath);
+	FilesystemModified.Broadcast();
+
+	return true;
 }
 
-TArray<FString> UPeacegateFileSystem::GetDirectories(const FString & InPath)
+bool UPeacegateFileSystem::GetDirectories(const FString & InPath, TArray<FString>& OutDirectories, EFilesystemStatusCode& OutStatusCode)
 {
-	FString ResolvedPath = ResolveToAbsolute(InPath);
-	TArray<FString> Parts;
-	ResolvedPath.ParseIntoArray(Parts, TEXT("/"), true);
-	UFolderNavigator* Navigator = Root;
+	// used for logging
+	FString ResolvedPath;
 
-	for (auto& Part : Parts)
+	// Split path into parts.
+	TArray<FString> Parts = GetPathParts(InPath, ResolvedPath);
+
+	// Navigator that we're going to read.
+	UFolderNavigator* Navigator = nullptr;
+
+	if (!TraversePath(Parts, Navigator))
 	{
-		if (Navigator->SubFolders.Contains(Part))
-		{
-			Navigator = Navigator->SubFolders[Part];
-		}
-		else {
-			return TArray<FString>();
-		}
+		// Directory doesn't exist.
+		OutStatusCode = EFilesystemStatusCode::FileOrDirectoryNotFound;
+		return false;
 	}
-
-	TArray<FString> Ret;
 
 	TArray<FString> Keys;
 	Navigator->SubFolders.GetKeys(Keys);
 
 	for (auto Key : Keys)
 	{
-		if (ResolvedPath.EndsWith(TEXT("/")))
-			Ret.Add(ResolvedPath + Key);
-		else
-			Ret.Add(ResolvedPath + TEXT("/") + Key);
+		OutDirectories.Add(ResolvedPath + TEXT("/") + Key);
 	}
 
-	return Ret;
-
+	return true;
 }
 
-TArray<FString> UPeacegateFileSystem::GetFiles(const FString & InPath)
+bool UPeacegateFileSystem::GetFiles(const FString & InPath, TArray<FString>& OutFiles, EFilesystemStatusCode& OutStatusCode)
 {
-	FString ResolvedPath = ResolveToAbsolute(InPath);
-	TArray<FString> Parts;
-	ResolvedPath.ParseIntoArray(Parts, TEXT("/"), true);
-	UFolderNavigator* Navigator = Root;
+	// used for logging
+	FString ResolvedPath;
 
-	for (auto& Part : Parts)
+	// split path into parts.
+	TArray<FString> Parts = GetPathParts(InPath, ResolvedPath);
+
+	// We need this in order to get the folder data
+	UFolderNavigator* Navigator;
+
+	if (!TraversePath(Parts, Navigator))
 	{
-		if (Navigator->SubFolders.Contains(Part))
-		{
-			Navigator = Navigator->SubFolders[Part];
-		}
-		else {
-			return TArray<FString>();
-		}
+		// Directory not found.
+		OutStatusCode = EFilesystemStatusCode::FileOrDirectoryNotFound;
+		return false;
 	}
 
-	TArray<FString> Ret;
+	// read folder data
 	FFolder Folder = GetFolderByID(Navigator->FolderIndex);
 
-	for (auto File : Folder.Files)
+	// loop through each file
+	for (FFile File : Folder.Files)
 	{
-		FString Key = File.FileName;
-		if (ResolvedPath.EndsWith(TEXT("/")))
-			Ret.Add(ResolvedPath + Key);
-		else
-			Ret.Add(ResolvedPath + TEXT("/") + Key);
+		OutFiles.Add(ResolvedPath + TEXT("/") + File.FileName);
 	}
 
-	return Ret;
+	return true;
 }
 
 void UPeacegateFileSystem::WriteText(const FString & InPath, const FString & InText)
@@ -516,98 +617,352 @@ void UPeacegateFileSystem::WriteBinary(const FString & InPath, TArray<uint8> InB
 }
 
 
-FString UPeacegateFileSystem::ReadText(const FString & InPath)
+bool UPeacegateFileSystem::ReadText(const FString & InPath, FString& OutText, EFilesystemStatusCode& OutStatusCode)
 {
-	if (!FileExists(InPath))
-		return FString();
+	// used for logging.
+	FString ResolvedPath;
 
-	FString FolderPath;
-	FString FileName;
+	// retrieve path parts.
+	TArray<FString> Parts = GetPathParts(InPath, ResolvedPath);
 
-	if (!InPath.Split(TEXT("/"), &FolderPath, &FileName, ESearchCase::IgnoreCase, ESearchDir::FromEnd))
-		return FString();
-
-	if (!DirectoryExists(FolderPath))
-		return FString();
-
-	FString ResolvedPath = ResolveToAbsolute(FolderPath);
-	TArray<FString> Parts;
-	ResolvedPath.ParseIntoArray(Parts, TEXT("/"), true);
-	UFolderNavigator* Navigator = this->Root;
-
-	for (auto& Part : Parts)
+	// If path part list is empty, don't read.
+	if (Parts.Num() == 0)
 	{
-		if (Navigator->SubFolders.Contains(Part))
-		{
-			Navigator = Navigator->SubFolders[Part];
-		}
-		else {
-			return FString();
-		}
+		OutStatusCode = EFilesystemStatusCode::PermissionDenied;
+		return false;
 	}
 
-	FFolder Folder = GetFolderByID(Navigator->FolderIndex);
+	// Folder navigator to look up when finding the file.
+	UFolderNavigator* ParentNav = nullptr;
 
-	for (int i = 0; i < Folder.Files.Num(); i++)
+	if (!TraversePath(Parts, Parts.Num() - 1, ParentNav))
 	{
-		FFile File = Folder.Files[i];
-
-		if (File.FileName == FileName)
-		{
-			FString Ret;
-			FBase64::Decode(File.FileContent, Ret);
-			return Ret;
-		}
+		// File's parent wasn't found.
+		OutStatusCode = EFilesystemStatusCode::FileOrDirectoryNotFound;
+		return false;
 	}
 
-	return FString();
+	// File name is always last part in path.
+	FString FileName = Parts[Parts.Num() - 1];
+
+	// Grab the folder data for the parent.
+	FFolder Parent = GetFolderByID(ParentNav->FolderIndex);
+
+	// Places to store found file info
+	FFile FoundFile;
+	int FoundIndex;
+
+	if (!GetFile(Parent, FileName, FoundIndex, FoundFile))
+	{
+		// File not found.
+		OutStatusCode = EFilesystemStatusCode::FileOrDirectoryNotFound;
+		return false;
+	}
+
+	// File contents are in base 64.
+	FBase64::Decode(FoundFile.FileContent, OutText);
+	return true;
 }
 
-TArray<uint8> UPeacegateFileSystem::ReadBinary(const FString & InPath)
+bool UPeacegateFileSystem::ReadBinary(const FString& InPath, TArray<uint8> OutBinary, EFilesystemStatusCode& OutStatusCode)
 {
-	if (!FileExists(InPath))
-		return TArray<uint8>();
+	// used for logging.
+	FString ResolvedPath;
 
-	FString FolderPath;
-	FString FileName;
+	// retrieve path parts.
+	TArray<FString> Parts = GetPathParts(InPath, ResolvedPath);
 
-	if (!InPath.Split(TEXT("/"), &FolderPath, &FileName, ESearchCase::IgnoreCase, ESearchDir::FromEnd))
-		return TArray<uint8>();
-
-	if (!DirectoryExists(FolderPath))
-		return TArray<uint8>();
-
-	FString ResolvedPath = ResolveToAbsolute(FolderPath);
-	TArray<FString> Parts;
-	ResolvedPath.ParseIntoArray(Parts, TEXT("/"), true);
-	UFolderNavigator* Navigator = this->Root;
-
-	for (auto& Part : Parts)
+	// If path part list is empty, don't read.
+	if (Parts.Num() == 0)
 	{
-		if (Navigator->SubFolders.Contains(Part))
-		{
-			Navigator = Navigator->SubFolders[Part];
-		}
-		else {
-			return TArray<uint8>();
-		}
+		OutStatusCode = EFilesystemStatusCode::PermissionDenied;
+		return false;
 	}
 
-	FFolder Folder = GetFolderByID(Navigator->FolderIndex);
+	// Folder navigator to look up when finding the file.
+	UFolderNavigator* ParentNav = nullptr;
 
-	for (int i = 0; i < Folder.Files.Num(); i++)
+	if (!TraversePath(Parts, Parts.Num() - 1, ParentNav))
 	{
-		FFile File = Folder.Files[i];
-
-		if (File.FileName == FileName)
-		{
-			TArray<uint8> Ret;
-			FBase64::Decode(File.FileContent, Ret);
-			return Ret;
-		}
+		// File's parent wasn't found.
+		OutStatusCode = EFilesystemStatusCode::FileOrDirectoryNotFound;
+		return false;
 	}
 
-	return TArray<uint8>();
+	// File name is always last part in path.
+	FString FileName = Parts[Parts.Num() - 1];
+
+	// Grab the folder data for the parent.
+	FFolder Parent = GetFolderByID(ParentNav->FolderIndex);
+
+	// Places to store found file info
+	FFile FoundFile;
+	int FoundIndex;
+
+	if (!GetFile(Parent, FileName, FoundIndex, FoundFile))
+	{
+		// File not found.
+		OutStatusCode = EFilesystemStatusCode::FileOrDirectoryNotFound;
+		return false;
+	}
+
+	// File contents are in base 64.
+	FBase64::Decode(FoundFile.FileContent, OutBinary);
+	return true;
+}
+
+bool UPeacegateFileSystem::MoveFile(const FString & Source, const FString & Destination, const bool InOverwrite, EFilesystemStatusCode & OutStatusCode)
+{
+	FString SourceResolved;
+	FString DestResolved;
+
+	TArray<FString> SourceParts = GetPathParts(Source, SourceResolved);
+	TArray<FString> DestParts = GetPathParts(Destination, DestResolved);
+
+	if (SourceParts.Num() == 0 || DestParts.Num() == 0)
+	{
+		// don't. fucking. touch. ROOT.
+		OutStatusCode = EFilesystemStatusCode::PermissionDenied;
+		return false;
+	}
+
+	UFolderNavigator* SourceNav = nullptr;
+	UFolderNavigator* DestNav = nullptr;
+
+	if (!TraversePath(SourceParts, SourceParts.Num() - 1, SourceNav) || !TraversePath(DestParts, DestParts.Num() - 1, DestNav))
+	{
+		// source/dest parent not found
+		OutStatusCode = EFilesystemStatusCode::FileOrDirectoryNotFound;
+		return false;
+	}
+
+	FFolder SourceFolder = GetFolderByID(SourceNav->FolderIndex);
+	FFolder DestFolder = GetFolderByID(DestNav->FolderIndex);
+
+	int SourceFileIndex;
+	int DestFileIndex;
+	FFile SourceFile;
+	FFile DestFile;
+
+	FString SourceName = SourceParts[SourceParts.Num() - 1];
+	FString DestName = DestParts[DestParts.Num() - 1];
+
+	if (!GetFile(SourceFolder, SourceName, SourceFileIndex, SourceFile))
+	{
+		// Source file not found.
+		OutStatusCode = EFilesystemStatusCode::FileOrDirectoryNotFound;
+		return false;
+	}
+
+	if (GetFile(DestFolder, DestName, DestFileIndex, DestFile))
+	{
+		if (!InOverwrite)
+		{
+			OutStatusCode = EFilesystemStatusCode::FileOrDirectoryExists;
+			return false;
+		}
+
+		// Overwrite the destination file.
+		DestFile.FileContent = SourceFile.FileContent;
+	
+		// overwrite the file in the destination folder
+		DestFolder.Files[DestFileIndex] = DestFile;
+	}
+	else 
+	{
+		// Allocate a new destination file
+		DestFile = FFile();
+		DestFile.FileName = DestName;
+		DestFile.FileContent = SourceFile.FileContent;
+
+		// add to destination folder
+		DestFolder.Files.Add(DestFile);
+	}
+
+	// remove source file from source folder
+	SourceFolder.Files.RemoveAt(SourceFileIndex);
+
+	// update FS
+	SetFolderByID(SourceNav->FolderIndex, SourceFolder);
+	SetFolderByID(DestNav->FolderIndex, DestFolder);
+
+	FilesystemModified.Broadcast();
+
+	return true;
+}
+
+bool UPeacegateFileSystem::MoveFolder(const FString & Source, const FString & Destination, const bool InOverwrite, EFilesystemStatusCode & OutStatusCode)
+{
+	FString SourceResolved;
+	FString DestResolved;
+
+	TArray<FString> SourceParts = GetPathParts(Source, SourceResolved);
+	TArray<FString> DestParts = GetPathParts(Destination, DestResolved);
+
+	if (SourceParts.Num() == 0 || DestParts.Num() == 0)
+	{
+		// don't. fucking. touch. ROOT.
+		OutStatusCode = EFilesystemStatusCode::PermissionDenied;
+		return false;
+	}
+
+	UFolderNavigator* SourceNav = nullptr;
+	UFolderNavigator* DestNav = nullptr;
+
+	if (!TraversePath(SourceParts, SourceParts.Num() - 1, SourceNav) || !TraversePath(DestParts, DestParts.Num() - 1, DestNav))
+	{
+		// source/dest parent not found
+		OutStatusCode = EFilesystemStatusCode::FileOrDirectoryNotFound;
+		return false;
+	}
+
+	FFolder SourceParent = GetFolderByID(SourceNav->FolderIndex);
+	FFolder DestParent = GetFolderByID(DestNav->FolderIndex);
+
+	FString SourceName = SourceParts[SourceParts.Num() - 1];
+	FString DestName = DestParts[DestParts.Num() - 1];
+
+	if (!SourceNav->SubFolders.Contains(SourceName))
+	{
+		// source directory not found.
+		OutStatusCode = EFilesystemStatusCode::FileOrDirectoryNotFound;
+		return false;
+	}
+
+	UFolderNavigator* SourceChild = SourceNav->SubFolders[SourceName];
+
+	if (DestNav->SubFolders.Contains(DestName))
+	{
+		if (!InOverwrite)
+		{
+			// I NEED A FUCKING ADVIL.
+			OutStatusCode = EFilesystemStatusCode::FileOrDirectoryExists;
+			return false;
+		}
+
+		UFolderNavigator* DestChild = DestNav->SubFolders[DestName];
+
+		FFolder FolderToDelete = GetFolderByID(DestChild->FolderIndex);
+
+		// Recursively delete this folder.
+		RecursiveDelete(FolderToDelete);
+
+		// Remove the child from the parent
+		DestParent.SubFolders.Remove(DestChild->FolderIndex);
+
+		// Remove the old navigator from its parent.
+		DestNav->SubFolders.Remove(DestName);
+	}
+
+	// Remove the source child from its parent.
+	SourceNav->SubFolders.Remove(SourceName);
+
+	// And add it to the destination.
+	DestNav->SubFolders.Add(DestName, SourceChild);
+
+	// Remove SourceChild's folder index from the source parent
+	SourceParent.SubFolders.Remove(SourceChild->FolderIndex);
+
+	// And add it to the destination
+	DestParent.SubFolders.Add(SourceChild->FolderIndex);
+
+	// Update the FS.
+	SetFolderByID(DestParent.FolderID, DestParent);
+	SetFolderByID(SourceParent.FolderID, SourceParent);
+
+	// Update source child folder's parent ID.
+	FFolder SourceChildData = GetFolderByID(SourceChild->FolderIndex);
+
+	SourceChildData.ParentID = DestParent.FolderID;
+
+	// Rename the folder.
+	SourceChildData.FolderName = DestName;
+
+	//Update FS
+	SetFolderByID(SourceChildData.FolderID, SourceChildData);
+
+	// Broadcast
+	FilesystemModified.Broadcast();
+
+	return true;
+}
+
+
+bool UPeacegateFileSystem::CopyFile(const FString & Source, const FString & Destination, const bool InOverwrite, EFilesystemStatusCode & OutStatusCode)
+{
+	FString SourceResolved;
+	FString DestResolved;
+
+	TArray<FString> SourceParts = GetPathParts(Source, SourceResolved);
+	TArray<FString> DestParts = GetPathParts(Destination, DestResolved);
+
+	if (SourceParts.Num() == 0 || DestParts.Num() == 0)
+	{
+		// don't. fucking. touch. ROOT.
+		OutStatusCode = EFilesystemStatusCode::PermissionDenied;
+		return false;
+	}
+
+	UFolderNavigator* SourceNav = nullptr;
+	UFolderNavigator* DestNav = nullptr;
+
+	if (!TraversePath(SourceParts, SourceParts.Num() - 1, SourceNav) || !TraversePath(DestParts, DestParts.Num() - 1, DestNav))
+	{
+		// source/dest parent not found
+		OutStatusCode = EFilesystemStatusCode::FileOrDirectoryNotFound;
+		return false;
+	}
+
+	FFolder SourceFolder = GetFolderByID(SourceNav->FolderIndex);
+	FFolder DestFolder = GetFolderByID(DestNav->FolderIndex);
+
+	int SourceFileIndex;
+	int DestFileIndex;
+	FFile SourceFile;
+	FFile DestFile;
+
+	FString SourceName = SourceParts[SourceParts.Num() - 1];
+	FString DestName = DestParts[DestParts.Num() - 1];
+
+	if (!GetFile(SourceFolder, SourceName, SourceFileIndex, SourceFile))
+	{
+		// Source file not found.
+		OutStatusCode = EFilesystemStatusCode::FileOrDirectoryNotFound;
+		return false;
+	}
+
+	if (GetFile(DestFolder, DestName, DestFileIndex, DestFile))
+	{
+		if (!InOverwrite)
+		{
+			OutStatusCode = EFilesystemStatusCode::FileOrDirectoryExists;
+			return false;
+		}
+
+		// Overwrite the destination file.
+		DestFile.FileContent = SourceFile.FileContent;
+
+		// overwrite the file in the destination folder
+		DestFolder.Files[DestFileIndex] = DestFile;
+	}
+	else
+	{
+		// Allocate a new destination file
+		DestFile = FFile();
+		DestFile.FileName = DestName;
+		DestFile.FileContent = SourceFile.FileContent;
+
+		// add to destination folder
+		DestFolder.Files.Add(DestFile);
+	}
+
+	// update FS
+	SetFolderByID(SourceNav->FolderIndex, SourceFolder);
+	SetFolderByID(DestNav->FolderIndex, DestFolder);
+
+	FilesystemModified.Broadcast();
+
+	return true;
 }
 
 

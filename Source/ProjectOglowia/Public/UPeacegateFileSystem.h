@@ -36,8 +36,19 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FFilesystemModifiedEvent);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FFilesystemOperationEvent, EFilesystemEventType, InType, FString, InPath);
 
+UENUM(BlueprintType)
+enum class EFilesystemStatusCode : uint8
+{
+	OK,
+	FileOrDirectoryNotFound,
+	FileOrDirectoryExists,
+	DirectoryNotEmpty,
+	PermissionDenied,
+	UnknownError
+};
+
 /**
- * 
+ * Encapsulates a filesystem of a Peacenet computer.
  */
 UCLASS(Blueprintable)
 class PROJECTOGLOWIA_API UPeacegateFileSystem : public UObject
@@ -68,7 +79,7 @@ public:
 	void BuildFolderNavigator();
 
 	UFUNCTION(BlueprintCallable, Category = "Filesystem")
-	void CreateDirectory(const FString InPath);
+	bool CreateDirectory(const FString InPath, EFilesystemStatusCode& OutStatusCode);
 
 	UFUNCTION(BlueprintCallable, Category = "Filesystem")
 	bool DirectoryExists(const FString InPath);
@@ -77,13 +88,13 @@ public:
 	bool FileExists(const FString InPath);
 
 	UFUNCTION(BlueprintCallable, Category = "Filesystem")
-	void Delete(const FString InPath);
+	bool Delete(const FString InPath, const bool InRecursive, EFilesystemStatusCode& OutStatusCode);
 
 	UFUNCTION(BlueprintCallable, Category= "Filesystem")
-	TArray<FString> GetDirectories(const FString& InPath);
+	bool GetDirectories(const FString& InPath, TArray<FString>& OutDirectories, EFilesystemStatusCode& OutStatusCode);
 
 	UFUNCTION(BlueprintCallable, Category = "Filesystem")
-	TArray<FString> GetFiles(const FString& InPath);
+	bool GetFiles(const FString& InPath, TArray<FString>& OutFiles, EFilesystemStatusCode& OutStatusCode);
 
 	UFUNCTION(BlueprintCallable, Category = "Filesystem")
 	void WriteText(const FString& InPath, const FString& InText);
@@ -92,11 +103,19 @@ public:
 	void WriteBinary(const FString& InPath, TArray<uint8> InBinary);
 
 	UFUNCTION(BlueprintCallable, Category = "Filesystem")
-	FString ReadText(const FString& InPath);
+	bool ReadText(const FString& InPath, FString& OutText, EFilesystemStatusCode& OutStatusCode);
 
 	UFUNCTION(BlueprintCallable, Category = "Filesystem")
-	TArray<uint8> ReadBinary(const FString& InPath);
+	bool ReadBinary(const FString& InPath, TArray<uint8> OutBinary, EFilesystemStatusCode& OutStatusCode);
 
+	UFUNCTION(BlueprintCallable, Category = "Filesystem")
+	bool MoveFile(const FString& Source, const FString& Destination, const bool InOverwrite, EFilesystemStatusCode& OutStatusCode);
+
+	UFUNCTION(BlueprintCallable, Category = "Filesystem")
+	bool MoveFolder(const FString& Source, const FString& Destination, const bool InOverwrite, EFilesystemStatusCode& OutStatusCode);
+	
+	UFUNCTION(BlueprintCallable, Category = "Filesystem")
+	bool CopyFile(const FString& Source, const FString& Destination, const bool InOverwrite, EFilesystemStatusCode& OutStatusCode);
 
 public:
 	UFUNCTION(BlueprintCallable, Category="Filesystem")
@@ -106,9 +125,16 @@ public:
 	static bool IsValidAsUserName(const FString& InUserName);
 
 private:
+	bool GetFile(FFolder Parent, FString FileName, int& Index, FFile& File);
+
 	void RecursiveDelete(FFolder& InFolder);
 
 	FFolder GetFolderByID(int FolderID);
 	void SetFolderByID(int FolderID, FFolder Folder);
 	int GetNewFolderID();
+
+	bool TraversePath(const TArray<FString>& PathParts, UFolderNavigator*& OutNavigator);
+	bool TraversePath(const TArray<FString>& PathParts, const int Count, UFolderNavigator*& OutNavigator);
+	TArray<FString> GetPathParts(FString InPath, FString& ResolvedPath);
+
 };

@@ -87,4 +87,6 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Hacking")
 	void SetAlertLevel(float InAlertLevel);
 
+	UFUNCTION(BlueprintImplementableEvent, Category = "Peacegate")
+	bool GetSuitableProgramForFileExtension(const FString& InExtension, class UPeacegateProgramAsset*& OutProgram);
 };

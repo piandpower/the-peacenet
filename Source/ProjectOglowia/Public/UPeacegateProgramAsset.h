@@ -10,6 +10,15 @@
 class UConsoleContext;
 class UPTerminalWidget;
 
+UENUM(BlueprintType)
+enum class EProgramFileOpenStatus : uint8
+{
+	OK,
+	FileNotFound,
+	PermissionDenied,
+	NoSuitableProgram
+};
+
 UCLASS(Blueprintable)
 class PROJECTOGLOWIA_API UProgram : public UUserWidget
 {
@@ -45,6 +54,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetWindowMinimumSize(FVector2D InSize);
 
+	UFUNCTION(BlueprintImplementableEvent, Category = "Program")
+	void FileOpened(const FString& InPath);
+
 protected:
 	// Filesystem context for the program.
 	UPROPERTY(BlueprintReadOnly, Category = "Program")
@@ -53,6 +65,9 @@ protected:
 	// The console allows the program to output to a Terminal, or run Terminal Commands as its user.
 	UPROPERTY(BlueprintReadOnly, Category = "Program")
 	UConsoleContext* Console;
+
+	UFUNCTION(BlueprintCallable, Category = "Program")
+	bool OpenFile(const FString& InPath, EProgramFileOpenStatus& OutStatus);
 };
 
 USTRUCT(BlueprintType)
@@ -95,6 +110,9 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	bool IsUnlockedByDefault = false;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TArray<FString> SupportedFileExtensions;
 };
 
 UCLASS(Blueprintable)

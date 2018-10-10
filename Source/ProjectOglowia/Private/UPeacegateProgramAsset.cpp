@@ -121,3 +121,46 @@ void UProgram::SetWindowMinimumSize(FVector2D InSize)
 {
 	Window->SetClientMinimumSize(InSize);
 }
+
+bool UProgram::OpenFile(const FString & InPath, EProgramFileOpenStatus & OutStatus)
+{
+	if (!Filesystem)
+	{
+		OutStatus = EProgramFileOpenStatus::PermissionDenied;
+		return false;
+	}
+
+	if (!Filesystem->FileExists(InPath))
+	{
+		OutStatus = EProgramFileOpenStatus::FileNotFound;
+		return false;
+	}
+
+	FString Path;
+	FString Extension;
+	if (!InPath.Split(TEXT("."), &Path, &Extension, ESearchCase::IgnoreCase, ESearchDir::FromEnd))
+	{
+		OutStatus = EProgramFileOpenStatus::NoSuitableProgram;
+		return false;
+	}
+
+	UPeacegateProgramAsset* ProgramAsset;
+	if (!ISystemContext::Execute_GetSuitableProgramForFileExtension(Window->SystemContext.GetObject(), Extension, ProgramAsset))
+	{
+		OutStatus = EProgramFileOpenStatus::NoSuitableProgram;
+		return false;
+	}
+
+	TSubclassOf<UWindow> WindowClass(Window->GetClass());
+
+	UWindow* NewWindow;
+	UProgram* NewProgram = UProgram::CreateProgram(WindowClass, ProgramAsset->ProgramClass, Window->SystemContext, Window->UserID, NewWindow);
+
+	NewWindow->WindowTitle = FText::FromString(ProgramAsset->AppLauncherItem.Name);
+	NewWindow->Icon = ProgramAsset->AppLauncherItem.Icon;
+	NewWindow->EnableMinimizeAndMaximize = ProgramAsset->AppLauncherItem.EnableMinimizeAndMaximize;
+
+	NewProgram->FileOpened(InPath);
+
+	return true;
+}

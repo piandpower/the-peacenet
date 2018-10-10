@@ -190,5 +190,14 @@ public:
 private:
 	TArray<FLinearColor> ColorPalette;
 
+public:
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Common Utils|Terminal")
+		static FString NewLine();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Common Utils|Terminal")
+		static FString CarriageReturn();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Common Utils|Terminal")
+		static FString Tab();
 
 };

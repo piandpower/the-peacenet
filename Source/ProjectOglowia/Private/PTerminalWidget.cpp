@@ -231,6 +231,21 @@ int32 UPTerminalWidget::NativePaint(const FPaintArgs& Args, const FGeometry& All
 			}
 		}
 
+		// If the character is a tab ('\t'), handle it.
+		if (c == TEXT('\t'))
+		{
+			// Get remainder of char_x divided by 8 * char_w.
+			float space = FMath::Fmod(char_x, char_w * 8);
+
+			// Realistically, truncating the value won't make much of a difference.
+			// But we'll store it as a float simply to make Unreal's life easier.
+			// All we need to do is add this value to char_x.
+			char_x += (char_w * 8) - space;
+
+			// Go to next char.
+			continue;
+		}
+
 		//return to char 0 if we're a \r
 		if (c == TEXT('\r'))
 		{
@@ -250,7 +265,7 @@ int32 UPTerminalWidget::NativePaint(const FPaintArgs& Args, const FGeometry& All
 		}
 
 		//Skip vertical tabs.
-		if (c == TEXT('\t') || c == TEXT('\v'))
+		if (c == TEXT('\v'))
 			continue;
 
 		//If char_x + char_w is greater than our width, drop down to a new line.
@@ -576,5 +591,20 @@ bool UPTerminalWidget::ParseEscape(TCHAR character, uint8 & termFont, uint8 & te
 		termForegroundColorCode = (uint8)hex;
 		return true;
 	}
+}
+
+FString UPTerminalWidget::NewLine()
+{
+	return TEXT("\n");
+}
+
+FString UPTerminalWidget::CarriageReturn()
+{
+	return TEXT("\r");
+}
+
+FString UPTerminalWidget::Tab()
+{
+	return TEXT("\t");
 }
 

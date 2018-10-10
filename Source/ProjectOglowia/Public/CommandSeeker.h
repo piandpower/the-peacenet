@@ -27,4 +27,6 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Peacegate")
 	TMap<FName, FString> GetCommandsWithDescriptions();
+
+
 };

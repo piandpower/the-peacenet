@@ -28,6 +28,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Peacegate")
 	static UProgram* CreateProgram(const TSubclassOf<UWindow> InWindowClass, const TSubclassOf<UProgram> InProgramClass, const TScriptInterface<ISystemContext> InSystem, const int InUserID, UWindow*& OutWindow);
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Peacegate")
+	FText GetUsername();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Peacegate")
+	FText GetHostname();
+
 	UFUNCTION(BlueprintCallable, Category = "Peacegate")
 	UConsoleContext* CreateConsole(UPARAM(Ref) UPTerminalWidget* InTerminalWidget);
 

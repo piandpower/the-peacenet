@@ -35,6 +35,17 @@ void UProgram::ShowInfoWithCallbacks(const FText & InTitle, const FText & InMess
 	Window->ShowInfoWithCallbacks(InTitle, InMessage, InIcon, ButtonLayout, ShowTextInput, OnDismissed, ValidatorFunction);
 }
 
+FText UProgram::GetUsername()
+{
+	FUserInfo User = ISystemContext::Execute_GetUserInfo(this->Window->SystemContext.GetObject(), this->Window->UserID);
+	return FText::FromString(User.Username);
+}
+
+FText UProgram::GetHostname()
+{
+	return FText::FromString(ISystemContext::Execute_GetHostname(this->Window->SystemContext.GetObject()));
+}
+
 UWallpaperAsset* UProgram::GetWallpaper()
 {
 	return ISystemContext::Execute_GetWallpaper(this->Window->SystemContext.GetObject());

@@ -78,7 +78,7 @@ UTexture2D* UImageLoader::LoadImageFromDisk(UPeacegateFileSystem* InFilesystem, 
 	}
 
 	// Create an image wrapper for the detected image format 
-	IImageWrapperPtr ImageWrapper = ImageWrapperModule.CreateImageWrapper(ImageFormat);
+	TSharedPtr<IImageWrapper> ImageWrapper = ImageWrapperModule.CreateImageWrapper(ImageFormat);
 	
 	if (!ImageWrapper.IsValid()) 
 	{ 

@@ -129,7 +129,6 @@ FReply UPTerminalWidget::NativeOnFocusReceived(const FGeometry & InGeometry, con
 	cursorTime = 0;
 	bCursorActive = true;
 
-	GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Green, TEXT("Terminal Emulator: Received focus."));
 	return FReply::Handled();
 }
 
@@ -142,10 +141,9 @@ void UPTerminalWidget::NativeConstruct()
 		//This is where we set the initial character size if we have a regular text font.
 		//If we don't have a regular text font at this point then fuck the frontend devs.
 		RegularUnrealFont->GetCharSize(TEXT('#'), CharacterWidth, CharacterHeight);
-
+		
 	}
 	else {
-		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, TEXT("WARNING: Terminal Emulator::Initialize(): Regular font not set, couldn't measure default character size. (Did you forget to set your fonts in the UMG designer?)"));
 	}
 
 	SetVisibility(ESlateVisibility::Visible);
@@ -183,6 +181,7 @@ int32 UPTerminalWidget::NativePaint(const FPaintArgs& Args, const FGeometry& All
 
 
 	FSlateFontInfo font = this->GetUnrealFont(term_font); //Grab the regular font.
+	const UFont* FontPtr = Cast<UFont>(font.FontObject);
 
 	//The width of a character.
 	float char_w = CharacterWidth;
@@ -190,6 +189,8 @@ int32 UPTerminalWidget::NativePaint(const FPaintArgs& Args, const FGeometry& All
 	float char_h = CharacterHeight;
 
 	TArray<TCHAR> arr = TextBuffer.GetCharArray();
+
+	TCHAR Last = TEXT('\0');
 
 	//How many elements are in the text array?
 	int arrNum = arr.Num();
@@ -224,11 +225,24 @@ int32 UPTerminalWidget::NativePaint(const FPaintArgs& Args, const FGeometry& All
 					//Attempt to parse the escape sequence. If it succeeds, i += 1 and continue.
 					if (ParseEscape(nextChar, term_font, term_fg_color))
 					{
+						//update font from font code
+						font = this->GetUnrealFont(term_font);
+
+						// update the ufont ptr
+						FontPtr = Cast<UFont>(font.FontObject);
+
 						i++;
 						continue;
 					}
 				}
 			}
+		}
+
+		float kerning = 0.f;
+
+		if (Last != TEXT('\0'))
+		{
+			kerning = FontPtr->GetCharKerning(Last, c);
 		}
 
 		// If the character is a tab ('\t'), handle it.
@@ -242,6 +256,8 @@ int32 UPTerminalWidget::NativePaint(const FPaintArgs& Args, const FGeometry& All
 			// All we need to do is add this value to char_x.
 			char_x += (char_w * 8) - space;
 
+			Last = TEXT('\0');
+
 			// Go to next char.
 			continue;
 		}
@@ -250,6 +266,8 @@ int32 UPTerminalWidget::NativePaint(const FPaintArgs& Args, const FGeometry& All
 		if (c == TEXT('\r'))
 		{
 			char_x = 0;
+			kerning = 0;
+			Last = TEXT('\0');
 			continue;
 		}
 
@@ -261,6 +279,7 @@ int32 UPTerminalWidget::NativePaint(const FPaintArgs& Args, const FGeometry& All
 		{
 			char_x = 0;
 			char_y += char_h;
+			Last = TEXT('\0');
 			continue;
 		}
 
@@ -268,9 +287,15 @@ int32 UPTerminalWidget::NativePaint(const FPaintArgs& Args, const FGeometry& All
 		if (c == TEXT('\v'))
 			continue;
 
+		FontPtr->GetCharSize(c, char_w, char_h);
+
+		char_x += kerning;
+
 		//If char_x + char_w is greater than our width, drop down to a new line.
 		if (char_x + char_w > size.X)
 		{
+			kerning = 0;
+			Last = TEXT('\0');
 			char_x = 0;
 			char_y += char_h;
 		}
@@ -286,9 +311,6 @@ int32 UPTerminalWidget::NativePaint(const FPaintArgs& Args, const FGeometry& All
 		if (char_y >= size.Y)
 			break;
 
-		//update font from font code
-		font = this->GetUnrealFont(term_font);
-
 		LayerId++;
 
 		FSlateDrawElement::MakeText(
@@ -301,6 +323,7 @@ int32 UPTerminalWidget::NativePaint(const FPaintArgs& Args, const FGeometry& All
 			ColorPalette[term_fg_color]);
 
 
+		Last = c;
 
 		//Advance the x coordinate by a single char.
 		char_x += char_w;
@@ -400,19 +423,13 @@ FReply UPTerminalWidget::NativeOnMouseWheel(const FGeometry & InGeometry, const 
 {
 	float wheelDelta = InMouseEvent.GetWheelDelta();
 
-	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Yellow, TEXT("Terminal emulator: Mouse scrolled. Delta: "));
-	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Yellow, FString::SanitizeFloat(wheelDelta));
-
-
 	ScrollOffsetY = FMath::Clamp(ScrollOffsetY - (wheelDelta*CharacterHeight), 0.f, MaxScrollOffset);
 
 	return FReply::Handled();
 }
 
 FReply UPTerminalWidget::NativeOnKeyChar(const FGeometry & InGeometry, const FCharacterEvent & InCharEvent)
-{
-	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Red, TEXT("Terminal key char event: ") + FString::Chr(InCharEvent.GetCharacter()));
-	
+{	
 	TCHAR c = InCharEvent.GetCharacter();
 
 	if (c == TEXT('\b'))

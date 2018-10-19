@@ -3,6 +3,21 @@
 #include "UConsoleContext.h"
 #include "SystemContext.h"
 
+UConsoleContext * UConsoleContext::CreateChildContext(TScriptInterface<ISystemContext> InSystemContext, int InUserID)
+{
+	UConsoleContext* NewCtx = NewObject<UConsoleContext>();
+
+	NewCtx->SystemContext = InSystemContext;
+	NewCtx->UserID = InUserID;
+
+	NewCtx->WorkingDirectory = ISystemContext::Execute_GetUserHomeDirectory(InSystemContext.GetObject(), InUserID);
+	NewCtx->Filesystem = ISystemContext::Execute_GetFilesystem(InSystemContext.GetObject(), InUserID);
+
+	NewCtx->Terminal = this->Terminal;
+
+	return NewCtx;
+}
+
 FString UConsoleContext::GetHostname()
 {
 	return ISystemContext::Execute_GetHostname(this->SystemContext.GetObject());

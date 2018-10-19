@@ -46,11 +46,6 @@ FText UProgram::GetHostname()
 	return FText::FromString(ISystemContext::Execute_GetHostname(this->Window->SystemContext.GetObject()));
 }
 
-UWallpaperAsset* UProgram::GetWallpaper()
-{
-	return ISystemContext::Execute_GetWallpaper(this->Window->SystemContext.GetObject());
-}
-
 UConsoleContext* UProgram::CreateConsole(UPTerminalWidget* InTerminalWidget)
 {
 	UConsoleContext* Console = NewObject<UConsoleContext>(this);
@@ -101,14 +96,15 @@ UConsoleContext* UProgram::CreateConsole(UPTerminalWidget* InTerminalWidget)
 	return Console;
 }
 
-void UProgram::SetWallpaper(FName InWallpaperID)
-{
-	ISystemContext::Execute_SetWallpaper(this->Window->SystemContext.GetObject(), InWallpaperID);
-}
 
 void UProgram::ShowInfo(const FText & InTitle, const FText & InMessage, const EInfoboxIcon InIcon)
 {
 	Window->ShowInfo(InTitle, InMessage, InIcon);
+}
+
+FString UProgram::HomeDirectory()
+{
+	return ISystemContext::Execute_GetUserHomeDirectory(Window->SystemContext.GetObject(), Window->UserID);
 }
 
 void UProgram::AskForFile(const FString InBaseDirectory, const FString InFilter, const EFileDialogType InDialogType, const FFileDialogDismissedEvent & OnDismissed)

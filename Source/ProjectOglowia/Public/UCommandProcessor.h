@@ -62,6 +62,20 @@ public:
 		}
 	}
 
+	virtual UConsoleContext* CreateChildContext(TScriptInterface<ISystemContext> InSystemContext, int InUserID) override
+	{
+		if (Output)
+		{
+			return Output->CreateChildContext(InSystemContext, InUserID);
+		}
+		else if (Input)
+		{
+			return Input->CreateChildContext(InSystemContext, InUserID);
+		}
+
+		return this;
+	}
+
 	virtual void Clear() override
 	{
 		if (Output)

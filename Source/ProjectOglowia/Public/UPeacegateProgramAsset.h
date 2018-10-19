@@ -32,16 +32,13 @@ public:
 	FText GetUsername();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Peacegate")
+	FString HomeDirectory();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Peacegate")
 	FText GetHostname();
 
 	UFUNCTION(BlueprintCallable, Category = "Peacegate")
 	UConsoleContext* CreateConsole(UPARAM(Ref) UPTerminalWidget* InTerminalWidget);
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Wallpaper")
-	UWallpaperAsset* GetWallpaper();
-
-	UFUNCTION(BlueprintCallable, Category = "Wallpaper")
-	void SetWallpaper(FName InWallpaperID);
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ExposeOnSpawn = "true"))
 	UWindow* Window;

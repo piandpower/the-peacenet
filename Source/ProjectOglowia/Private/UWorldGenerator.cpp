@@ -1,6 +1,9 @@
 // Copyright (c) 2018 The Peacenet & Alkaline Thunder.
 
 #include "UWorldGenerator.h"
+#include "UComputerTypeAsset.h"
+#include "AssetRegistryModule.h"
+#include "UNonPlayerSystemContext.h"
 
 FString UWorldGenerator::GenerateRandomName(const FRandomStream& InGenerator, const TArray<FString> InFirstNames, TArray<FString> InLastNames)
 {
@@ -59,89 +62,130 @@ FRandomStream UWorldGenerator::GetRandomNumberGenerator(int32 InSeed)
 	return FRandomStream(InSeed);
 }
 
-void UWorldGenerator::GenerateCharacters(UPARAM(Ref) TArray<FPeacenetIdentity>& CharacterArray, UPARAM(Ref) TArray<FComputer>& ComputerArray, const FRandomStream& InGenerator, int32 InCharacterCount, const TArray<FString> InFirstNames, TArray<FString> InLastNames)
+void UWorldGenerator::GenerateCharacters(UPARAM(Ref) TArray<FPeacenetIdentity>& CharacterArray, UPARAM(Ref) TArray<FComputer>& ComputerArray, const FRandomStream& InGenerator, const TArray<FString> InFirstNames, TArray<FString> InLastNames)
 {
+	// Get the Asset Registry
+	FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
+
+	// A place to store computer type asset data
+	TArray<FAssetData> ComputerTypeAssets;
+
+	// The class of a computer type asset
+	UClass* ComputerTypeClass = UComputerTypeAsset::StaticClass();
+
+	AssetRegistryModule.Get().GetAssetsByClass(TEXT("ComputerTypeAsset"), ComputerTypeAssets, true);
+
+	TArray<UComputerTypeAsset*> ComputerTypes;
+
+	// Load all the computer type assets, we'll need them for later.
+	for (auto& Asset : ComputerTypeAssets)
+	{
+		ComputerTypes.Add((UComputerTypeAsset*)Asset.GetAsset());
+	}
+
+	// Retrieve the number of countries in the game.
 	int CountryCount = (int)ECountry::Num_Countries;
 
-	for (int i = 0; i < InCharacterCount; i++)
+	// The MINIMUM amount of computers that will generate in the world.
+	const int MIN_WORLD_SIZE = 200;
+
+	for (UComputerTypeAsset* ComputerType : ComputerTypes)
 	{
-		// Create new computer and identity
-		FComputer PersonalComputer;
-		FPeacenetIdentity Identity;
+		// TODO: ComputerType->Rarity should be ComputerType->Chance.
+		float Rarity = ComputerType->Rarity;
 
-		// Set the entity IDs of the computer and character.
-		PersonalComputer.ID = ComputerArray.Num();
-		Identity.ID = CharacterArray.Num();
+		// The amount of computers to generate of this type.
+		int ComputersToGenerate = (int)(MIN_WORLD_SIZE * Rarity);
 
-		// These are all NPCs.
-		Identity.CharacterType = EIdentityType::NonPlayer;
-
-		// Set default alert stuff
-		Identity.AlertLevel = 0.f;
-		Identity.ActiveGovernmentWatch = false;
-		Identity.Skill = 0;
-
-		uint8 Country = (uint8)InGenerator.RandRange(0, CountryCount - 1);
-		Identity.Country = (ECountry)Country;
-
-		// Set the reputation
-		int RepDiceRoll = InGenerator.RandRange(1, 6);
-		if (RepDiceRoll % 2 == 0)
+		// Let's generate them.
+		for (int i = 0; i < ComputersToGenerate; i++)
 		{
-			Identity.Reputation = InGenerator.GetFraction();
-		}
-		else
-		{
-			Identity.Reputation = -InGenerator.GetFraction();
-		}
+			FComputer NewComputer;
 
-		// Get a random number between 1 and 256 to decide if we should make a person NPC or a business NPC
-		int businessDecider = InGenerator.RandRange(1, 256);
+			// ID becomes current world computer count.
+			NewComputer.ID = ComputerArray.Num();
 
-		if (businessDecider % 2 == 0 && businessDecider % 3 == 0)
-		{
-			// Make a business.
-		}
-		else
-		{
-			// We'll make a person.
-			FString CharName = UWorldGenerator::GenerateRandomName(InGenerator, InFirstNames, InLastNames);
+			// Computer type matches the ID in the asset.
+			NewComputer.ComputerType = ComputerType->InternalID;
 
-			FString First;
-			FString Last;
+			// TODO: proper hostname generator
+			NewComputer.Hostname = FText::FromString(TEXT("npc_host_") + FString::FromInt(NewComputer.ID));
 
-			TArray<FString> Split;
+			// Now, we format the filesystem.
+			TArray<FFolder> NewFS;
+			UFileUtilities::FormatFilesystem(NewFS);
 
-			CharName.ParseIntoArray(Split, TEXT(" "), true);
+			NewComputer.Filesystem = NewFS;
 
-			First = Split[0];
-			Last = Split[1];
-
-			Identity.CharacterName = FText::FromString(CharName);
-
-			PersonalComputer.Hostname = FText::FromString(First.ToLower() + TEXT("-pc"));
-
+			// Now, we create a root user account.
 			FUser RootUser;
-			RootUser.ID = 0;
 			RootUser.Username = FText::FromString(TEXT("root"));
-			RootUser.Password = FText::FromString(UWorldGenerator::GenerateRandomPassword(InGenerator, 16));
+
+			// TODO: skill-based password generation.
+			RootUser.Password = FText::FromString(UWorldGenerator::GenerateRandomPassword(InGenerator, 64));
+
+			// Root user needs to be admin
 			RootUser.Domain = EUserDomain::Administrator;
 
-			FUser PowerUser;
-			PowerUser.ID = 1;
-			PowerUser.Username = FText::FromString(First.ToLower());
-			PowerUser.Password = FText::FromString(UWorldGenerator::GenerateRandomPassword(InGenerator, 16));
-			PowerUser.Domain = EUserDomain::PowerUser;
+			// and ID 0
+			RootUser.ID = 0;
 
-			PersonalComputer.Users.Add(RootUser);
-			PersonalComputer.Users.Add(PowerUser);
+			// Add user account
+			NewComputer.Users.Add(RootUser);
 
-			PersonalComputer.ComputerType = EComputerType::PersonalComputer;
+			// BEGIN TODO: Non-root user generation
+			// END TODO
+
+
+			// Create a system context.
+			UNonPlayerSystemContext* SysCtx = NewObject<UNonPlayerSystemContext>();
+			SysCtx->Computer = NewComputer;
+
+// This lets us get a filesystem context as if we were logged into Peacegate OS as the root user we created above.
+// We're still generating the computer - there's no Peacegate yet - we're about to "install" it.
+// However, since we're in the C++ land, we can create a Peacegate context before Peacegate exists so we can generate the system properly.
+
+			UPeacegateFileSystem* Filesystem = SysCtx->GetFilesystem_Implementation(RootUser.ID);
+
+EFilesystemStatusCode InstallStatusCode = EFilesystemStatusCode::OK;
+
+// CODE-DUPLICATION, TODO: create these dynamically when generating lootable files
+Filesystem->CreateDirectory(TEXT("/bin"), InstallStatusCode);
+Filesystem->CreateDirectory(TEXT("/etc"), InstallStatusCode);
+Filesystem->CreateDirectory(TEXT("/usr"), InstallStatusCode);
+Filesystem->CreateDirectory(TEXT("/var"), InstallStatusCode);
+Filesystem->CreateDirectory(TEXT("/run"), InstallStatusCode);
+Filesystem->CreateDirectory(TEXT("/tmp"), InstallStatusCode);
+Filesystem->CreateDirectory(TEXT("/etc/peacegate"), InstallStatusCode);
+
+// Now we can look through all the users and create their home directories.
+for (auto User : NewComputer.Users)
+{
+	FString Home = SysCtx->GetUserHomeDirectory(User.ID);
+				
+	Filesystem->CreateDirectory(Home, InstallStatusCode);
+				
+	// TODO, CODE-DUPLICATION, REPETITIVE STRAIN INJURY WARNING: We should create these dynamically based on file assets that are randomly picked to place in the filesystem.
+	Filesystem->CreateDirectory(Home + TEXT("/Desktop"), InstallStatusCode);
+	Filesystem->CreateDirectory(Home + TEXT("/Documents"), InstallStatusCode);
+	Filesystem->CreateDirectory(Home + TEXT("/Downloads"), InstallStatusCode);
+	Filesystem->CreateDirectory(Home + TEXT("/Pictures"), InstallStatusCode);
+	Filesystem->CreateDirectory(Home + TEXT("/Videos"), InstallStatusCode);
+	Filesystem->CreateDirectory(Home + TEXT("/Music"), InstallStatusCode);
+	Filesystem->CreateDirectory(Home + TEXT("/.peacegate"), InstallStatusCode);
+
+}
+
+			// As the system context works its magic, it's been updaying its copy of our new computer.
+			// Emphasis on copy. We're going to copy its updated computer back into our scope so we can
+			// spawn it into the world.
+
+			// Do NOT perform any actions using the above system context after this point. They won't be saved.
+			NewComputer = SysCtx->Computer;
+
+			// Add the computer to the world.
+			ComputerArray.Add(NewComputer);
+
 		}
-
-		Identity.PersonalComputer = PersonalComputer.ID;
-
-		CharacterArray.Add(Identity);
-		ComputerArray.Add(PersonalComputer);
 	}
 }

@@ -23,20 +23,6 @@ enum class EUserDomain : uint8
 
 
 /**
- * Represents a type of Peacenet computer, including services, storage type, etc.
- */
-UENUM(BlueprintType)
-enum class EComputerType : uint8
-{
-	PersonalComputer,
-	FileStorage,
-	WebServer,
-	MailServer,
-	Vault,
-	DatabaseServer
-};
-
-/**
  * Represents a Peacegate user.
  */
 USTRUCT(BlueprintType)
@@ -74,7 +60,7 @@ public:
 	FText Hostname;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Computer")
-	EComputerType ComputerType;
+	FName ComputerType = NAME_None;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Computer")
 	TArray<FFolder> Filesystem;

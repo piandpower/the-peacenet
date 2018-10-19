@@ -33,6 +33,9 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	UPeacegateFileSystem* Filesystem;
 
+	UFUNCTION(BlueprintCallable, Category = "Peacegate")
+	virtual UConsoleContext* CreateChildContext(TScriptInterface<ISystemContext> InSystemContext, int InUserID);
+
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Console Context")
 	FString GetHostname();
 

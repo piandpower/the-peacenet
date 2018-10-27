@@ -6,6 +6,9 @@
 #include "PTerminalWidget.h"
 #include "UPeacegateFileSystem.h"
 #include "UConsoleContext.generated.h"
+
+class USystemContext;
+
 /**
  * 
  */
@@ -22,7 +25,7 @@ public:
 	FString HomeDirectory;
 
 	UPROPERTY()
-	TScriptInterface<class ISystemContext> SystemContext;
+	USystemContext* SystemContext;
 
 	UPROPERTY()
 	UPTerminalWidget* Terminal;
@@ -34,7 +37,7 @@ public:
 	UPeacegateFileSystem* Filesystem;
 
 	UFUNCTION(BlueprintCallable, Category = "Peacegate")
-	virtual UConsoleContext* CreateChildContext(TScriptInterface<ISystemContext> InSystemContext, int InUserID);
+	virtual UConsoleContext* CreateChildContext(USystemContext* InSystemContext, int InUserID);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Console Context")
 	FString GetHostname();

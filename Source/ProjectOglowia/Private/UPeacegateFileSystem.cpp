@@ -2,6 +2,7 @@
 
 #include "UPeacegateFileSystem.h"
 #include "Base64.h"
+#include "USystemContext.h"
 
 bool UPeacegateFileSystem::GetFile(FFolder Parent, FString FileName, int & Index, FFile & File)
 {
@@ -30,7 +31,7 @@ void UPeacegateFileSystem::RecursiveDelete(FFolder& InFolder)
 	
 	TArray<FFolder> FolderTree;
 
-	IFolderRepository::Execute_GetFolderTree(FolderRepo.GetObject(), FolderTree);
+	SystemContext->GetFolderTree(FolderTree);
 
 	for (int i = 0; i < FolderTree.Num(); i++)
 	{
@@ -41,13 +42,13 @@ void UPeacegateFileSystem::RecursiveDelete(FFolder& InFolder)
 		}
 	}
 
-	IFolderRepository::Execute_PushFolderTree(FolderRepo.GetObject(), FolderTree);
+	SystemContext->PushFolderTree(FolderTree);
 }
 
 FFolder UPeacegateFileSystem::GetFolderByID(int FolderID)
 {
 	TArray<FFolder> FolderTree;
-	IFolderRepository::Execute_GetFolderTree(FolderRepo.GetObject(), FolderTree);
+	SystemContext->GetFolderTree(FolderTree);
 
 	for (auto& Folder : FolderTree)
 	{
@@ -61,7 +62,7 @@ FFolder UPeacegateFileSystem::GetFolderByID(int FolderID)
 void UPeacegateFileSystem::SetFolderByID(int FolderID, FFolder Folder)
 {
 	TArray<FFolder> FolderTree;
-	IFolderRepository::Execute_GetFolderTree(FolderRepo.GetObject(), FolderTree);
+	SystemContext->GetFolderTree(FolderTree);
 
 	for (int i = 0; i < FolderTree.Num(); i++)
 	{
@@ -70,7 +71,7 @@ void UPeacegateFileSystem::SetFolderByID(int FolderID, FFolder Folder)
 		if (ExFolder.FolderID == FolderID)
 		{
 			FolderTree[i] = Folder;
-			IFolderRepository::Execute_PushFolderTree(FolderRepo.GetObject(), FolderTree);
+			SystemContext->PushFolderTree(FolderTree);
 			return;
 		}
 	}
@@ -79,7 +80,7 @@ void UPeacegateFileSystem::SetFolderByID(int FolderID, FFolder Folder)
 int UPeacegateFileSystem::GetNewFolderID()
 {
 	TArray<FFolder> FolderTree;
-	IFolderRepository::Execute_GetFolderTree(FolderRepo.GetObject(), FolderTree);
+	SystemContext->GetFolderTree(FolderTree);
 	int ID = 0;
 
 	for (auto& Folder : FolderTree)
@@ -195,12 +196,12 @@ FString UPeacegateFileSystem::ResolveToAbsolute(const FString Path)
 void UPeacegateFileSystem::BuildFolderNavigator()
 {
 	TArray<FFolder> FolderTree;
-	IFolderRepository::Execute_GetFolderTree(FolderRepo.GetObject(), FolderTree);
+	SystemContext->GetFolderTree(FolderTree);
 
 	if (FolderTree.Num()==0)
 	{
 		UFileUtilities::FormatFilesystem(FolderTree);
-		IFolderRepository::Execute_PushFolderTree(FolderRepo.GetObject(), FolderTree);
+		SystemContext->PushFolderTree(FolderTree);
 	}
 
 	Root = NewObject<UFolderNavigator>();
@@ -250,7 +251,7 @@ bool UPeacegateFileSystem::CreateDirectory(const FString InPath, EFilesystemStat
 	}
 
 	TArray<FFolder> FolderTree;
-	IFolderRepository::Execute_GetFolderTree(FolderRepo.GetObject(), FolderTree);
+	SystemContext->GetFolderTree(FolderTree);
 
 	// Allocate a new Folder structure in memory
 	FFolder NewFolder;
@@ -268,7 +269,7 @@ bool UPeacegateFileSystem::CreateDirectory(const FString InPath, EFilesystemStat
 	FolderTree.Add(NewFolder);
 
 	// Alert the save system over in Blueprint land of the change too, so the game saves
-	IFolderRepository::Execute_PushFolderTree(FolderRepo.GetObject(), FolderTree);
+	SystemContext->PushFolderTree(FolderTree);
 
 	// Retrieve the filesystem entry for the parent folder
 	FFolder CurrFolder = GetFolderByID(ParentNav->FolderIndex);

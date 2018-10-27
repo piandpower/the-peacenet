@@ -4,11 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "UWindow.h"
-#include "SystemContext.h"
+#include "USystemContext.h"
+#include "Engine/DataAsset.h"
 #include "UPeacegateProgramAsset.generated.h"
 
 class UConsoleContext;
 class UPTerminalWidget;
+class APeacenetWorldStateActor;
 
 UENUM(BlueprintType)
 enum class EProgramFileOpenStatus : uint8
@@ -26,7 +28,7 @@ class PROJECTOGLOWIA_API UProgram : public UUserWidget
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Peacegate")
-	static UProgram* CreateProgram(const TSubclassOf<UWindow> InWindowClass, const TSubclassOf<UProgram> InProgramClass, const TScriptInterface<ISystemContext> InSystem, const int InUserID, UWindow*& OutWindow);
+	static UProgram* CreateProgram(const APeacenetWorldStateActor* InWorldState, const TSubclassOf<UWindow> InWindowClass, const TSubclassOf<UProgram> InProgramClass, USystemContext* InSystem, const int InUserID, UWindow*& OutWindow);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Peacegate")
 	FText GetUsername();
@@ -61,6 +63,9 @@ public:
 	void FileOpened(const FString& InPath);
 
 protected:
+	UFUNCTION()
+	virtual void NativeProgramLaunched();
+
 	// Filesystem context for the program.
 	UPROPERTY(BlueprintReadOnly, Category = "Program")
 	class UPeacegateFileSystem* Filesystem;
@@ -173,4 +178,17 @@ public:
 			TextInputErrorText = FText::GetEmpty();
 		}
 	}
+};
+
+
+UCLASS(Blueprintable)
+class PROJECTOGLOWIA_API USettingsProgram : public UProgram
+{
+	GENERATED_BODY()
+
+protected:
+	UPROPERTY(BlueprintReadOnly, Category = "Settings Program")
+	UDesktopWidget* Desktop;
+
+	virtual void NativeProgramLaunched() override;
 };

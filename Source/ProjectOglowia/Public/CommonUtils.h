@@ -6,8 +6,7 @@
 #include "UPeacegateFileSystem.h"
 #include "CommonUtils.generated.h"
 
-
-
+class USystemContext;
 
 /**
  * Common utilities used throughout the entire game.
@@ -22,5 +21,5 @@ public:
 	static FText GetFriendlyFilesystemStatusCode(const EFilesystemStatusCode InStatusCode);
 
 	UFUNCTION(BlueprintCallable, Category = "Peacegate")
-	static UPeacegateFileSystem* CreateFilesystem(UPARAM(Ref) TScriptInterface<IFolderRepository> InFolderRepo, int InUserID);
+	static UPeacegateFileSystem* CreateFilesystem(USystemContext* InSystemContext, int InUserID);
 };

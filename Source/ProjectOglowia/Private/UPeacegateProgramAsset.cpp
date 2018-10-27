@@ -5,14 +5,18 @@
 #include "PTerminalWidget.h"
 #include "UConsoleContext.h"
 #include "UPeacegateFileSystem.h"
+#include "PeacenetWorldStateActor.h"
+#include "Kismet/GameplayStatics.h"
 
-UProgram* UProgram::CreateProgram(const TSubclassOf<UWindow> InWindow, const TSubclassOf<UProgram> InProgramClass, const TScriptInterface<ISystemContext> InSystem, const int InUserID, UWindow*& OutWindow)
+UProgram* UProgram::CreateProgram(const APeacenetWorldStateActor* InWorldState, const TSubclassOf<UWindow> InWindow, const TSubclassOf<UProgram> InProgramClass, USystemContext* InSystem, const int InUserID, UWindow*& OutWindow)
 {
+	APlayerController* MyPlayer = UGameplayStatics::GetPlayerController(InWorldState->GetWorld(), 0);
+
 	// The window is what contains the program's UI.
-	UWindow* Window = NewObject<UWindow>(InSystem.GetObject(), InWindow);
+	UWindow* Window = CreateWidget<UWindow, APlayerController>(MyPlayer, InWindow);
 
 	// Construct the actual program.
-	UProgram* ProgramInstance = NewObject<UProgram>(Window, InProgramClass);
+	UProgram* ProgramInstance = CreateWidget<UProgram, APlayerController>(MyPlayer, InProgramClass);
 
 	// Program and window are friends with each other
 	ProgramInstance->Window = Window;
@@ -37,13 +41,13 @@ void UProgram::ShowInfoWithCallbacks(const FText & InTitle, const FText & InMess
 
 FText UProgram::GetUsername()
 {
-	FUserInfo User = ISystemContext::Execute_GetUserInfo(this->Window->SystemContext.GetObject(), this->Window->UserID);
+	FUserInfo User = Window->SystemContext->GetUserInfo(Window->UserID);
 	return FText::FromString(User.Username);
 }
 
 FText UProgram::GetHostname()
 {
-	return FText::FromString(ISystemContext::Execute_GetHostname(this->Window->SystemContext.GetObject()));
+	return FText::FromString(this->Window->SystemContext->GetHostname());
 }
 
 UConsoleContext* UProgram::CreateConsole(UPTerminalWidget* InTerminalWidget)
@@ -60,7 +64,7 @@ UConsoleContext* UProgram::CreateConsole(UPTerminalWidget* InTerminalWidget)
 	Console->SystemContext = Window->SystemContext;
 
 	// Get user info.
-	FUserInfo User = ISystemContext::Execute_GetUserInfo(Console->SystemContext.GetObject(), Console->UserID);
+	FUserInfo User = Console->SystemContext->GetUserInfo(Console->UserID);
 
 	// If the user's username is root, then we set the home directory to "/root."
 	if (User.IsAdminUser)
@@ -104,7 +108,7 @@ void UProgram::ShowInfo(const FText & InTitle, const FText & InMessage, const EI
 
 FString UProgram::HomeDirectory()
 {
-	return ISystemContext::Execute_GetUserHomeDirectory(Window->SystemContext.GetObject(), Window->UserID);
+	return Window->SystemContext->GetUserHomeDirectory(Window->UserID);
 }
 
 void UProgram::AskForFile(const FString InBaseDirectory, const FString InFilter, const EFileDialogType InDialogType, const FFileDialogDismissedEvent & OnDismissed)
@@ -115,13 +119,15 @@ void UProgram::AskForFile(const FString InBaseDirectory, const FString InFilter,
 void UProgram::SetupContexts()
 {
 	// Fetch a filesystem context from Peacegate, with the current User ID.
-	this->Filesystem = ISystemContext::Execute_GetFilesystem(Window->SystemContext.GetObject(), Window->UserID);
+	this->Filesystem = Window->SystemContext->GetFilesystem(Window->UserID);
 
 	// Show the program on the current workspace.
-	ISystemContext::Execute_ShowWindowOnWorkspace(Window->SystemContext.GetObject(), this);
+	Window->SystemContext->ShowWindowOnWorkspace(this);
 
 	// Add ourself to the window's client slot.
 	Window->AddWindowToClientSlot(this);
+
+	this->NativeProgramLaunched();
 }
 
 void UProgram::SetWindowMinimumSize(FVector2D InSize)
@@ -152,7 +158,7 @@ bool UProgram::OpenFile(const FString & InPath, EProgramFileOpenStatus & OutStat
 	}
 
 	UPeacegateProgramAsset* ProgramAsset;
-	if (!ISystemContext::Execute_GetSuitableProgramForFileExtension(Window->SystemContext.GetObject(), Extension, ProgramAsset))
+	if (!Window->SystemContext->GetSuitableProgramForFileExtension(Extension, ProgramAsset))
 	{
 		OutStatus = EProgramFileOpenStatus::NoSuitableProgram;
 		return false;
@@ -161,7 +167,7 @@ bool UProgram::OpenFile(const FString & InPath, EProgramFileOpenStatus & OutStat
 	TSubclassOf<UWindow> WindowClass(Window->GetClass());
 
 	UWindow* NewWindow;
-	UProgram* NewProgram = UProgram::CreateProgram(WindowClass, ProgramAsset->ProgramClass, Window->SystemContext, Window->UserID, NewWindow);
+	UProgram* NewProgram = UProgram::CreateProgram(Window->SystemContext->Peacenet, WindowClass, ProgramAsset->ProgramClass, Window->SystemContext, Window->UserID, NewWindow);
 
 	NewWindow->WindowTitle = FText::FromString(ProgramAsset->AppLauncherItem.Name);
 	NewWindow->Icon = ProgramAsset->AppLauncherItem.Icon;
@@ -170,4 +176,11 @@ bool UProgram::OpenFile(const FString & InPath, EProgramFileOpenStatus & OutStat
 	NewProgram->FileOpened(InPath);
 
 	return true;
+}
+
+void UProgram::NativeProgramLaunched() {}
+
+void USettingsProgram::NativeProgramLaunched()
+{
+	this->Desktop = this->Window->SystemContext->Desktop;
 }

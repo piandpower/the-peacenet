@@ -45,6 +45,17 @@ public:
 };
 
 /**
+ * Defines how the game should handle this computer.
+ */
+UENUM(BlueprintType)
+enum class EComputerOwnerType : uint8
+{
+	Player,
+	NPC,
+	Story
+};
+
+/**
  * Represents a computer within The Peacenet.
  */
 USTRUCT(BlueprintType)
@@ -55,6 +66,9 @@ struct PROJECTOGLOWIA_API FComputer
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Computer")
 	int ID;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Computer")
+	EComputerOwnerType OwnerType = EComputerOwnerType::NPC;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Computer")
 	FText Hostname;

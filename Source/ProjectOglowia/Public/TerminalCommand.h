@@ -6,8 +6,7 @@
 #include "CoreMinimal.h"
 #include "DocoptForUnrealBPLibrary.h"
 #include "UConsoleContext.h"
-#include "CommandSeeker.h"
-#include "SystemContext.h"
+#include "USystemContext.h"
 #include "TerminalCommand.generated.h"
 
 /**
@@ -30,7 +29,7 @@ public:
 	virtual void RunCommand(UPARAM(Ref) UConsoleContext* InConsole, const TMap<FString, FDocoptValue> InArguments);
 protected:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Terminal Command")
-	void OnRunCommand(const UConsoleContext* InConsole, const TScriptInterface<ICommandSeeker>& InSeeker, const TMap<FString, FDocoptValue>& InArguments);
+	void OnRunCommand(const UConsoleContext* InConsole, const TMap<FString, FDocoptValue>& InArguments);
 
 	UFUNCTION(BlueprintCallable, Category="Terminal Command")
 	void Complete() { Completed.Broadcast(); }
@@ -38,6 +37,15 @@ protected:
 
 UCLASS(Blueprintable)
 class PROJECTOGLOWIA_API UAdminTerminalCommand : public UTerminalCommand
+{
+	GENERATED_BODY()
+
+public:
+	virtual void RunCommand(UConsoleContext* InConsole, const TMap<FString, FDocoptValue> InArguments) override;
+};
+
+UCLASS()
+class PROJECTOGLOWIA_API UHelpCommand : public UTerminalCommand
 {
 	GENERATED_BODY()
 

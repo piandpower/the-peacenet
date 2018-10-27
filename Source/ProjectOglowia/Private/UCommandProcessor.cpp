@@ -1,10 +1,11 @@
 // Copyright (c) 2018 The Peacenet & Alkaline Thunder.
 
 #include "UCommandProcessor.h"
-#include "SystemContext.h"
+#include "USystemContext.h"
+#include "TerminalCommand.h"
 #include "TerminalCommandParserLibrary.h"
 
-TArray<FCommandRunInstruction> UCommandProcessor::ProcessCommand(TScriptInterface<ICommandSeeker> InCommandSeeker, UConsoleContext* InConsole, const FString& InCommand)
+TArray<FCommandRunInstruction> UCommandProcessor::ProcessCommand(UConsoleContext* InConsole, const FString& InCommand)
 {
 	TArray<FCommandRunInstruction> CommandsToRun;
 
@@ -62,8 +63,8 @@ TArray<FCommandRunInstruction> UCommandProcessor::ProcessCommand(TScriptInterfac
 
 
 
-		UTerminalCommand* CommandImpl = ICommandSeeker::Execute_FindCommand(InCommandSeeker.GetObject(), Name, InternalUsage, FriendlyUsage);
-		if (CommandImpl)
+		UTerminalCommand* CommandImpl = nullptr;
+		if (InConsole->SystemContext->TryGetTerminalCommand(FName(*Name), CommandImpl, InternalUsage, FriendlyUsage))
 		{
 			bool DocoptError = false;
 			FString DocoptErrorMessage;
@@ -97,7 +98,7 @@ TArray<FCommandRunInstruction> UCommandProcessor::ProcessCommand(TScriptInterfac
 					Ctx->SystemContext = InConsole->SystemContext;
 				}
 
-				Ctx->Filesystem = ISystemContext::Execute_GetFilesystem(Ctx->SystemContext.GetObject(), Ctx->UserID);
+				Ctx->Filesystem = Ctx->SystemContext->GetFilesystem(Ctx->UserID);
 				
 				NewInst.IntendedContext = Ctx;
 				LastPiper = Ctx;
@@ -120,7 +121,7 @@ TArray<FCommandRunInstruction> UCommandProcessor::ProcessCommand(TScriptInterfac
 					Ctx->SystemContext = InConsole->SystemContext;
 				}
 
-				Ctx->Filesystem = ISystemContext::Execute_GetFilesystem(Ctx->SystemContext.GetObject(), Ctx->UserID);
+				Ctx->Filesystem = Ctx->SystemContext->GetFilesystem(Ctx->UserID);
 
 				NewInst.IntendedContext = Ctx;
 			}

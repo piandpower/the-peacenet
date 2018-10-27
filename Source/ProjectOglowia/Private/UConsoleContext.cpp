@@ -1,17 +1,18 @@
 // Copyright (c) 2018 The Peacenet & Alkaline Thunder.
 
 #include "UConsoleContext.h"
-#include "SystemContext.h"
+#include "USystemContext.h"
 
-UConsoleContext * UConsoleContext::CreateChildContext(TScriptInterface<ISystemContext> InSystemContext, int InUserID)
+UConsoleContext * UConsoleContext::CreateChildContext(USystemContext* InSystemContext, int InUserID)
 {
 	UConsoleContext* NewCtx = NewObject<UConsoleContext>();
 
 	NewCtx->SystemContext = InSystemContext;
 	NewCtx->UserID = InUserID;
 
-	NewCtx->WorkingDirectory = ISystemContext::Execute_GetUserHomeDirectory(InSystemContext.GetObject(), InUserID);
-	NewCtx->Filesystem = ISystemContext::Execute_GetFilesystem(InSystemContext.GetObject(), InUserID);
+	NewCtx->HomeDirectory = InSystemContext->GetUserHomeDirectory(InUserID);
+	NewCtx->WorkingDirectory = NewCtx->HomeDirectory;
+	NewCtx->Filesystem = InSystemContext->GetFilesystem(InUserID);
 
 	NewCtx->Terminal = this->Terminal;
 
@@ -20,18 +21,18 @@ UConsoleContext * UConsoleContext::CreateChildContext(TScriptInterface<ISystemCo
 
 FString UConsoleContext::GetHostname()
 {
-	return ISystemContext::Execute_GetHostname(this->SystemContext.GetObject());
+	return this->SystemContext->GetHostname();
 }
 
 FString UConsoleContext::GetUsername()
 {
-	FUserInfo User = ISystemContext::Execute_GetUserInfo(this->SystemContext.GetObject(), this->UserID);
+	FUserInfo User = this->SystemContext->GetUserInfo(this->UserID);
 	return User.Username;
 }
 
 FString UConsoleContext::GetUserTypeDisplay()
 {
-	FUserInfo User = ISystemContext::Execute_GetUserInfo(this->SystemContext.GetObject(), this->UserID);
+	FUserInfo User = this->SystemContext->GetUserInfo(this->UserID);
 	return User.IsAdminUser ? TEXT("#") : TEXT("$");
 }
 

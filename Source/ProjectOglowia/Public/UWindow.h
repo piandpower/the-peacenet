@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UserWidget.h"
-#include "SystemContext.h"
+#include "USystemContext.h"
 #include "UWindow.generated.h"
 
 UENUM(BlueprintType)
@@ -73,7 +73,7 @@ public:
 	int UserID;
 
 	UPROPERTY(BlueprintReadOnly)
-	TScriptInterface<ISystemContext> SystemContext;
+	USystemContext* SystemContext;
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ExposeOnSpawn = "true"))
 	bool EnableCloseButton = true;

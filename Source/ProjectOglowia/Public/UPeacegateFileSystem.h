@@ -5,8 +5,9 @@
 #include "CoreMinimal.h"
 #include "FFolder.h"
 #include "FComputer.h"
-#include "FolderRepository.h"
 #include "UPeacegateFileSystem.generated.h"
+
+class USystemContext;
 
 UENUM(BlueprintType)
 enum class EFilesystemEventType : uint8
@@ -68,7 +69,7 @@ public:
 	void Initialize(int InUserID);
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta=(ExposeOnSpawn="true"))
-	TScriptInterface<IFolderRepository> FolderRepo;
+	USystemContext* SystemContext;
 
 	UPROPERTY()
 	UFolderNavigator* Root;

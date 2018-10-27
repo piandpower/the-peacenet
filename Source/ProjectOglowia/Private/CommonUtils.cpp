@@ -1,6 +1,7 @@
 // Copyright (c) 2018 The Peacenet & Alkaline Thunder.
 
 #include "CommonUtils.h"
+#include "USystemContext.h"
 
 FText UCommonUtils::GetFriendlyFilesystemStatusCode(const EFilesystemStatusCode InStatusCode)
 {
@@ -23,10 +24,10 @@ FText UCommonUtils::GetFriendlyFilesystemStatusCode(const EFilesystemStatusCode 
 	}
 }
 
-UPeacegateFileSystem * UCommonUtils::CreateFilesystem(UPARAM(Ref)TScriptInterface<IFolderRepository> InFolderRepo, int InUserID)
+UPeacegateFileSystem * UCommonUtils::CreateFilesystem(USystemContext* InSystemContext, int InUserID)
 {
 	UPeacegateFileSystem* FS = NewObject<UPeacegateFileSystem>();
-	FS->FolderRepo = InFolderRepo;
+	FS->SystemContext = InSystemContext;
 	FS->Initialize(InUserID);
 	return FS;
 }

@@ -5,10 +5,10 @@
 #include "LatentActions.h"
 #include "CoreMinimal.h"
 #include "UConsoleContext.h"
-#include "CommandSeeker.h"
 #include "DocoptForUnrealBPLibrary.h"
 #include "UCommandProcessor.generated.h"
 
+class UTerminalCommand;
 
 class FPlaceboLatentAction : public FPendingLatentAction
 {
@@ -62,7 +62,7 @@ public:
 		}
 	}
 
-	virtual UConsoleContext* CreateChildContext(TScriptInterface<ISystemContext> InSystemContext, int InUserID) override
+	virtual UConsoleContext* CreateChildContext(USystemContext* InSystemContext, int InUserID) override
 	{
 		if (Output)
 		{
@@ -143,5 +143,5 @@ class PROJECTOGLOWIA_API UCommandProcessor : public UObject
 
 public:
 	UFUNCTION(BlueprintCallable, Category="Bash")
-	static TArray<FCommandRunInstruction> ProcessCommand(TScriptInterface<ICommandSeeker> InCommandSeeker, UPARAM(Ref) UConsoleContext* InConsole, const FString& InCommand);
+	static TArray<FCommandRunInstruction> ProcessCommand(UPARAM(Ref) UConsoleContext* InConsole, const FString& InCommand);
 };

@@ -94,3 +94,53 @@ bool UDocoptValue::ValueEquals(const UDocoptValue* InOther) const
 {
     return (this->HashValueData() == InOther->HashValueData());
 }
+
+void UDocoptValue::SetEmpty()
+{
+    this->NumberValue = 0;
+    this->BooleanValue = false;
+    this->StringValue = FString();
+    this->ListValue = TArray<FString>();
+
+    this->Kind = EDocoptValueKind::Empty;
+}
+
+void UDocoptValue::SetValue(bool InValue)
+{
+        this->NumberValue = 0;
+    this->BooleanValue = InValue;
+    this->StringValue = FString();
+    this->ListValue = TArray<FString>();
+
+    this->Kind = EDocoptValueKind::Boolean;
+}
+
+void UDocoptValue::SetValue(int InValue)
+{
+        this->NumberValue = InValue;
+    this->BooleanValue = false;
+    this->StringValue = FString();
+    this->ListValue = TArray<FString>();
+
+    this->Kind = EDocoptValueKind::Number;
+}
+
+void UDocoptValue::SetValue(FString InValue)
+{
+        this->NumberValue = 0;
+    this->BooleanValue = false;
+    this->StringValue = InValue;
+    this->ListValue = TArray<FString>();
+
+    this->Kind = EDocoptValueKind::String;
+}
+
+void UDocoptValue::SetValue(TArray<FString> InValue)
+{
+        this->NumberValue = 0;
+    this->BooleanValue = false;
+    this->StringValue = FString();
+    this->ListValue = InValue;
+
+    this->Kind = EDocoptValueKind::List;
+}

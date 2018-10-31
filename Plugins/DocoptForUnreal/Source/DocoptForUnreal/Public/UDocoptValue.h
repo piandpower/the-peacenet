@@ -67,4 +67,10 @@ private:
 
 public:
 	bool ValueEquals(const UDocoptValue* InOther) const;
+
+	void SetValue(bool InValue);
+	void SetValue(int InValue);
+	void SetValue(FString InValue);
+	void SetValue(TArray<FString> InValue);
+	void SetEmpty();
 };

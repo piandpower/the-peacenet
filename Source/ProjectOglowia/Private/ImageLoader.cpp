@@ -13,7 +13,6 @@
 #include "UPeacegateFileSystem.h"
 #include "Engine/Texture2D.h"
 
-#define UIL_LOG(Verbosity, Format, ...)	UE_LOG(LogTemp, Verbosity, Format, __VA_ARGS__)
 // Module loading is not allowed outside of the main thread, so we load the ImageWrapper module ahead of time. 
 static IImageWrapperModule& ImageWrapperModule = FModuleManager::LoadModuleChecked<IImageWrapperModule>(TEXT("ImageWrapper"));
 
@@ -64,7 +63,7 @@ UTexture2D* UImageLoader::LoadImageFromDisk(UPeacegateFileSystem* InFilesystem, 
 	// Check if the file exists first 
 	if (!InFilesystem->ReadBinary(ImagePath, FileData, StatusCode)) 
 	{ 
-		UIL_LOG(Error, TEXT("File not found or couldn't be read: %s"), *ImagePath); 
+		//UIL_LOG(Error, TEXT("File not found or couldn't be read: %s"), *ImagePath); 
 		return nullptr;
 	}
 
@@ -73,7 +72,7 @@ UTexture2D* UImageLoader::LoadImageFromDisk(UPeacegateFileSystem* InFilesystem, 
 	
 	if (ImageFormat == EImageFormat::Invalid) 
 	{ 
-		UIL_LOG(Error, TEXT("Unrecognized image file format: %s"), *ImagePath); 
+		//UIL_LOG(Error, TEXT("Unrecognized image file format: %s"), *ImagePath); 
 		return nullptr;
 	}
 
@@ -82,7 +81,7 @@ UTexture2D* UImageLoader::LoadImageFromDisk(UPeacegateFileSystem* InFilesystem, 
 	
 	if (!ImageWrapper.IsValid()) 
 	{ 
-		UIL_LOG(Error, TEXT("Failed to create image wrapper for file: %s"), *ImagePath);
+		//UIL_LOG(Error, TEXT("Failed to create image wrapper for file: %s"), *ImagePath);
 		return nullptr;
 	}
 
@@ -94,7 +93,7 @@ UTexture2D* UImageLoader::LoadImageFromDisk(UPeacegateFileSystem* InFilesystem, 
 	
 	if (RawData == nullptr) 
 	{ 
-		UIL_LOG(Error, TEXT("Failed to decompress image file: %s"), *ImagePath); 
+		//UIL_LOG(Error, TEXT("Failed to decompress image file: %s"), *ImagePath); 
 		return nullptr;
 	}
 
@@ -108,7 +107,7 @@ UTexture2D* UImageLoader::CreateTexture(UObject* Outer, const TArray<uint8>& Pix
 	// Shamelessly copied from UTexture2D::CreateTransient with a few modifications 
 	if (InSizeX <= 0 || InSizeY <= 0 || (InSizeX % GPixelFormats[InFormat].BlockSizeX) != 0 || (InSizeY % GPixelFormats[InFormat].BlockSizeY) != 0)
 	{ 
-		UIL_LOG(Warning, TEXT("Invalid parameters specified for UImageLoader::CreateTexture()")); 
+		//UIL_LOG(Warning, TEXT("Invalid parameters specified for UImageLoader::CreateTexture()")); 
 		return nullptr;
 	}
 
@@ -263,7 +262,7 @@ bool UImageLoader::SaveImage(const TArray<TPixelType>& Bitmap, const FIntPoint& 
 	}
 	else
 	{
-		UIL_LOG(Error, TEXT("Failed to write bitmap data."));
+		//UIL_LOG(Error, TEXT("Failed to write bitmap data."));
 	}
 
 	return bSuccess;

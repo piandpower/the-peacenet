@@ -9,12 +9,12 @@ UTerminalCommand::UTerminalCommand()
 
 UTerminalCommand::~UTerminalCommand()
 {
-}void UTerminalCommand::RunCommand(UConsoleContext* InConsole, const TMap<FString, FDocoptValue> InArguments)
+}void UTerminalCommand::RunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments)
 {
 	OnRunCommand(InConsole, InArguments);
 }
 
-void UHelpCommand::RunCommand(UConsoleContext* InConsole, const TMap<FString, FDocoptValue> InArguments)
+void UHelpCommand::RunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments)
 {
 	InConsole->WriteLine(TEXT("`*`1Command help`r"));
 	InConsole->WriteLine(TEXT("------------------- \n"));
@@ -29,7 +29,7 @@ void UHelpCommand::RunCommand(UConsoleContext* InConsole, const TMap<FString, FD
 	this->Complete();
 }
 
-void UAdminTerminalCommand::RunCommand(UConsoleContext* InConsole, const TMap<FString, FDocoptValue> InArguments)
+void UAdminTerminalCommand::RunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments)
 {
 	if (InConsole->SystemContext->GetUserDomain(InConsole->UserID) != EUserDomain::Administrator)
 	{

@@ -52,52 +52,52 @@ FText UProgram::GetHostname()
 
 UConsoleContext* UProgram::CreateConsole(UPTerminalWidget* InTerminalWidget)
 {
-	UConsoleContext* Console = NewObject<UConsoleContext>(this);
+	UConsoleContext* SubConsole = NewObject<UConsoleContext>(this);
 
 	// Assign it to the terminal widget.
-	Console->Terminal = InTerminalWidget;
+	SubConsole->Terminal = InTerminalWidget;
 
 	// User ID matches our window.
-	Console->UserID = Window->UserID;
+	SubConsole->UserID = Window->UserID;
 
 	// Same with system ctx.
-	Console->SystemContext = Window->SystemContext;
+	SubConsole->SystemContext = Window->SystemContext;
 
 	// Get user info.
-	FUserInfo User = Console->SystemContext->GetUserInfo(Console->UserID);
+	FUserInfo User = SubConsole->SystemContext->GetUserInfo(SubConsole->UserID);
 
 	// If the user's username is root, then we set the home directory to "/root."
 	if (User.IsAdminUser)
 	{
-		Console->HomeDirectory = TEXT("/root");
+		SubConsole->HomeDirectory = TEXT("/root");
 	}
 	else
 	{
-		Console->HomeDirectory = TEXT("/home/") + User.Username;
+		SubConsole->HomeDirectory = TEXT("/home/") + User.Username;
 	}
 
-	Console->WorkingDirectory = Console->HomeDirectory;
+	SubConsole->WorkingDirectory = SubConsole->HomeDirectory;
 	
 	// Console FS matches ours.
-	Console->Filesystem = this->Filesystem;
+	SubConsole->Filesystem = this->Filesystem;
 
 	// Attempt to create the user directory if it's not there
-	if (!Console->Filesystem->DirectoryExists(Console->WorkingDirectory))
+	if (!SubConsole->Filesystem->DirectoryExists(SubConsole->WorkingDirectory))
 	{
 		EFilesystemStatusCode StatusCode;
 
-		if (!Console->Filesystem->CreateDirectory(Console->WorkingDirectory, StatusCode))
+		if (!SubConsole->Filesystem->CreateDirectory(SubConsole->WorkingDirectory, StatusCode))
 		{
 			FText Error = UCommonUtils::GetFriendlyFilesystemStatusCode(StatusCode);
-			Console->Write(TEXT("peacegate: user home directory '`8") + Console->WorkingDirectory + TEXT("`1' could not be created: "));
-			Console->WriteLine(Error.ToString());
+			SubConsole->Write(TEXT("peacegate: user home directory '`8") + Console->WorkingDirectory + TEXT("`1' could not be created: "));
+			SubConsole->WriteLine(Error.ToString());
 
 			// Working directory becomes /.
-			Console->WorkingDirectory = TEXT("/");
+			SubConsole->WorkingDirectory = TEXT("/");
 		}
 	}
 
-	return Console;
+	return SubConsole;
 }
 
 

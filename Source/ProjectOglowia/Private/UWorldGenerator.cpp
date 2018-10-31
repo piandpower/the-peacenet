@@ -249,7 +249,7 @@ void FMarkovSource::Rotate(TCHAR NextChar)
 bool FMarkovSource::IsLessThan(const FMarkovSource& OtherSource)
 {
 	int i = 0;
-	for (int i = 0; i < Chars.Num() - 1; i++)
+	for (i = 0; i < Chars.Num() - 1; i++)
 	{
 		if (Chars[i] != OtherSource.Chars[i]) break;
 	}

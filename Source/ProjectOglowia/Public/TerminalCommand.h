@@ -26,10 +26,10 @@ public:
 	FCommandCompletedEvent Completed;
 
 	UFUNCTION(BlueprintCallable, Category = "Terminal Command")
-	virtual void RunCommand(UPARAM(Ref) UConsoleContext* InConsole, const TMap<FString, FDocoptValue> InArguments);
+	virtual void RunCommand(UPARAM(Ref) UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments);
 protected:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Terminal Command")
-	void OnRunCommand(const UConsoleContext* InConsole, const TMap<FString, FDocoptValue>& InArguments);
+	void OnRunCommand(const UConsoleContext* InConsole, const TMap<FString, UDocoptValue*>& InArguments);
 
 	UFUNCTION(BlueprintCallable, Category="Terminal Command")
 	void Complete() { Completed.Broadcast(); }
@@ -41,7 +41,7 @@ class PROJECTOGLOWIA_API UAdminTerminalCommand : public UTerminalCommand
 	GENERATED_BODY()
 
 public:
-	virtual void RunCommand(UConsoleContext* InConsole, const TMap<FString, FDocoptValue> InArguments) override;
+	virtual void RunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments) override;
 };
 
 UCLASS()
@@ -50,5 +50,5 @@ class PROJECTOGLOWIA_API UHelpCommand : public UTerminalCommand
 	GENERATED_BODY()
 
 public:
-	virtual void RunCommand(UConsoleContext* InConsole, const TMap<FString, FDocoptValue> InArguments) override;
+	virtual void RunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments) override;
 };

@@ -4,7 +4,7 @@
 
 #include "Modules/ModuleManager.h"
 
-class FDocoptForUnrealModule : public IModuleInterface
+class DOCOPTFORUNREAL_API FDocoptForUnrealModule : public IModuleInterface
 {
 public:
 

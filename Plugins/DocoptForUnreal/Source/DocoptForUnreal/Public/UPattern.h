@@ -131,7 +131,7 @@ class DOCOPTFORUNREAL_API UOption : public ULeafPattern
 public:
 	UOption() {}
 	~UOption() {}
-	UOption* Parse(FString const& InOptionDescription);
+	static UOption* Parse(FString const& InOptionDescription);
 	FString ShortOption;
 	FString LongOption;
 	int ArgumentCount = 0;

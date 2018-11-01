@@ -290,7 +290,7 @@ bool ULeafPattern::Match(PatternList& InLeft, TArray<ULeafPattern*>& Collected) 
 
     InLeft.RemoveAt(match.First);
 
-    ULeafPattern* SameName;
+	ULeafPattern* SameName = nullptr;
     for(auto Leaf :  Collected)
     {
         if(Leaf->Name() == this->Name())

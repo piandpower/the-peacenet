@@ -3,29 +3,8 @@
 
 #include "UPattern.h"
 #include "Regex.h"
+#include "UDocoptUtils.h"
 #include "UDocoptValue.h"
-
-static TArray<FString> Split(FString x) 
-{
-    FString spaces = TEXT("\t\r\n\v\f");
-
-    TArray<FString> ret;
-    
-    for(auto c : spaces)
-    {
-        FString cAsString = FString::Chr(c);
-        while(x.Contains(cAsString))
-        {
-            FString left;
-            FString right;
-            x.Split(FString::Chr(c), &left, &right);
-            x.RemoveAt(0, left.GetCharArray().Num()+1);
-            ret.Add(left);
-        }
-    }
-
-    return ret;
-}
 
 PatternList ULeafPattern::Flatten(bool(*filter)(UPattern const*))
 {
@@ -286,7 +265,7 @@ void UBranchPattern::FixRepeatingArguments()
                 TArray<FString> newValue;
                 if(leaf->Value->IsString())
                 {
-                    newValue = Split(leaf->Value->AsString());
+                    newValue = UDocoptUtils::Split(leaf->Value->AsString());
                 }
                 if(!leaf->Value->IsList())
                 {

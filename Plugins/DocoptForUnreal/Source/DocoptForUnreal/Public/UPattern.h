@@ -66,7 +66,7 @@ public:
 	virtual int HashPattern() const override;
 
 protected:
-	virtual FPair<int, ULeafPattern*> SingleMatch(PatternList const&) const { return FPair<int, ULeafPattern*>(); }
+	virtual FPair<int, ULeafPattern*> SingleMatch(PatternList const& list) const { return FPair<int, ULeafPattern*>(); }
 
 public:
 	UPROPERTY()
@@ -111,7 +111,7 @@ class DOCOPTFORUNREAL_API UArgument : public ULeafPattern
 	GENERATED_BODY()
 
 protected:
-	virtual FPair<int, ULeafPattern*> SingleMatch(PatternList const&) const override;
+	virtual FPair<int, ULeafPattern*> SingleMatch(PatternList const& list) const override;
 };
 
 UCLASS(BlueprintType)
@@ -120,7 +120,7 @@ class DOCOPTFORUNREAL_API UCommand : public UArgument
 	GENERATED_BODY()
 
 protected:
-	virtual FPair<int, ULeafPattern*> SingleMatch(PatternList const&) const override;
+	virtual FPair<int, ULeafPattern*> SingleMatch(PatternList const& list) const override;
 };
 
 UCLASS(BlueprintType)
@@ -130,7 +130,8 @@ class DOCOPTFORUNREAL_API UOption : public ULeafPattern
 
 public:
 	UOption() {}
-	static UOption* Parse(FString const& InOptionDescription);
+	~UOption() {}
+	UOption* Parse(FString const& InOptionDescription);
 	FString ShortOption;
 	FString LongOption;
 	int ArgumentCount = 0;

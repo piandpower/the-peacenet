@@ -62,10 +62,11 @@ public:
 	bool IsList() const;
 
 private:
-	int HashValueData() const;
 	FString GetSerializedValue() const;
 
 public:
+	int HashValueData() const;
+
 	bool ValueEquals(const UDocoptValue* InOther) const;
 
 	void SetValue(bool InValue);

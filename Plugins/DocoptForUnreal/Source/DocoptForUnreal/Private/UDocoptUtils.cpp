@@ -153,3 +153,14 @@ TArray<FString> UDocoptUtils::RegexSplit(FString InStr, FRegexMatcher InRegex)
     }
     return ret;
 }
+
+template<typename T>
+TArray<T> UDocoptUtils::SubArray(TArray<T> InArray, int InStart, int InEnd)
+{
+    TArray<T> ret;
+    for(int i = InStart; i < InEnd; i++)
+    {
+        ret.Add(InArray[i]);
+    }
+    return ret;
+}

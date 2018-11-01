@@ -36,4 +36,7 @@ public:
 	static int FindFirstOf(FString InStr, FString InChars, int InStart);
 	static FString SubString(FString InStr, int InStart, int InEnd);
 	static void Resize(FString& InStr, int NewSize);
+
+	template<typename T>
+	static TArray<T> SubArray(TArray<T> InArray, int InStart, int InEnd);
 };

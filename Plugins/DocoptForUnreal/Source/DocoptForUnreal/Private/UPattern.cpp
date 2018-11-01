@@ -551,8 +551,8 @@ bool UOneOrMore::Match(PatternList& InLeft, TArray<ULeafPattern*>& Collected) co
 		return false;
 	}
 
-	InLeft = std::move(l);
-	Collected = std::move(c);
+	InLeft = l;
+	Collected = c;
 	return true;
 }
 

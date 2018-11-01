@@ -129,6 +129,7 @@ class DOCOPTFORUNREAL_API UOption : public ULeafPattern
 	GENERATED_BODY()
 
 public:
+	UOption() {}
 	static UOption* Parse(FString const& InOptionDescription);
 	FString ShortOption;
 	FString LongOption;

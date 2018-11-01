@@ -418,6 +418,20 @@ FPair<int, ULeafPattern*> UCommand::SingleMatch(PatternList const& left) const
     return ret;
 }
 
+int UOption::HashPattern() const
+{
+    TArray<int> hashList;
+    hashList.Add(ArgumentCount);
+
+    TArray<TCHAR> shortOptChars = ShortOption.GetCharArray();
+    TArray<TCHAR> longOptChars = LongOption.GetCharArray();
+
+    hashList.Add(FCrc::MemCrc32(shortOptChars.GetData(), sizeof(TCHAR)*shortOptChars.Num()));
+    hashList.Add(FCrc::MemCrc32(longOptChars.GetData(), sizeof(TCHAR)*longOptChars.Num()));
+    
+    return FCrc::MemCrc32(hashList.GetData(), sizeof(int) * hashList.Num());
+}
+
 UOption* UOption::Parse(FString const& InOptionDescription)
 {
     FString shortOpt, longOpt;

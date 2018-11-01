@@ -556,6 +556,15 @@ bool UOneOrMore::Match(PatternList& InLeft, TArray<ULeafPattern*>& Collected) co
 	return true;
 }
 
+bool UOptional::Match(PatternList& InLeft, TArray<ULeafPattern*>& Collected) const
+{
+    for(auto const& pattern : Children) 
+    {
+		pattern->Match(InLeft, Collected);
+	}
+	return true;
+}
+
 bool UEither::Match(PatternList& InLeft, TArray<ULeafPattern*>& Collected) const
 {
     using Outcome = FPair<PatternList, TArray<ULeafPattern*>>;

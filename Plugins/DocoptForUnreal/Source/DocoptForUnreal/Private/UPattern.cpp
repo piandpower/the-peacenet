@@ -7,8 +7,24 @@
 
 static TArray<FString> Split(FString x) 
 {
-    checkNoEntry();
-    return TArray<FString>();
+    FString spaces = TEXT("\t\r\n\v\f");
+
+    TArray<FString> ret;
+    
+    for(auto c : spaces)
+    {
+        FString cAsString = FString::Chr(c);
+        while(x.Contains(cAsString))
+        {
+            FString left;
+            FString right;
+            x.Split(FString::Chr(c), &left, &right);
+            x.RemoveAt(0, left.GetCharArray().Num()+1);
+            ret.Add(left);
+        }
+    }
+
+    return ret;
 }
 
 PatternList ULeafPattern::Flatten(bool(*filter)(UPattern const*))

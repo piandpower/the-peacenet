@@ -136,20 +136,15 @@ FString UDocoptUtils::Join(TArray<FString> InArray, FString InDelimeter)
     return ret;
 }
 
-TArray<FString> UDocoptUtils::RegexSplit(FString InStr, FRegexMatcher InRegex)
+TArray<FString> UDocoptUtils::RegexSplit(FString InStr, std::regex InRegex)
 {
+    std::string text = TCHAR_TO_UTF8(*InStr);
     TArray<FString> ret;
-    int last=0;
-    while(InRegex.FindNext())
+    for (auto it = std::sregex_token_iterator(text.begin(), text.end(), InRegex, -1);
+			it != std::sregex_token_iterator();
+			++it) 
     {
-        int beginning = InRegex.GetMatchBeginning();
-        int ending = InRegex.GetMatchEnding();
-        ret.Add(InStr.LeftChop(beginning - last));
-        last = beginning;
-    }
-    if(!InStr.IsEmpty())
-    {
-        ret.Add(InStr);
+		ret.Add(FString((*it).str().c_str()));
     }
     return ret;
 }

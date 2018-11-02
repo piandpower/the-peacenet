@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Regex.h"
+#include <regex>
 #include "UDocoptUtils.generated.h"
 
 USTRUCT()
@@ -31,7 +31,7 @@ public:
 	static TArray<FString> Split(FString InStr, int InPosition = 0);
 	static FStringPartition Partition(FString InStr, FString const& InPoint);
 	static FString Join(TArray<FString> InArray, FString InDelimeter);
-	static TArray<FString> RegexSplit(FString InText, FRegexMatcher InRegex);
+	static TArray<FString> RegexSplit(FString InText, std::regex InRegex);
 	static int FindFirstNotOf(FString InStr, FString InChars, int InStart);
 	static int FindFirstOf(FString InStr, FString InChars, int InStart);
 	static FString SubString(FString InStr, int InStart, int InEnd);

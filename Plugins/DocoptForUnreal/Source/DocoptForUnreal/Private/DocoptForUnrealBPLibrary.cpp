@@ -1,74 +1,62 @@
 // Copyright 1998-2018 Epic Games, Inc. All Rights Reserved.
 
 #include "DocoptForUnrealBPLibrary.h"
-#include "UDocoptUsageParser.h"
-#include "UDocoptUtils.h"
+#include "docopt.h"
 #include "DocoptForUnreal.h"
 
 TMap<FString, UDocoptValue*> UDocoptForUnrealBPLibrary::NativeParseArguments(const FString& InDoc, const TArray<FString> InArgv, bool InHelp, const FString& InVersion, bool InOptionsFirst, bool& OutHasMessage, FString& OutMessage)
 {
-	FSyntaxTree SyntaxTree;
+	std::string doc = TCHAR_TO_UTF8(*InDoc);
 
-	if(!UDocoptUsageParser::CreatePatternTree(InDoc, SyntaxTree, OutMessage))
+	std::vector<std::string> argv;
+	for (auto a : InArgv)
 	{
+		argv.emplace_back(TCHAR_TO_UTF8(*a));
+	}
+
+	std::map<std::string, docopt::value> internal_map;
+
+	try 
+	{
+		internal_map = docopt::docopt_parse(doc, argv, InHelp, !InVersion.IsEmpty(), InOptionsFirst);
+	}
+	catch (docopt::DocoptExitHelp const&) 
+	{
+		OutMessage = InDoc;
+		OutHasMessage = true;
+		return TMap<FString, UDocoptValue*>();
+	}
+	catch (docopt::DocoptExitVersion const&) 
+	{
+		OutMessage = InVersion;
+		OutHasMessage = true;
+		return TMap<FString, UDocoptValue*>();
+	}
+	catch (docopt::DocoptLanguageError const& error)
+	{
+		OutMessage = TEXT("Docopt Language Error:\r\n\r\n");
+		OutMessage.Append(FString(error.what()));
+		OutHasMessage = true;
+		return TMap<FString, UDocoptValue*>();
+	}
+	catch (docopt::DocoptArgumentError const& error) 
+	{
+		OutMessage = FString(error.what());
 		OutHasMessage = true;
 		return TMap<FString, UDocoptValue*>();
 	}
 
-	UTokens* Tokens = NewObject<UTokens>();
-	Tokens->IsParsingArgv = true;
-	Tokens->TokensArray = InArgv;
+	TMap<FString, UDocoptValue*> ret;
 
-	PatternList ArgvPatterns = UDocoptUsageParser::ParseArgv(Tokens, SyntaxTree.Second, InOptionsFirst, OutMessage);
-
-	if(!OutMessage.IsEmpty())
+	for (auto kvs : internal_map)
 	{
-		OutHasMessage = true;
-		return TMap<FString, UDocoptValue*>();
+		FString ueKey = FString(kvs.first.c_str());
+		UDocoptValue* ueValue = NewObject<UDocoptValue>();
+		ueValue->UnderlyingValue = kvs.second;
+		ret.Add(ueKey, ueValue);
 	}
 
-	UDocoptUsageParser::Extras(InHelp, !InVersion.IsEmpty(), ArgvPatterns, OutMessage);
-	if(!OutMessage.IsEmpty())
-	{
-		if(OutMessage == TEXT("version"))
-		{
-			OutMessage = InVersion;
-		}
-		OutHasMessage = true;
-		return TMap<FString, UDocoptValue*>();
-	}
-
-	TArray<ULeafPattern*> Collected;
-	bool matched = SyntaxTree.First->Fix()->Match(ArgvPatterns, Collected);
-
-	if(matched && ArgvPatterns.Num() == 0)
-	{
-		TMap<FString, UDocoptValue*> ret;
-
-		for(auto p : SyntaxTree.First->Leaves())
-		{
-			ret.Add(p->GetName(), p->GetValue());
-		}
-
-		for(auto p : Collected)
-		{
-			ret.Add(p->LeafName, p->Value);
-		}
-
-		return ret;
-	}
-
-	if(matched)
-	{
-		FString LeftOver = UDocoptUtils::Join(InArgv, TEXT(", "));
-		OutMessage = TEXT("Unexpected argument: ") + LeftOver;
-		OutHasMessage = true;
-		return TMap<FString, UDocoptValue*>();
-	}
-
-	OutHasMessage = true;
-	OutMessage = TEXT("Arguments did not match the expected value.");
-	return TMap<FString, UDocoptValue*>();
+	return ret;
 }
 
 TMap<FString, UDocoptValue*> UDocoptForUnrealBPLibrary::ParseArguments(const FString& InDoc, const TArray<FString> InArgv, bool InHelp, const FString& InVersion, bool InOptionsFirst, bool& OutHasMessage, FString& OutMessage)
@@ -77,3 +65,101 @@ TMap<FString, UDocoptValue*> UDocoptForUnrealBPLibrary::ParseArguments(const FSt
 }
 
 
+bool UDocoptValue::IsBoolean()
+{
+	return UnderlyingValue.isBool();
+}
+
+bool UDocoptValue::IsNumber()
+{
+	return UnderlyingValue.isLong();
+}
+
+bool UDocoptValue::IsString()
+{
+	return UnderlyingValue.isString();
+}
+
+bool UDocoptValue::IsList()
+{
+	return UnderlyingValue.isStringList();
+}
+
+bool UDocoptValue::AsBoolean()
+{
+	check(!UnderlyingValue.isStringList());
+
+	if (UnderlyingValue.isBool())
+		return UnderlyingValue.asBool();
+
+	if (UnderlyingValue.isLong())
+		return UnderlyingValue.asLong() > 0;
+
+	if (UnderlyingValue.isString())
+	{
+		FString str = AsString().ToLower();
+		if (str.IsNumeric())
+		{
+			return str != TEXT("0");
+		}
+		return str == TEXT("true");
+	}
+
+	return false;
+}
+
+int UDocoptValue::AsNumber()
+{
+	check(!IsList());
+
+	if (IsBoolean())
+	{
+		return (AsBoolean() ? 1 : 0);
+	}
+
+	if (IsString())
+	{
+		FString str = AsString();
+		if (str.IsNumeric())
+		{
+			return FCString::Atoi(*str);
+		}
+		return 0;
+	}
+	
+	return (int)UnderlyingValue.asLong();
+	
+}
+
+FString UDocoptValue::AsString()
+{
+	if (IsBoolean())
+	{
+		return (AsBoolean() ? TEXT("true") : TEXT("false"));
+	}
+
+	if (IsNumber())
+	{
+		return FString::FromInt(AsNumber());
+	}
+
+	if (IsList())
+	{
+		TCHAR delim = TEXT(' ');
+		return FString::Join(AsList(), &delim);
+	}
+
+	return FString(UnderlyingValue.asString().c_str());
+}
+
+TArray<FString> UDocoptValue::AsList()
+{
+	check(IsList());
+
+	TArray<FString> ret;
+	for (auto str : UnderlyingValue.asStringList())
+	{
+		ret.Add(FString(str.c_str()));
+	}
+	return ret;
+}

@@ -6,6 +6,17 @@
 *.user
 *.sln.docstates
 
+.kdev4/
+.idea/
+*.workspace
+*.code-workspace
+*.pro
+*.pri
+*CodeCompletionFolders.txt
+*CodeLitePreProcessor.txt
+Makefile
+CMakeLists.txt
+
 # visual studio shit
 .vs/
 

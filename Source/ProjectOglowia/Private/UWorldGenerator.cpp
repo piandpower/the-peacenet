@@ -182,6 +182,7 @@ void UWorldGenerator::GenerateSystemDirectories(USystemContext * InSystemContext
 	// CODE-DUPLICATION, TODO: create these dynamically when generating lootable files
 	Filesystem->CreateDirectory(TEXT("/bin"), InstallStatusCode);
 	Filesystem->CreateDirectory(TEXT("/etc"), InstallStatusCode);
+	Filesystem->CreateDirectory(TEXT("/home"), InstallStatusCode);
 	Filesystem->CreateDirectory(TEXT("/usr"), InstallStatusCode);
 	Filesystem->CreateDirectory(TEXT("/var"), InstallStatusCode);
 	Filesystem->CreateDirectory(TEXT("/run"), InstallStatusCode);

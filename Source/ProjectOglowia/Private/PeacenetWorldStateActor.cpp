@@ -194,7 +194,7 @@ void APeacenetWorldStateActor::StartGame()
 		}
 	}
 
-	FComputer PlayerPC = SaveGame->Computers[0];
+	FComputer PlayerPC = SaveGame->Computers[SaveGame->PlayerComputerID];
 
 	USystemContext* PlayerContext = NewObject<USystemContext>();
 
@@ -208,6 +208,7 @@ void APeacenetWorldStateActor::StartGame()
 	PlayerContext->Desktop = CreateWidget<UDesktopWidget, APlayerController>(PlayerController, this->DesktopClass);
 
 	PlayerContext->Desktop->SystemContext = PlayerContext;
+	PlayerContext->Desktop->UserID = SaveGame->PlayerUserID;
 
 	SystemContexts.Add(PlayerContext);
 
@@ -351,6 +352,10 @@ APeacenetWorldStateActor* APeacenetWorldStateActor::GenerateAndCreateWorld(const
 	// Note: The save file would have been loaded as soon as the actor spawned - BeginPlay gets called during UWorld::SpawnActor.
 	// So, at this point, we've had a save file created and ready for us for a few CPU cycles now...
 	UPeacenetSaveGame* WorldSave = NewPeacenet->SaveGame;
+
+	// Tell the game what user and computer to possess.
+	WorldSave->PlayerComputerID = PlayerComputer.ID;
+	WorldSave->PlayerUserID = PlayerUser.ID;
 
 	// We can then add our player's computer to the save file.
 	WorldSave->Computers.Add(PlayerComputer);

@@ -22,6 +22,12 @@ class PROJECTOGLOWIA_API UPeacenetSaveGame : public USaveGame
 
 public:
 	UPROPERTY(VisibleAnywhere, Category = "Peacegate")
+	int PlayerComputerID = 0;
+
+	UPROPERTY(VisibleAnywhere, Category = "Peacegate")
+	int PlayerUserID = 0;
+
+	UPROPERTY(VisibleAnywhere, Category = "Peacegate")
 	TSubclassOf<UWindow> WindowClass;
 
 	UPROPERTY(VisibleAnywhere, Category = "Peacegate")

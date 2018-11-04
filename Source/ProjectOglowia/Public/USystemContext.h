@@ -45,7 +45,7 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "System Context")
-		FString GetHostname() const;
+	FString GetHostname() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "System Context")
 	TArray<UPeacegateProgramAsset*> GetInstalledPrograms();

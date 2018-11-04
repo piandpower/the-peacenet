@@ -7,6 +7,7 @@
 #include "FComputer.h"
 #include "FPeacenetIdentity.h"
 #include "UDesktopWidget.h"
+#include "UWindow.h"
 #include "UPeacenetSaveGame.generated.h"
 
 class UDesktopWidget;
@@ -20,6 +21,9 @@ class PROJECTOGLOWIA_API UPeacenetSaveGame : public USaveGame
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(VisibleAnywhere, Category = "Peacegate")
+	TSubclassOf<UWindow> WindowClass;
+
 	UPROPERTY(VisibleAnywhere, Category = "Peacegate")
 	TSubclassOf<UDesktopWidget> DesktopClass;
 

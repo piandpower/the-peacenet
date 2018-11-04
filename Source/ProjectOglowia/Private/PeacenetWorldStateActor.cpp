@@ -113,7 +113,8 @@ void APeacenetWorldStateActor::BeginPlay()
 		// desktop class is stored in the save, too.
 		this->DesktopClass = this->SaveGame->DesktopClass;
 
-		UDesktopWidget* Test = NewObject<UDesktopWidget>(this, this->DesktopClass.Get());
+		// And we need a window decorator.
+		this->WindowClass = this->SaveGame->WindowClass;
 	}
 	else
 	{
@@ -155,6 +156,44 @@ void APeacenetWorldStateActor::Tick(float DeltaTime)
 
 void APeacenetWorldStateActor::StartGame()
 {
+	// Let's go through all the computers in the save file.
+	for (auto& Computer : SaveGame->Computers)
+	{
+		// Are we owned by a player?
+		if (Computer.OwnerType == EComputerOwnerType::Player)
+		{
+			// Go through all the programs we have loaded.
+			for (auto Program : Programs)
+			{
+				// Is it unlocked by default and not installed?
+				if (Program->IsUnlockedByDefault && !Computer.InstalledPrograms.Contains(Program->ExecutableName))
+				{
+					// Install it.
+					Computer.InstalledPrograms.Add(Program->ExecutableName);
+				}
+			}
+
+			// And now we do the same thing for terminal commands.
+			TArray<FName> CommandNames;
+
+			this->CommandInfo.GetKeys(CommandNames); //retrieve names of all commands
+			
+			for (auto CommandName : CommandNames)
+			{
+				// Get the command info.
+				UCommandInfo* Command = this->CommandInfo[CommandName];
+
+				// Are we unlocked by default and not installed?
+				if (Command->UnlockedByDefault && !Computer.InstalledCommands.Contains(CommandName))
+				{
+					// Install it.
+					Computer.InstalledCommands.Add(CommandName);
+				}
+			}
+
+		}
+	}
+
 	FComputer PlayerPC = SaveGame->Computers[0];
 
 	USystemContext* PlayerContext = NewObject<USystemContext>();
@@ -237,7 +276,7 @@ bool APeacenetWorldStateActor::HasExistingOS()
 	return UGameplayStatics::DoesSaveGameExist(TEXT("PeacegateOS"), 0);
 }
 
-APeacenetWorldStateActor* APeacenetWorldStateActor::GenerateAndCreateWorld(const APlayerController* InPlayerController, const FPeacenetWorldInfo& InWorldInfo, TSubclassOf<UDesktopWidget> InDesktop, UPeacenetGameTypeAsset* InGameType)
+APeacenetWorldStateActor* APeacenetWorldStateActor::GenerateAndCreateWorld(const APlayerController* InPlayerController, const FPeacenetWorldInfo& InWorldInfo, TSubclassOf<UDesktopWidget> InDesktop, UPeacenetGameTypeAsset* InGameType, TSubclassOf<UWindow> InWindowDecorator)
 {
 	// This function is responsible for initially generating a Peacenet world.
 	// We take in an FPeacenetWorldInfo structure by-ref so we know how to spawn
@@ -267,6 +306,7 @@ APeacenetWorldStateActor* APeacenetWorldStateActor::GenerateAndCreateWorld(const
 	// Import the desktop and game type
 	NewPeacenet->DesktopClass = InDesktop;
 	NewPeacenet->GameType = InGameType;
+	NewPeacenet->WindowClass = InWindowDecorator;
 
 	// Now we can create a world seed. The world seed will be generated from the combined string of the player's full name, username and hostname. This creates a unique world for each player.
 	FString CombinedPlayerName = InWorldInfo.PlayerName.ToString() + TEXT("_") + InWorldInfo.PlayerUsername.ToString() + TEXT("_") + InWorldInfo.PlayerHostname.ToString();
@@ -327,9 +367,10 @@ APeacenetWorldStateActor* APeacenetWorldStateActor::GenerateAndCreateWorld(const
 
 void APeacenetWorldStateActor::SaveWorld()
 {
-	// update game type and desktop class
+	// update game type, window decorator and desktop class
 	SaveGame->DesktopClass = this->DesktopClass;
 	SaveGame->GameTypeName = this->GameType->Info.Name;
+	SaveGame->WindowClass = this->WindowClass;
 
 	UGameplayStatics::SaveGameToSlot(this->SaveGame, TEXT("PeacegateOS"), 0);
 }

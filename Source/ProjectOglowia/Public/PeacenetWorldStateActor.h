@@ -132,7 +132,7 @@ public:
 	static bool HasExistingOS();
 
 	UFUNCTION(BlueprintCallable, Category = "Peacegate")
-	static APeacenetWorldStateActor* GenerateAndCreateWorld(const APlayerController* InPlayerController, const FPeacenetWorldInfo& InWorldInfo, TSubclassOf<UDesktopWidget> InDesktop, UPeacenetGameTypeAsset* InGameType);
+		static APeacenetWorldStateActor* GenerateAndCreateWorld(const APlayerController* InPlayerController, const FPeacenetWorldInfo& InWorldInfo, TSubclassOf<UDesktopWidget> InDesktop, UPeacenetGameTypeAsset* InGameType, TSubclassOf<UWindow> InWindowDecorator);
 
 	UFUNCTION(BlueprintCallable, Category = "Peacegate")
 	static APeacenetWorldStateActor* LoadExistingOS(const APlayerController* InPlayerController);

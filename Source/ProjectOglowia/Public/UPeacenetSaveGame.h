@@ -6,7 +6,10 @@
 #include "GameFramework/SaveGame.h"
 #include "FComputer.h"
 #include "FPeacenetIdentity.h"
+#include "UDesktopWidget.h"
 #include "UPeacenetSaveGame.generated.h"
+
+class UDesktopWidget;
 
 /**
  * Represents a world state within Peacenet
@@ -17,6 +20,12 @@ class PROJECTOGLOWIA_API UPeacenetSaveGame : public USaveGame
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(VisibleAnywhere, Category = "Peacegate")
+	TSubclassOf<UDesktopWidget> DesktopClass;
+
+	UPROPERTY(VisibleAnywhere, Category = "Peacegate")
+	FString GameTypeName;
+
 	UPROPERTY(VisibleAnywhere, Category = "Entities")
 	TArray<FComputer> Computers;
 

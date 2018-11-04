@@ -26,7 +26,7 @@ bool APeacenetWorldStateActor::UpdateComputer(int InEntityID, FComputer & InComp
 			SaveGame->Computers[i] = InComputer;
 			if (InComputer.OwnerType == EComputerOwnerType::Player)
 			{
-				UGameplayStatics::SaveGameToSlot(SaveGame, WorldSlot, 0);
+				this->SaveWorld();
 			}
 			return true;
 		}
@@ -90,6 +90,30 @@ void APeacenetWorldStateActor::BeginPlay()
 	{
 		// Load the OS from disk.
 		this->SaveGame = Cast<UPeacenetSaveGame>(UGameplayStatics::LoadGameFromSlot(TEXT("PeacegateOS"), 0));
+		
+		// we need to look up the game type assets in the game.
+		TArray<UPeacenetGameTypeAsset*> GameTypeAssets;
+
+		// load them all in. Crash if we can't.
+		check(this->LoadAssets<UPeacenetGameTypeAsset>(TEXT("PeacenetGameTypeAsset"), GameTypeAssets));
+
+		// look through the assets and check if one matches the save file
+		for (auto Asset : GameTypeAssets)
+		{
+			if (Asset->Info.Name == SaveGame->GameTypeName)
+			{
+				this->GameType = Asset;
+				break;
+			}
+		}
+
+		// crash if we didn't find any
+		check(this->GameType);
+
+		// desktop class is stored in the save, too.
+		this->DesktopClass = this->SaveGame->DesktopClass;
+
+		UDesktopWidget* Test = NewObject<UDesktopWidget>(this, this->DesktopClass.Get());
 	}
 	else
 	{
@@ -228,6 +252,12 @@ APeacenetWorldStateActor* APeacenetWorldStateActor::GenerateAndCreateWorld(const
 	// But, that can wait until I've had my fucking coffee... on Boxing Day of 2025.
 	// - Alkaline
 
+	// We're going to first delete the save file if it exists.
+	if (HasExistingOS())
+	{
+		UGameplayStatics::DeleteGameInSlot(TEXT("PeacegateOS"), 0);
+	}
+
 	// For now, get the current world:
 	UWorld* CurrentWorld = InPlayerController->GetWorld();
 
@@ -297,5 +327,20 @@ APeacenetWorldStateActor* APeacenetWorldStateActor::GenerateAndCreateWorld(const
 
 void APeacenetWorldStateActor::SaveWorld()
 {
+	// update game type and desktop class
+	SaveGame->DesktopClass = this->DesktopClass;
+	SaveGame->GameTypeName = this->GameType->Info.Name;
+
 	UGameplayStatics::SaveGameToSlot(this->SaveGame, TEXT("PeacegateOS"), 0);
+}
+
+APeacenetWorldStateActor* APeacenetWorldStateActor::LoadExistingOS(const APlayerController* InPlayerController)
+{
+	check(HasExistingOS());
+
+	UWorld* World = InPlayerController->GetWorld();
+
+	auto ExistingPeacenet = World->SpawnActor<APeacenetWorldStateActor>();
+
+	return ExistingPeacenet;
 }

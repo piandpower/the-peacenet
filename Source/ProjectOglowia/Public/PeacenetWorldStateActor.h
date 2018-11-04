@@ -133,5 +133,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Peacegate")
 	static APeacenetWorldStateActor* GenerateAndCreateWorld(const APlayerController* InPlayerController, const FPeacenetWorldInfo& InWorldInfo, TSubclassOf<UDesktopWidget> InDesktop, UPeacenetGameTypeAsset* InGameType);
-};
 
+	UFUNCTION(BlueprintCallable, Category = "Peacegate")
+	static APeacenetWorldStateActor* LoadExistingOS(const APlayerController* InPlayerController);
+};

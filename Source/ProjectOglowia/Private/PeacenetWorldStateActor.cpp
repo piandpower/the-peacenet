@@ -213,7 +213,7 @@ bool APeacenetWorldStateActor::HasExistingOS()
 	return UGameplayStatics::DoesSaveGameExist(TEXT("PeacegateOS"), 0);
 }
 
-APeacenetWorldStateActor* APeacenetWorldStateActor::GenerateAndCreateWorld(const APlayerController* InPlayerController, const FPeacenetWorldInfo& InWorldInfo)
+APeacenetWorldStateActor* APeacenetWorldStateActor::GenerateAndCreateWorld(const APlayerController* InPlayerController, const FPeacenetWorldInfo& InWorldInfo, TSubclassOf<UDesktopWidget> InDesktop, UPeacenetGameTypeAsset* InGameType)
 {
 	// This function is responsible for initially generating a Peacenet world.
 	// We take in an FPeacenetWorldInfo structure by-ref so we know how to spawn
@@ -233,6 +233,10 @@ APeacenetWorldStateActor* APeacenetWorldStateActor::GenerateAndCreateWorld(const
 
 	// For now, that's all we need that player controller for. We can now spawn the Peacenet world.
 	auto NewPeacenet = CurrentWorld->SpawnActor<APeacenetWorldStateActor>();
+
+	// Import the desktop and game type
+	NewPeacenet->DesktopClass = InDesktop;
+	NewPeacenet->GameType = InGameType;
 
 	// Now we can create a world seed. The world seed will be generated from the combined string of the player's full name, username and hostname. This creates a unique world for each player.
 	FString CombinedPlayerName = InWorldInfo.PlayerName.ToString() + TEXT("_") + InWorldInfo.PlayerUsername.ToString() + TEXT("_") + InWorldInfo.PlayerHostname.ToString();

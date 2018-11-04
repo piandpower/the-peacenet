@@ -262,6 +262,9 @@ APeacenetWorldStateActor* APeacenetWorldStateActor::GenerateAndCreateWorld(const
 	// World generator can generate the computer's filesystem.
 	UWorldGenerator::CreateFilesystem(PlayerComputer, WorldGenerator);
 
+	// Note: The save file would have been loaded as soon as the actor spawned - BeginPlay gets called during UWorld::SpawnActor.
+	// So, at this point, we've had a save file created and ready for us for a few CPU cycles now...
+
 	// Give our new Peacenet back to the Blueprint land or whoever else happened to call us.
 	return NewPeacenet;
 }

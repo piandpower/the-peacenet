@@ -15,6 +15,14 @@ FString USystemContext::GetHostname() const
 
 TArray<UPeacegateProgramAsset*> USystemContext::GetInstalledPrograms()
 {
+	check(Peacenet);
+
+	if (Peacenet->GameType->Info.UnlockAllProgramsByDefault)
+	{
+		// Return ALL loaded programs if we're in a sandbox environment with all programs unlocked.
+		return Peacenet->Programs;
+	}
+
 	TArray<UPeacegateProgramAsset*> OutArray;
 
 	for (auto Executable : Computer.InstalledPrograms)
@@ -64,7 +72,9 @@ UPeacegateFileSystem * USystemContext::GetFilesystem(const int UserID)
 
 bool USystemContext::TryGetTerminalCommand(FName CommandName, UTerminalCommand *& OutCommand, FString& InternalUsage, FString& FriendlyUsage)
 {
-	if (!Computer.InstalledCommands.Contains(CommandName))
+	check(Peacenet);
+
+	if (!Computer.InstalledCommands.Contains(CommandName) && !Peacenet->GameType->Info.UnlockAllProgramsByDefault)
 		return false;
 
 	if (!Peacenet->CommandInfo.Contains(CommandName) && !Peacenet->ManPages.Contains(CommandName))

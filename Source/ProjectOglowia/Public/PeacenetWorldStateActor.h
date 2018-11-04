@@ -18,6 +18,25 @@ class UWindow;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPlayerSystemContextReadyEvent, USystemContext*, InSystemContext);
 
+USTRUCT(BlueprintType)
+struct PROJECTOGLOWIA_API FPeacenetWorldInfo
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FText PlayerName;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FText PlayerUsername;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FText PlayerHostname;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FText PlayerPassword;
+};
+
 USTRUCT()
 struct FManPage
 {
@@ -104,5 +123,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Peacenet")
 	void StartGame();
 	
+public:
+	// Used by the Ubiquity menu to see if the "Boot existing OS" screen should show.
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Peacegate")
+	static bool HasExistingOS();
+
+	UFUNCTION(BlueprintCallable, Category = "Peacegate")
+	static APeacenetWorldStateActor* GenerateAndCreateWorld(const APlayerController* InPlayerController, const FPeacenetWorldInfo& InWorldInfo);
 };
 

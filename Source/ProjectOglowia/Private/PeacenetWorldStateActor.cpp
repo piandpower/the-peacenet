@@ -90,93 +90,6 @@ void APeacenetWorldStateActor::BeginPlay()
 
 	// Load terminal command assets, build usage strings, populate command map.
 	this->LoadTerminalCommands();
-
-	if (UGameplayStatics::DoesSaveGameExist(this->WorldSlot, 0))
-	{
-		SaveGame = Cast<UPeacenetSaveGame>(UGameplayStatics::LoadGameFromSlot(this->WorldSlot, 0));
-	}
-	else
-	{
-		SaveGame = NewObject<UPeacenetSaveGame>();
-
-		FComputer Player;
-		Player.ID = 0;
-		Player.Hostname = FText::FromString(TEXT("player"));
-		Player.ComputerType = this->PlayerComputerType->InternalID;
-		Player.OwnerType = EComputerOwnerType::Player;
-
-		FUser Root;
-		Root.Username = FText::FromString(TEXT("root"));
-		Root.Domain = EUserDomain::Administrator;
-		Root.ID = 0;
-
-		Player.Users.Add(Root);
-
-		UFileUtilities::FormatFilesystem(Player.Filesystem);
-
-		SaveGame->Computers.Add(Player);
-
-		FRandomStream Rng = UWorldGenerator::GetRandomNumberGenerator(UWorldGenerator::GetSeedFromString(WorldSlot));
-
-		UWorldGenerator::GenerateCharacters(SaveGame->Characters, SaveGame->Computers, Rng, TArray<FString>(), TArray<FString>());
-
-		UGameplayStatics::SaveGameToSlot(SaveGame, WorldSlot, 0);
-	}
-
-	// Have we modified a PC?
-	bool HasUpdatedPC = false;
-
-	// Go through all the computers in the save.
-	for (auto& PC : SaveGame->Computers)
-	{
-		// Is it a player?
-		if (PC.OwnerType == EComputerOwnerType::Player)
-		{
-			// Go through all the programs in the game.
-			for (auto Program : this->Programs)
-			{
-				// Is it unlocked by default?
-				if (Program->IsUnlockedByDefault)
-				{
-					// Is it not installed on the NPC?
-					if (!PC.InstalledPrograms.Contains(Program->ExecutableName))
-					{
-						// Add it.
-						PC.InstalledPrograms.Add(Program->ExecutableName);
-						HasUpdatedPC = true;
-					}
-				}
-			}
-
-			// Go through every loaded command.
-			TArray<FName> CommandNames;
-			CommandInfo.GetKeys(CommandNames);
-
-			for (auto CommandName : CommandNames)
-			{
-				UCommandInfo* LoadedCommand = CommandInfo[CommandName];
-				if (LoadedCommand)
-				{
-					if (LoadedCommand->UnlockedByDefault)
-					{
-						if (!PC.InstalledCommands.Contains(CommandName))
-						{
-							PC.InstalledCommands.Add(CommandName);
-							HasUpdatedPC = true;
-						}
-					}
-				}
-			}
-
-		}
-	}
-
-
-	// Save the game if a PC was updated
-	if (HasUpdatedPC)
-	{
-		UGameplayStatics::SaveGameToSlot(SaveGame, WorldSlot, 0);
-	}
 }
 
 // Called every frame
@@ -281,4 +194,74 @@ bool APeacenetWorldStateActor::LoadAssets(FName ClassName, TArray<AssetType*>& O
 	}
 
 	return true;
+}
+
+bool APeacenetWorldStateActor::HasExistingOS()
+{
+	return UGameplayStatics::DoesSaveGameExist(TEXT("PeacegateOS"), 0);
+}
+
+APeacenetWorldStateActor* APeacenetWorldStateActor::GenerateAndCreateWorld(const APlayerController* InPlayerController, const FPeacenetWorldInfo& InWorldInfo)
+{
+	// This function is responsible for initially generating a Peacenet world.
+	// We take in an FPeacenetWorldInfo structure by-ref so we know how to spawn
+	// the player's computer and Peacenet identity.
+	//
+	// We take in a Player Controller so that we have a world context object.
+	// Eventually, we won't take in a raw UE4 Player Controller - we'll take in
+	// our own Player Controller, allowing us to directly call back into
+	// the game's Blueprint land, automatically telling the controller
+	// to possess a new Peacegate OS pawn when the world generator finishes.
+
+	// But, that can wait until I've had my fucking coffee... on Boxing Day of 2025.
+	// - Alkaline
+
+	// For now, get the current world:
+	UWorld* CurrentWorld = InPlayerController->GetWorld();
+
+	// For now, that's all we need that player controller for. We can now spawn the Peacenet world.
+	auto NewPeacenet = CurrentWorld->SpawnActor<APeacenetWorldStateActor>();
+
+	// Now we can create a world seed. The world seed will be generated from the combined string of the player's full name, username and hostname. This creates a unique world for each player.
+	FString CombinedPlayerName = InWorldInfo.PlayerName.ToString() + TEXT("_") + InWorldInfo.PlayerUsername.ToString() + TEXT("_") + InWorldInfo.PlayerHostname.ToString();
+
+	// We can use a CRC memory hash function to create the seed.
+	TArray<TCHAR> SeedChars = CombinedPlayerName.GetCharArray();
+	int Seed = FCrc::MemCrc32(SeedChars.GetData(), sizeof(TCHAR) * SeedChars.Num());
+
+	// Suitable seed for a random number generator. So, let Peacenet create one with it.
+	FRandomStream WorldGenerator = UWorldGenerator::GetRandomNumberGenerator(Seed);
+
+	// Create a new computer for the player.
+	FComputer PlayerComputer;
+
+	// Set its entity metadata.
+	PlayerComputer.ID = 0;
+	PlayerComputer.ComputerType = TEXT("c_desktop"); // TODO: shouldn't be hardcoded.
+	PlayerComputer.Hostname = InWorldInfo.PlayerHostname;
+	PlayerComputer.OwnerType = EComputerOwnerType::Player;
+
+	// Create a unix root user.
+	FUser RootUser;
+	RootUser.ID = 0;
+	RootUser.Username = FText::FromString(TEXT("root"));
+	RootUser.Password = FText::FromString(TEXT(""));
+	RootUser.Domain = EUserDomain::Administrator;
+
+	// Create a non-root user.
+	FUser PlayerUser;
+	PlayerUser.ID = 1;
+	PlayerUser.Username = InWorldInfo.PlayerUsername;
+	PlayerUser.Password = InWorldInfo.PlayerPassword;
+	PlayerUser.Domain = EUserDomain::PowerUser;
+
+	// Assign users to the new computer.
+	PlayerComputer.Users.Add(RootUser);
+	PlayerComputer.Users.Add(PlayerUser);
+
+	// World generator can generate the computer's filesystem.
+	UWorldGenerator::CreateFilesystem(PlayerComputer, WorldGenerator);
+
+	// Give our new Peacenet back to the Blueprint land or whoever else happened to call us.
+	return NewPeacenet;
 }

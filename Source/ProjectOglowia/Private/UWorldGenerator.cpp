@@ -481,3 +481,22 @@ FString FMarkovSource::ToString() const
 
 	return Out;
 }
+
+void UWorldGenerator::CreateFilesystem(FComputer& InComputer, const FRandomStream& InGenerator)
+{
+	// Format the filesystem.
+	UFileUtilities::FormatFilesystem(InComputer.Filesystem);
+
+	// Create a system context.
+	USystemContext* SysCtx = NewObject<USystemContext>();
+	SysCtx->Computer = InComputer;
+	
+	// Creates system directories for the computer. This should include all users' home directories.
+	UWorldGenerator::GenerateSystemDirectories(SysCtx);
+
+	// At this point, we would also generate lootable files. However, that isn't implemented into the game yet.
+
+	// This system context isn't actually registered with a world context, so it can't update the save file.
+	// That's why we took in our computer by-reference, so we can report back the changes to the calling function.
+	InComputer = SysCtx->Computer;
+}

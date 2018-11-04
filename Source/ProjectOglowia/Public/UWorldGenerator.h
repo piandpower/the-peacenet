@@ -103,4 +103,7 @@ public:
 
 	UFUNCTION()
 	static FString GenerateWordString(UMarkovChain* InMarkovChain, int Length);
+
+	UFUNCTION()
+	static void CreateFilesystem(FComputer& InComputer, const FRandomStream& InGenerator);
 };

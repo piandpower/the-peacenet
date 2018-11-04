@@ -63,6 +63,9 @@ private:
 	void LoadTerminalCommands();
 
 public:	
+	UFUNCTION()
+	void SaveWorld();
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Meta=(ExposeOnSpawn))
 	TSubclassOf<UDesktopWidget> DesktopClass;
 

@@ -85,6 +85,18 @@ void APeacenetWorldStateActor::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// Do we have an existing OS?
+	if(HasExistingOS())
+	{
+		// Load the OS from disk.
+		this->SaveGame = Cast<UPeacenetSaveGame>(UGameplayStatics::LoadGameFromSlot(TEXT("PeacegateOS"), 0));
+	}
+	else
+	{
+		// Create a new save game object.
+		this->SaveGame = NewObject<UPeacenetSaveGame>(this);
+	}
+
 	// Load all the game's programs
 	LoadAssets(TEXT("PeacegateProgramAsset"), this->Programs);
 
@@ -264,7 +276,22 @@ APeacenetWorldStateActor* APeacenetWorldStateActor::GenerateAndCreateWorld(const
 
 	// Note: The save file would have been loaded as soon as the actor spawned - BeginPlay gets called during UWorld::SpawnActor.
 	// So, at this point, we've had a save file created and ready for us for a few CPU cycles now...
+	UPeacenetSaveGame* WorldSave = NewPeacenet->SaveGame;
+
+	// We can then add our player's computer to the save file.
+	WorldSave->Computers.Add(PlayerComputer);
+
+	// And we can generate non-story NPCs.
+	UWorldGenerator::GenerateCharacters(WorldSave->Characters, WorldSave->Computers, WorldGenerator, TArray<FString>(), TArray<FString>()); // TODO: Remove these last parameters - we have a markov chain for a reason.
+
+	// Save the game.
+	NewPeacenet->SaveWorld();
 
 	// Give our new Peacenet back to the Blueprint land or whoever else happened to call us.
 	return NewPeacenet;
+}
+
+void APeacenetWorldStateActor::SaveWorld()
+{
+	UGameplayStatics::SaveGameToSlot(this->SaveGame, TEXT("PeacegateOS"), 0);
 }

@@ -10,7 +10,8 @@
 UENUM(BlueprintType)
 enum class EMarkovTrainingDataUsage : uint8
 {
-	FirstNames,
+	MaleFirstNames,
+	FemaleFirstNames,
 	LastNames,
 	Hostnames,
 	FileNames
@@ -26,7 +27,7 @@ class PROJECTOGLOWIA_API UMarkovTrainingDataAsset : public UDataAsset
 
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	EMarkovTrainingDataUsage Usage = EMarkovTrainingDataUsage::FirstNames;
+	EMarkovTrainingDataUsage Usage = EMarkovTrainingDataUsage::MaleFirstNames;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TArray<FString> TrainingData;

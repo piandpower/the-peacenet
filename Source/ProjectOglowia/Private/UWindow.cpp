@@ -14,6 +14,7 @@ void UWindow::ShowInfo(const FText& InTitle, const FText& InMessage, const EInfo
 void UWindow::Close()
 {
 	OnWindowClosed();
+	NativeWindowClosed.Broadcast();
 }
 
 void UWindow::Minimize()

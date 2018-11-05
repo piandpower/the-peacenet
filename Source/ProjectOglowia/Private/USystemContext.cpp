@@ -6,6 +6,7 @@
 #include "UPeacegateFileSystem.h"
 #include "CommonUtils.h"
 #include "UPeacegateProgramAsset.h"
+#include "UGraphicalTerminalCommand.h"
 #include "CommandInfo.h"
 
 FString USystemContext::GetHostname() const
@@ -74,19 +75,33 @@ bool USystemContext::TryGetTerminalCommand(FName CommandName, UTerminalCommand *
 {
 	check(Peacenet);
 
-	if (!Computer.InstalledCommands.Contains(CommandName) && !Peacenet->GameType->Info.UnlockAllProgramsByDefault)
+	if (!(Computer.InstalledCommands.Contains(CommandName) || Computer.InstalledPrograms.Contains(CommandName)) && !Peacenet->GameType->Info.UnlockAllProgramsByDefault)
 		return false;
 
-	if (!Peacenet->CommandInfo.Contains(CommandName) && !Peacenet->ManPages.Contains(CommandName))
+	if (!Peacenet->ManPages.Contains(CommandName))
 		return false;
-
-	UCommandInfo* Info = Peacenet->CommandInfo[CommandName];
-	OutCommand = NewObject<UTerminalCommand>(this, Info->Info.CommandClass);
 
 	FManPage ManPage = Peacenet->ManPages[CommandName];
 
 	InternalUsage = ManPage.InternalUsage;
 	FriendlyUsage = ManPage.FriendlyUsage;
+
+	UPeacegateProgramAsset* Program = nullptr;
+	if (Peacenet->FindProgramByName(CommandName, Program))
+	{
+		UGraphicalTerminalCommand* GraphicalCommand = NewObject<UGraphicalTerminalCommand>(this);
+		GraphicalCommand->ProgramAsset = Program;
+		OutCommand = GraphicalCommand;
+		return true;
+	}
+
+	if (!Peacenet->CommandInfo.Contains(CommandName))
+	{
+		return false;
+	}
+
+	UCommandInfo* Info = Peacenet->CommandInfo[CommandName];
+	OutCommand = NewObject<UTerminalCommand>(this, Info->Info.CommandClass);
 
 	return true;
 }

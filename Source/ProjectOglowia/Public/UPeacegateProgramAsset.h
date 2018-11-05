@@ -96,6 +96,8 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	bool EnableMinimizeAndMaximize = true;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FText Description;
 };
 
 /**

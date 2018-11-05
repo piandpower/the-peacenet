@@ -44,6 +44,7 @@ enum class EFileDialogType : uint8
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FInfoboxDismissedEvent, EDialogResult, DialogResult, FText, UserTextInput);
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FInfoboxInputValidator, FText, UserTextInput, FText&, OutError);
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FFileDialogDismissedEvent, bool, FileSelected, FString, FilePath);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FWindowClosedEvent);
 
 /**
  * Contains useful functionality for a Peacegate OS window.
@@ -54,6 +55,9 @@ class PROJECTOGLOWIA_API UWindow : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(BlueprintAssignable, Category = "Window")
+	FWindowClosedEvent NativeWindowClosed;
+
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Infobox")
 		void ShowInfoWithCallbacks(const FText& InTitle, const FText& InMessage, const EInfoboxIcon InIcon, const EInfoboxButtonLayout ButtonLayout, const bool ShowTextInput, const FInfoboxDismissedEvent& OnDismissed, const FInfoboxInputValidator& ValidatorFunction);
 

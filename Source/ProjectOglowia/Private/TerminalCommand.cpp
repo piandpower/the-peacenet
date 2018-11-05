@@ -19,11 +19,42 @@ void UHelpCommand::RunCommand(UConsoleContext* InConsole, const TMap<FString, UD
 	InConsole->WriteLine(TEXT("`*`1Command help`r"));
 	InConsole->WriteLine(TEXT("------------------- \n"));
 
+	TMap<FName, FString> CommandList;
+	int MaxLength = 0;
+
+	for (auto Program : InConsole->SystemContext->Peacenet->Programs)
+	{
+		if (InConsole->SystemContext->Computer.InstalledPrograms.Contains(Program->ExecutableName))
+		{
+			CommandList.Add(Program->ExecutableName, Program->AppLauncherItem.Description.ToString());
+			int Length = Program->ExecutableName.ToString().GetCharArray().Num();
+			if (Length > MaxLength)
+			{
+				MaxLength = Length;
+			}
+		}
+	}
+
 	for (auto Command : InConsole->SystemContext->Computer.InstalledCommands)
 	{
-		InConsole->Write(TEXT("`8") + Command.ToString() + TEXT("`1\t:\t"));
 		FManPage ManPage = InConsole->SystemContext->Peacenet->ManPages[Command];
-		InConsole->WriteLine(ManPage.Description);
+		CommandList.Add(Command, ManPage.Description);
+		int Length = Command.ToString().GetCharArray().Num();
+		if (Length > MaxLength)
+		{
+			MaxLength = Length;
+		}
+	}
+
+	TArray<FName> CommandNames;
+	CommandList.GetKeys(CommandNames);
+
+	for (auto Name : CommandNames)
+	{
+		FString NameStr = Name.ToString();
+		int DistLength = (MaxLength + 2) - (NameStr.GetCharArray().Num() + 2);
+
+		InConsole->WriteLine(TEXT("`8`*") + NameStr + TEXT("`r`1: ") + FString::ChrN(DistLength, TEXT(' ')) + CommandList[Name]);
 	}
 
 	this->Complete();

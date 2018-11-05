@@ -77,6 +77,23 @@ void APeacenetWorldStateActor::LoadTerminalCommands()
 		ManPages.Add(Command->Info.CommandName, ManPage);
 	}
 
+	for (auto Program : this->Programs)
+	{
+		// create manual pages for the programs as well.
+		FCommandInfoS Info;
+		Info.CommandName = Program->ExecutableName;
+		Info.Description = Program->AppLauncherItem.Description.ToString();
+
+		FString FriendlyUsage = UCommandInfo::BuildDisplayUsageString(Info);
+		FString InternalUsage = UCommandInfo::BuildInternalUsageString(Info);
+
+		FManPage ManPage;
+		ManPage.Description = Info.Description;
+		ManPage.InternalUsage = InternalUsage;
+		ManPage.FriendlyUsage = FriendlyUsage;
+
+		ManPages.Add(Info.CommandName, ManPage);
+	}
 
 }
 

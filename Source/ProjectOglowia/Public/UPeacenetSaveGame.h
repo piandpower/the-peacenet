@@ -46,4 +46,7 @@ public:
 	float EpochTime = 43200.f;
 
 	const float SECONDS_DAY_LENGTH = 86400.f;
+
+	UFUNCTION()
+	bool CharacterNameExists(FText CharacterName);
 };

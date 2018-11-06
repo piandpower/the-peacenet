@@ -378,7 +378,7 @@ APeacenetWorldStateActor* APeacenetWorldStateActor::GenerateAndCreateWorld(const
 	WorldSave->Computers.Add(PlayerComputer);
 
 	// And we can generate non-story NPCs.
-	UWorldGenerator::GenerateCharacters(WorldSave->Characters, WorldSave->Computers, WorldGenerator, TArray<FString>(), TArray<FString>()); // TODO: Remove these last parameters - we have a markov chain for a reason.
+	UWorldGenerator::GenerateCharacters(WorldGenerator, WorldSave);
 
 	// Save the game.
 	NewPeacenet->SaveWorld();

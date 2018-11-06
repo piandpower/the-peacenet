@@ -4,6 +4,7 @@
 #include "UComputerTypeAsset.h"
 #include "AssetRegistryModule.h"
 #include "USystemContext.h"
+#include "UPeacenetSaveGame.h"
 #include "UPeacegateFileSystem.h"
 
 FString UWorldGenerator::GenerateRandomName(const FRandomStream& InGenerator, const TArray<FString> InFirstNames, TArray<FString> InLastNames)
@@ -12,6 +13,172 @@ FString UWorldGenerator::GenerateRandomName(const FRandomStream& InGenerator, co
 	FString last = InLastNames[InGenerator.RandRange(0, InLastNames.Num() - 1)];
 
 	return first + TEXT(" ") + last;
+}
+
+void UWorldGenerator::GenerateCharacters(const FRandomStream & InRandomStream, UPeacenetSaveGame * InSaveGame)
+{
+	// These values don't indicate how many npcs/business exactly that we'll generate.
+	// The amount varies from world seed to world seed. The variation comes from the fact that
+	// the relevant value is decreased by a random number between 1 and 5 every time
+	// an NPC or business is generated.
+	//
+	// When the relevant value reaches zero or below, the game starts generating the next
+	// part of the world.
+	int NPCCounter = 1000;
+	int BusinessCounter = 400;
+
+	// This is a list of all training data assets in the game.
+	TArray<UMarkovTrainingDataAsset*> TrainingData;
+
+	// The UE4 asset data needed for that above array.
+	TArray<FAssetData> TrainingDataAssets;
+
+	// We need to load in the assets into that above array.
+	FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
+	check(AssetRegistryModule.Get().GetAssetsByClass(TEXT("MarkovTrainingDataAsset"), TrainingDataAssets, true));
+	for (FAssetData Asset : TrainingDataAssets)
+	{
+		TrainingData.Add(Cast<UMarkovTrainingDataAsset>(Asset.GetAsset()));
+	}
+
+	// These arrays contain aggregated training data for Markov chains.
+	TArray<FString> MaleFirstNames = FilterTrainingData(TrainingData, EMarkovTrainingDataUsage::MaleFirstNames);
+	TArray<FString> FemaleFirstNames = FilterTrainingData(TrainingData, EMarkovTrainingDataUsage::FemaleFirstNames);
+	TArray<FString> BusinessWords = FilterTrainingData(TrainingData, EMarkovTrainingDataUsage::Hostnames);
+	TArray<FString> LastNames = FilterTrainingData(TrainingData, EMarkovTrainingDataUsage::LastNames);
+
+	// Create markov chains for first names.
+	UMarkovChain* MaleGenerator = CreateMarkovChain(MaleFirstNames, InRandomStream);
+	UMarkovChain* FemaleGenerator = CreateMarkovChain(FemaleFirstNames, InRandomStream);
+
+
+	// And one for the last names.
+	UMarkovChain* LastNameGenerator = UWorldGenerator::CreateMarkovChain(LastNames, InRandomStream);
+
+	// Now we have all our training data for name generation.
+	// So, now we'll start generating NPCs.
+	while (NPCCounter > 0)
+	{
+		// Allocate memory for a new character.
+		FPeacenetIdentity NPC;
+
+		// This NPC's entity ID becomes the number of entities in the world.
+		NPC.ID = InSaveGame->Characters.Num();
+
+		// Now we get to generate their name.
+
+		// To do this, we need to know their gender. Sorry, 21st century, but Peacenet's world generator only recognizes males and females as genders.
+		bool IsMale = (InRandomStream.RandRange(1, 6) % 2) == 0; // odd = female, even = male. No, I'm not being sexist, just adding a 50% chance. Females aren't odd. They just spawn in the game when the dice rolls an odd number. Okay?
+
+		// Pick the right name generator for the gender.
+		UMarkovChain* FirstNameGenerator = (IsMale ? MaleGenerator : FemaleGenerator);
+		
+		// We do this in a loop until we come up with a character name that is NOT taken yet.
+		do
+		{
+			// Generate the first and last name of the NPC.
+			FString FirstName = FirstNameGenerator->GetMarkovString(0);
+			FString LastName = LastNameGenerator->GetMarkovString(0);
+
+			// Combine it into a single Text variable as the NPC's full name.
+			NPC.CharacterName = FText::FromString(FirstName + TEXT(" ") + LastName);
+		} while (InSaveGame->CharacterNameExists(NPC.CharacterName));
+
+		// The NPC is not a player or story character.
+		NPC.CharacterType = EIdentityType::NonPlayer;
+
+		// This is the character's raw reputation value.
+		float RawReputation = InRandomStream.GetFraction();
+
+		// Roll a dice, if it's odd, the NPC becomes a malicious one.
+		if (InRandomStream.RandRange(1, 6) % 2 != 0)
+		{
+			RawReputation = -RawReputation;
+		}
+
+		// RawReputation is now the true reputation value.
+		NPC.Reputation = RawReputation;
+
+		// Now we decide what country the NPC's in.
+		NPC.Country = (ECountry)InRandomStream.RandRange(0, (int)ECountry::Num_Countries - 1);
+
+		// TODO: Skill generation.
+		NPC.Skill = 1;
+
+		// Add the character to the save!
+		InSaveGame->Characters.Add(NPC);
+
+		// Decrease counter.
+		NPCCounter -= InRandomStream.RandRange(1, 5);
+	}
+
+	// TODO: Business generation.
+
+	// Now we generate each NPC's computer.
+	for (auto& NPC : InSaveGame->Characters)
+	{
+		// Allocate memory for the new computer.
+		FComputer Computer;
+
+		// set the ID just like a character.
+		Computer.ID = InSaveGame->Computers.Num();
+
+		// Update the NPC's computer ID to match.
+		NPC.ComputerID = Computer.ID;
+
+		// These values are crucial for the computer.
+		FString Username;
+		FString Hostname;
+		FString Password;
+		FString RootPassword;
+
+		// The password length is equal to rand(3, 5) * (2 ^ skill).
+		int PasswordLength = InRandomStream.RandRange(3, 5) * FMath::Pow(2, NPC.Skill);
+
+		// Hostname and user generation is really easy, since this is a personal computer.
+		USystemContext::ParseCharacterName(NPC.CharacterName.ToString(), Username, Hostname);
+
+		// For the password, I probably have a function for that. But who knows?
+		Password = GenerateRandomPassword(InRandomStream, PasswordLength);
+
+		// Whether or not we have a root password is based on a random number between 1 and (4 ^ Skill) being less than 2.
+		if (InRandomStream.RandRange(1, FMath::Pow(4, NPC.Skill)) > 2)
+		{
+			// Anything above 2 means we get a root password.
+			RootPassword = GenerateRandomPassword(InRandomStream, PasswordLength);
+		}
+
+		// Now that we have the user info... we can assign it all to the computer.
+		Computer.Hostname = FText::FromString(Hostname);
+
+		// Create the root user:
+		FUser Root;
+		Root.Username = FText::FromString(TEXT("root"));
+		Root.Password = FText::FromString(RootPassword);
+		Root.Domain = EUserDomain::Administrator;
+
+		// Create the NPC user:
+		FUser NonRoot;
+		NonRoot.Username = FText::FromString(Username);
+		NonRoot.Password = FText::FromString(Password);
+		NonRoot.Domain = EUserDomain::PowerUser;
+
+		// Set their uids.
+		Root.ID = 0;
+		NonRoot.ID = 1;
+
+		// Add them to the computer.
+		Computer.Users.Add(Root);
+		Computer.Users.Add(NonRoot);
+
+		// Generate the filesystem!!
+		UWorldGenerator::CreateFilesystem(Computer, InRandomStream);
+
+		// And add the computer to the world.
+		InSaveGame->Computers.Add(Computer);
+	}
+
+
 }
 
 int32 UWorldGenerator::GetSeedFromString(const FString& InSeedString)
@@ -61,112 +228,6 @@ FString UWorldGenerator::GenerateRandomPassword(const FRandomStream& InGenerator
 FRandomStream UWorldGenerator::GetRandomNumberGenerator(int32 InSeed)
 {
 	return FRandomStream(InSeed);
-}
-
-void UWorldGenerator::GenerateCharacters(UPARAM(Ref) TArray<FPeacenetIdentity>& CharacterArray, UPARAM(Ref) TArray<FComputer>& ComputerArray, const FRandomStream& InGenerator, const TArray<FString> InFirstNames, TArray<FString> InLastNames)
-{
-	// Get the Asset Registry
-	FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
-
-	// A place to store computer type asset data
-	TArray<FAssetData> ComputerTypeAssets;
-
-	// List of markov training data assets
-	TArray<FAssetData> MarkovAssets;
-
-	AssetRegistryModule.Get().GetAssetsByClass(TEXT("ComputerTypeAsset"), ComputerTypeAssets, true);
-	AssetRegistryModule.Get().GetAssetsByClass(TEXT("MarkovTrainingDataAsset"), MarkovAssets, true);
-
-	TArray<UComputerTypeAsset*> ComputerTypes;
-	TArray<UMarkovTrainingDataAsset*> MarkovTrainingData;
-
-	// Load all the computer type assets, we'll need them for later.
-	for (auto& Asset : ComputerTypeAssets)
-	{
-		ComputerTypes.Add((UComputerTypeAsset*)Asset.GetAsset());
-	}
-
-	// Load all the computer type assets, we'll need them for later.
-	for (auto& Asset : MarkovAssets)
-	{
-		MarkovTrainingData.Add((UMarkovTrainingDataAsset*)Asset.GetAsset());
-	}
-
-	UMarkovChain* HostnameGenerator = CreateMarkovChain(FilterTrainingData(MarkovTrainingData, EMarkovTrainingDataUsage::Hostnames), InGenerator);
-
-	// Retrieve the number of countries in the game.
-	int CountryCount = (int)ECountry::Num_Countries;
-
-	// The MINIMUM amount of computers that will generate in the world.
-	const int MIN_WORLD_SIZE = 200;
-
-	for (UComputerTypeAsset* ComputerType : ComputerTypes)
-	{
-		// TODO: ComputerType->Rarity should be ComputerType->Chance.
-		float Rarity = ComputerType->Rarity;
-
-		// The amount of computers to generate of this type.
-		int ComputersToGenerate = (int)(MIN_WORLD_SIZE * Rarity);
-
-		// Let's generate them.
-		for (int i = 0; i < ComputersToGenerate; i++)
-		{
-			FComputer NewComputer;
-
-			// ID becomes current world computer count.
-			NewComputer.ID = ComputerArray.Num();
-
-			// Computer type matches the ID in the asset.
-			NewComputer.ComputerType = ComputerType->InternalID;
-
-			// TODO: proper hostname generator
-			NewComputer.Hostname = FText::FromString(GenerateWordString(HostnameGenerator, 1));
-
-			// Now, we format the filesystem.
-			TArray<FFolder> NewFS;
-			UFileUtilities::FormatFilesystem(NewFS);
-
-			NewComputer.Filesystem = NewFS;
-
-			// Now, we create a root user account.
-			FUser RootUser;
-			RootUser.Username = FText::FromString(TEXT("root"));
-
-			// TODO: skill-based password generation.
-			RootUser.Password = FText::FromString(UWorldGenerator::GenerateRandomPassword(InGenerator, 64));
-
-			// Root user needs to be admin
-			RootUser.Domain = EUserDomain::Administrator;
-
-			// and ID 0
-			RootUser.ID = 0;
-
-			// Add user account
-			NewComputer.Users.Add(RootUser);
-
-			// BEGIN TODO: Non-root user generation
-			// END TODO
-
-
-			// Create a system context.
-			USystemContext* SysCtx = NewObject<USystemContext>();
-			SysCtx->Computer = NewComputer;
-
-			UWorldGenerator::GenerateSystemDirectories(SysCtx);
-
-
-			// As the system context works its magic, it's been updaying its copy of our new computer.
-			// Emphasis on copy. We're going to copy its updated computer back into our scope so we can
-			// spawn it into the world.
-
-			// Do NOT perform any actions using the above system context after this point. They won't be saved.
-			NewComputer = SysCtx->Computer;
-
-			// Add the computer to the world.
-			ComputerArray.Add(NewComputer);
-
-		}
-	}
 }
 
 void UWorldGenerator::GenerateSystemDirectories(USystemContext * InSystemContext)

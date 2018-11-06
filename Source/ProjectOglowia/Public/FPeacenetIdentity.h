@@ -33,19 +33,10 @@ public:
 	FText CharacterName;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	float AlertLevel;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	bool ActiveGovernmentWatch;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	int Skill;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	int PersonalComputer;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	TArray<int> OwnedComputers;
+	int ComputerID;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float Reputation;

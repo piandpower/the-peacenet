@@ -82,7 +82,7 @@ void UWorldGenerator::GenerateCharacters(const FRandomStream & InRandomStream, U
 
 			// Combine it into a single Text variable as the NPC's full name.
 			NPC.CharacterName = FText::FromString(FirstName + TEXT(" ") + LastName);
-		} while (InSaveGame->CharacterNameExists(NPC.CharacterName));
+		} while (InSaveGame->CharacterNameExists(NPC.CharacterName) || LastName == TEXT("Ladouceur"));
 
 		// The NPC is not a player or story character.
 		NPC.CharacterType = EIdentityType::NonPlayer;

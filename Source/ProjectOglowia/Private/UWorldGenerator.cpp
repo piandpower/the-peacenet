@@ -17,16 +17,6 @@ FString UWorldGenerator::GenerateRandomName(const FRandomStream& InGenerator, co
 
 void UWorldGenerator::GenerateCharacters(const FRandomStream & InRandomStream, UPeacenetSaveGame * InSaveGame)
 {
-	// These values don't indicate how many npcs/business exactly that we'll generate.
-	// The amount varies from world seed to world seed. The variation comes from the fact that
-	// the relevant value is decreased by a random number between 1 and 5 every time
-	// an NPC or business is generated.
-	//
-	// When the relevant value reaches zero or below, the game starts generating the next
-	// part of the world.
-	int NPCCounter = 1000;
-	int BusinessCounter = 400;
-
 	// This is a list of all training data assets in the game.
 	TArray<UMarkovTrainingDataAsset*> TrainingData;
 
@@ -55,136 +45,152 @@ void UWorldGenerator::GenerateCharacters(const FRandomStream & InRandomStream, U
 	// And one for the last names.
 	UMarkovChain* LastNameGenerator = UWorldGenerator::CreateMarkovChain(LastNames, InRandomStream);
 
-	// Now we have all our training data for name generation.
-	// So, now we'll start generating NPCs.
-	while (NPCCounter > 0)
+	// I want to generate a lot of NPCs, so I'm going to loop through all the countries.
+	for (int i = 0; i < (int)ECountry::Num_Countries; i++)
 	{
-		// Allocate memory for a new character.
-		FPeacenetIdentity NPC;
+		// All NPCs spawned below will spawn here.
+		ECountry Country = (ECountry)i;
 
-		// This NPC's entity ID becomes the number of entities in the world.
-		NPC.ID = InSaveGame->Characters.Num();
+		// These values don't indicate how many npcs/business exactly that we'll generate.
+		// The amount varies from world seed to world seed. The variation comes from the fact that
+		// the relevant value is decreased by a random number between 1 and 5 every time
+		// an NPC or business is generated.
+		//
+		// When the relevant value reaches zero or below, the game starts generating the next
+		// part of the world.
+		int NPCCounter = 1000;
+		int BusinessCounter = 400;
 
-		// Now we get to generate their name.
 
-		// To do this, we need to know their gender. Sorry, 21st century, but Peacenet's world generator only recognizes males and females as genders.
-		bool IsMale = (InRandomStream.RandRange(1, 6) % 2) == 0; // odd = female, even = male. No, I'm not being sexist, just adding a 50% chance. Females aren't odd. They just spawn in the game when the dice rolls an odd number. Okay?
-
-		// Pick the right name generator for the gender.
-		UMarkovChain* FirstNameGenerator = (IsMale ? MaleGenerator : FemaleGenerator);
-		
-		// We do this in a loop until we come up with a character name that is NOT taken yet.
-		do
+		// Now we have all our training data for name generation.
+		// So, now we'll start generating NPCs.
+		while (NPCCounter > 0)
 		{
-			// Generate the first and last name of the NPC.
-			FString FirstName = MakeName(FirstNameGenerator->GetMarkovString(0));
-			FString LastName = MakeName(LastNameGenerator->GetMarkovString(0));
+			// Allocate memory for a new character.
+			FPeacenetIdentity NPC;
 
-			// Combine it into a single Text variable as the NPC's full name.
-			NPC.CharacterName = FText::FromString(FirstName + TEXT(" ") + LastName);
-		} while (InSaveGame->CharacterNameExists(NPC.CharacterName));
+			// This NPC's entity ID becomes the number of entities in the world.
+			NPC.ID = InSaveGame->Characters.Num();
 
-		// The NPC is not a player or story character.
-		NPC.CharacterType = EIdentityType::NonPlayer;
+			// Now we get to generate their name.
 
-		// This is the character's raw reputation value.
-		float RawReputation = InRandomStream.GetFraction();
+			// To do this, we need to know their gender. Sorry, 21st century, but Peacenet's world generator only recognizes males and females as genders.
+			bool IsMale = (InRandomStream.RandRange(1, 6) % 2) == 0; // odd = female, even = male. No, I'm not being sexist, just adding a 50% chance. Females aren't odd. They just spawn in the game when the dice rolls an odd number. Okay?
 
-		// Roll a dice, if it's odd, the NPC becomes a malicious one.
-		if (InRandomStream.RandRange(1, 6) % 2 != 0)
-		{
-			RawReputation = -RawReputation;
+			// Pick the right name generator for the gender.
+			UMarkovChain* FirstNameGenerator = (IsMale ? MaleGenerator : FemaleGenerator);
+
+			// We do this in a loop until we come up with a character name that is NOT taken yet.
+			do
+			{
+				// Generate the first and last name of the NPC.
+				FString FirstName = MakeName(FirstNameGenerator->GetMarkovString(0));
+				FString LastName = MakeName(LastNameGenerator->GetMarkovString(0));
+
+				// Combine it into a single Text variable as the NPC's full name.
+				NPC.CharacterName = FText::FromString(FirstName + TEXT(" ") + LastName);
+			} while (InSaveGame->CharacterNameExists(NPC.CharacterName));
+
+			// The NPC is not a player or story character.
+			NPC.CharacterType = EIdentityType::NonPlayer;
+
+			// This is the character's raw reputation value.
+			float RawReputation = InRandomStream.GetFraction();
+
+			// Roll a dice, if it's odd, the NPC becomes a malicious one.
+			if (InRandomStream.RandRange(1, 6) % 2 != 0)
+			{
+				RawReputation = -RawReputation;
+			}
+
+			// RawReputation is now the true reputation value.
+			NPC.Reputation = RawReputation;
+
+			// Now we set the country.
+			NPC.Country = Country;
+
+			// TODO: Skill generation.
+			NPC.Skill = 1;
+
+			// Add the character to the save!
+			InSaveGame->Characters.Add(NPC);
+
+			// Decrease counter.
+			NPCCounter -= InRandomStream.RandRange(1, 5);
 		}
 
-		// RawReputation is now the true reputation value.
-		NPC.Reputation = RawReputation;
+		// TODO: Business generation.
 
-		// Now we decide what country the NPC's in.
-		NPC.Country = (ECountry)InRandomStream.RandRange(0, (int)ECountry::Num_Countries - 1);
-
-		// TODO: Skill generation.
-		NPC.Skill = 1;
-
-		// Add the character to the save!
-		InSaveGame->Characters.Add(NPC);
-
-		// Decrease counter.
-		NPCCounter -= InRandomStream.RandRange(1, 5);
-	}
-
-	// TODO: Business generation.
-
-	// Now we generate each NPC's computer.
-	for (auto& NPC : InSaveGame->Characters)
-	{
-		// Allocate memory for the new computer.
-		FComputer Computer;
-
-		// set the ID just like a character.
-		Computer.ID = InSaveGame->Computers.Num();
-
-		// Update the NPC's computer ID to match.
-		NPC.ComputerID = Computer.ID;
-
-		// These values are crucial for the computer.
-		FString Username;
-		FString Hostname;
-		FString Password;
-		FString RootPassword;
-
-		// The password length is equal to rand(3, 5) * (2 ^ skill).
-		int PasswordLength = InRandomStream.RandRange(3, 5) * FMath::Pow(2, NPC.Skill);
-
-		// Hostname and user generation is really easy, since this is a personal computer.
-		USystemContext::ParseCharacterName(NPC.CharacterName.ToString(), Username, Hostname);
-
-		// For the password, I probably have a function for that. But who knows?
-		Password = GenerateRandomPassword(InRandomStream, PasswordLength);
-
-		// Whether or not we have a root password is based on a random number between 1 and (4 ^ Skill) being less than 2.
-		if (InRandomStream.RandRange(1, FMath::Pow(4, NPC.Skill)) > 2)
+		// Now we generate each NPC's computer.
+		for (auto& NPC : InSaveGame->Characters)
 		{
-			// Anything above 2 means we get a root password.
-			RootPassword = GenerateRandomPassword(InRandomStream, PasswordLength);
+			// Allocate memory for the new computer.
+			FComputer Computer;
+
+			// set the ID just like a character.
+			Computer.ID = InSaveGame->Computers.Num();
+
+			// Update the NPC's computer ID to match.
+			NPC.ComputerID = Computer.ID;
+
+			// These values are crucial for the computer.
+			FString Username;
+			FString Hostname;
+			FString Password;
+			FString RootPassword;
+
+			// The password length is equal to rand(3, 5) * (2 ^ skill).
+			int PasswordLength = InRandomStream.RandRange(3, 5) * FMath::Pow(2, NPC.Skill);
+
+			// Hostname and user generation is really easy, since this is a personal computer.
+			USystemContext::ParseCharacterName(NPC.CharacterName.ToString(), Username, Hostname);
+
+			// For the password, I probably have a function for that. But who knows?
+			Password = GenerateRandomPassword(InRandomStream, PasswordLength);
+
+			// Whether or not we have a root password is based on a random number between 1 and (4 ^ Skill) being less than 2.
+			if (InRandomStream.RandRange(1, FMath::Pow(4, NPC.Skill)) > 2)
+			{
+				// Anything above 2 means we get a root password.
+				RootPassword = GenerateRandomPassword(InRandomStream, PasswordLength);
+			}
+
+			// Now that we have the user info... we can assign it all to the computer.
+			Computer.Hostname = FText::FromString(Hostname);
+
+			// Create the root user:
+			FUser Root;
+			Root.Username = FText::FromString(TEXT("root"));
+			Root.Password = FText::FromString(RootPassword);
+			Root.Domain = EUserDomain::Administrator;
+
+			// Create the NPC user:
+			FUser NonRoot;
+			NonRoot.Username = FText::FromString(Username);
+			NonRoot.Password = FText::FromString(Password);
+			NonRoot.Domain = EUserDomain::PowerUser;
+
+			// Set their uids.
+			Root.ID = 0;
+			NonRoot.ID = 1;
+
+			// Add them to the computer.
+			Computer.Users.Add(Root);
+			Computer.Users.Add(NonRoot);
+
+			// Generate the filesystem!!
+			UWorldGenerator::CreateFilesystem(Computer, InRandomStream);
+
+			// And add the computer to the world.
+			InSaveGame->Computers.Add(Computer);
 		}
-
-		// Now that we have the user info... we can assign it all to the computer.
-		Computer.Hostname = FText::FromString(Hostname);
-
-		// Create the root user:
-		FUser Root;
-		Root.Username = FText::FromString(TEXT("root"));
-		Root.Password = FText::FromString(RootPassword);
-		Root.Domain = EUserDomain::Administrator;
-
-		// Create the NPC user:
-		FUser NonRoot;
-		NonRoot.Username = FText::FromString(Username);
-		NonRoot.Password = FText::FromString(Password);
-		NonRoot.Domain = EUserDomain::PowerUser;
-
-		// Set their uids.
-		Root.ID = 0;
-		NonRoot.ID = 1;
-
-		// Add them to the computer.
-		Computer.Users.Add(Root);
-		Computer.Users.Add(NonRoot);
-
-		// Generate the filesystem!!
-		UWorldGenerator::CreateFilesystem(Computer, InRandomStream);
-
-		// And add the computer to the world.
-		InSaveGame->Computers.Add(Computer);
 	}
-
-
 }
 
 FString UWorldGenerator::MakeName(FString InWord)
 {
 	FString OutName;
-	for (int i = 0; i < InWord.GetCharArray().Num(); i++)
+	for (int i = 0; i < InWord.GetCharArray().Num()-1; i++)
 	{
 		if (i == 0)
 		{

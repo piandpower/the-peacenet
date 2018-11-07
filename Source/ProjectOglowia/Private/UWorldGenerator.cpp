@@ -5,6 +5,7 @@
 #include "AssetRegistryModule.h"
 #include "USystemContext.h"
 #include "UPeacenetSaveGame.h"
+#include "FEnterpriseNetwork.h"
 #include "UPeacegateFileSystem.h"
 
 FString UWorldGenerator::GenerateRandomName(const FRandomStream& InGenerator, const TArray<FString> InFirstNames, TArray<FString> InLastNames)
@@ -119,7 +120,23 @@ void UWorldGenerator::GenerateCharacters(const FRandomStream & InRandomStream, U
 			NPCCounter -= InRandomStream.RandRange(1, 5);
 		}
 
-		// TODO: Business generation.
+		while (BusinessCounter > 0)
+		{
+			FEnterpriseNetwork Business;
+
+			// Set the ID of the network.
+			Business.ID = InSaveGame->Businesses.Num();
+		
+			// TODO: business names.
+			Business.Name = FText::FromString(TEXT("Business Inc."));
+
+			// Set the country.
+			Business.Country = Country;
+
+			InSaveGame->Businesses.Add(Business);
+
+			BusinessCounter -= InRandomStream.RandRange(1, 5);
+		}
 
 		// Now we generate each NPC's computer.
 		for (auto& NPC : InSaveGame->Characters)

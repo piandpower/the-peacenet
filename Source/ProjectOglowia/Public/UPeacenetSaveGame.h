@@ -7,6 +7,7 @@
 #include "FComputer.h"
 #include "FPeacenetIdentity.h"
 #include "UDesktopWidget.h"
+#include "FEnterpriseNetwork.h"
 #include "UWindow.h"
 #include "UPeacenetSaveGame.generated.h"
 
@@ -44,6 +45,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, Category = "World")
 	float EpochTime = 43200.f;
+
+	UPROPERTY(VisibleAnywhere, Category = "World")
+	TArray<FEnterpriseNetwork> Businesses;
 
 	const float SECONDS_DAY_LENGTH = 86400.f;
 

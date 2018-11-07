@@ -77,12 +77,12 @@ void UWorldGenerator::GenerateCharacters(const FRandomStream & InRandomStream, U
 		do
 		{
 			// Generate the first and last name of the NPC.
-			FString FirstName = FirstNameGenerator->GetMarkovString(0);
-			FString LastName = LastNameGenerator->GetMarkovString(0);
+			FString FirstName = MakeName(FirstNameGenerator->GetMarkovString(0));
+			FString LastName = MakeName(LastNameGenerator->GetMarkovString(0));
 
 			// Combine it into a single Text variable as the NPC's full name.
 			NPC.CharacterName = FText::FromString(FirstName + TEXT(" ") + LastName);
-		} while (InSaveGame->CharacterNameExists(NPC.CharacterName) || LastName == TEXT("Ladouceur"));
+		} while (InSaveGame->CharacterNameExists(NPC.CharacterName));
 
 		// The NPC is not a player or story character.
 		NPC.CharacterType = EIdentityType::NonPlayer;
@@ -179,6 +179,23 @@ void UWorldGenerator::GenerateCharacters(const FRandomStream & InRandomStream, U
 	}
 
 
+}
+
+FString UWorldGenerator::MakeName(FString InWord)
+{
+	FString OutName;
+	for (int i = 0; i < InWord.GetCharArray().Num(); i++)
+	{
+		if (i == 0)
+		{
+			OutName.Append(FString::Chr(InWord[i]).ToUpper());
+		}
+		else
+		{
+			OutName.AppendChar(InWord[i]);
+		}
+	}
+	return OutName;
 }
 
 int32 UWorldGenerator::GetSeedFromString(const FString& InSeedString)
@@ -461,7 +478,7 @@ void UMarkovChain::Init(TArray<FString> InArray, int N, FRandomStream InRng)
 		FMarkovSource Source;
 		Source.SetCount(N);
 
-		for (TCHAR Char : ArrayString)
+		for (TCHAR Char : ArrayString.ToLower())
 		{
 			if (Char == TEXT('\0'))
 				break;

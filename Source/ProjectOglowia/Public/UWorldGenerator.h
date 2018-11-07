@@ -80,6 +80,9 @@ private:
 	static TArray<FString> FilterTrainingData(TArray<UMarkovTrainingDataAsset*> InAssets, EMarkovTrainingDataUsage Usage);
 
 public:
+	UFUNCTION()
+	static FString MakeName(FString InWord);
+
 	UFUNCTION(BlueprintCallable, Category = "World Generation")
 	static int32 GetSeedFromString(const FString& InSeedString);
 

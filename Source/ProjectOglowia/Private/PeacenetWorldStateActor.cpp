@@ -294,7 +294,7 @@ bool APeacenetWorldStateActor::HasExistingOS()
 	return UGameplayStatics::DoesSaveGameExist(TEXT("PeacegateOS"), 0);
 }
 
-APeacenetWorldStateActor* APeacenetWorldStateActor::GenerateAndCreateWorld(const APlayerController* InPlayerController, const FPeacenetWorldInfo& InWorldInfo, TSubclassOf<UDesktopWidget> InDesktop, UPeacenetGameTypeAsset* InGameType, TSubclassOf<UWindow> InWindowDecorator)
+APeacenetWorldStateActor* APeacenetWorldStateActor::GenerateAndCreateWorld(const APlayerController* InPlayerController, const FPeacenetWorldInfo& InWorldInfo, TSubclassOf<UDesktopWidget> InDesktop, UPeacenetGameTypeAsset* InGameType, TSubclassOf<UWindow> InWindowDecorator, FShowLoadingScreenEvent InShowLoadingScreen)
 {
 	// This function is responsible for initially generating a Peacenet world.
 	// We take in an FPeacenetWorldInfo structure by-ref so we know how to spawn
@@ -378,10 +378,15 @@ APeacenetWorldStateActor* APeacenetWorldStateActor::GenerateAndCreateWorld(const
 	WorldSave->Computers.Add(PlayerComputer);
 
 	// And we can generate non-story NPCs.
-	UWorldGenerator::GenerateCharacters(WorldGenerator, WorldSave);
+	auto Status = UWorldGenerator::GenerateCharacters(WorldGenerator, WorldSave);
+	InShowLoadingScreen.Execute(Status);
+	NewPeacenet->WorldGeneratorStatus = Status;
 
-	// Save the game.
-	NewPeacenet->SaveWorld();
+	// Saves the game when the world finishes generating.
+	TScriptDelegate<> SaveDelegate;
+	SaveDelegate.BindUFunction(NewPeacenet, TEXT("SaveWorld"));
+
+	Status->WorldGenerationCompleted.Add(SaveDelegate);
 
 	// Give our new Peacenet back to the Blueprint land or whoever else happened to call us.
 	return NewPeacenet;

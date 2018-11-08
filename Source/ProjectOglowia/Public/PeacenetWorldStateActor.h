@@ -17,6 +17,7 @@ class UCommandInfo;
 class UWindow;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPlayerSystemContextReadyEvent, USystemContext*, InSystemContext);
+DECLARE_DYNAMIC_DELEGATE_OneParam(FShowLoadingScreenEvent, UWorldGeneratorStatus*, InStatus);
 
 USTRUCT(BlueprintType)
 struct PROJECTOGLOWIA_API FPeacenetWorldInfo
@@ -127,12 +128,16 @@ public:
 	void StartGame();
 	
 public:
+	UPROPERTY()
+	UWorldGeneratorStatus* WorldGeneratorStatus = nullptr;
+
+public:
 	// Used by the Ubiquity menu to see if the "Boot existing OS" screen should show.
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Peacegate")
 	static bool HasExistingOS();
 
 	UFUNCTION(BlueprintCallable, Category = "Peacegate")
-		static APeacenetWorldStateActor* GenerateAndCreateWorld(const APlayerController* InPlayerController, const FPeacenetWorldInfo& InWorldInfo, TSubclassOf<UDesktopWidget> InDesktop, UPeacenetGameTypeAsset* InGameType, TSubclassOf<UWindow> InWindowDecorator);
+		static APeacenetWorldStateActor* GenerateAndCreateWorld(const APlayerController* InPlayerController, const FPeacenetWorldInfo& InWorldInfo, TSubclassOf<UDesktopWidget> InDesktop, UPeacenetGameTypeAsset* InGameType, TSubclassOf<UWindow> InWindowDecorator, FShowLoadingScreenEvent InShowLoadingScreen);
 
 	UFUNCTION(BlueprintCallable, Category = "Peacegate")
 	static APeacenetWorldStateActor* LoadExistingOS(const APlayerController* InPlayerController);

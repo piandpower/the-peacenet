@@ -7,12 +7,15 @@
 #include "FPeacenetIdentity.h"
 #include "FComputer.h"
 #include "ECountry.h"
+#include "AsyncWork.h"
 #include "CString.h"
 #include "Parse.h"
 #include "UMarkovTrainingDataAsset.h"
 #include "UWorldGenerator.generated.h"
 
 class USystemContext;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FWorldGenCompleteEvent);
 
 USTRUCT()
 struct PROJECTOGLOWIA_API FMarkovSource
@@ -40,7 +43,23 @@ public:
 FORCEINLINE uint32 GetTypeHash(const FMarkovSource& Source)
 {
 	return FCrc::MemCrc32(Source.GetChars().GetData(), Source.GetChars().Num() * sizeof(TCHAR));
-}
+};
+
+UCLASS(BlueprintType)
+class PROJECTOGLOWIA_API UWorldGeneratorStatus : public UObject
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintReadOnly, Category = "World Generator")
+	FText Status;
+
+	UPROPERTY(BlueprintReadOnly, Category = "World Generator")
+	float Percentage = 0.f;
+
+	UPROPERTY(BlueprintAssignable, Category = "World Generator")
+	FWorldGenCompleteEvent WorldGenerationCompleted;
+};
 
 UCLASS()
 class PROJECTOGLOWIA_API UMarkovChain : public UObject
@@ -76,10 +95,10 @@ class PROJECTOGLOWIA_API UWorldGenerator : public UObject
 {
 	GENERATED_BODY()
 
-private:
-	static TArray<FString> FilterTrainingData(TArray<UMarkovTrainingDataAsset*> InAssets, EMarkovTrainingDataUsage Usage);
 
 public:
+	static TArray<FString> FilterTrainingData(TArray<UMarkovTrainingDataAsset*> InAssets, EMarkovTrainingDataUsage Usage);
+
 	UFUNCTION()
 	static FString MakeName(FString InWord);
 
@@ -96,7 +115,7 @@ public:
 	static FString GenerateRandomName(const FRandomStream& InGenerator, const TArray<FString> InFirstNames, TArray<FString> InLastNames);
 
 	UFUNCTION(BlueprintCallable, Category = "World Generation")
-		static void GenerateCharacters(const FRandomStream& InRandomStream, UPeacenetSaveGame* InSaveGame);
+	static UWorldGeneratorStatus* GenerateCharacters(const FRandomStream& InRandomStream, UPeacenetSaveGame* InSaveGame);
 
 	UFUNCTION()
 	static void GenerateSystemDirectories(USystemContext* InSystemContext);
@@ -109,4 +128,28 @@ public:
 
 	UFUNCTION()
 	static void CreateFilesystem(FComputer& InComputer, const FRandomStream& InGenerator);
+};
+
+class PROJECTOGLOWIA_API FWorldGenTask : public FNonAbandonableTask
+{
+	friend class FAutoDeleteAsyncTask<FWorldGenTask>;
+
+public:
+	FWorldGenTask(UPeacenetSaveGame* InSaveGame, const FRandomStream InRandomStream, UWorldGeneratorStatus* InStatus, TArray<UMarkovTrainingDataAsset*> InTrainingData)
+		: SaveGame(InSaveGame)
+		, RandomStream(InRandomStream)
+		, Status(InStatus)
+		, TrainingData(InTrainingData) {}
+
+	UPeacenetSaveGame* SaveGame;
+	FRandomStream RandomStream;
+	UWorldGeneratorStatus* Status;
+	TArray<UMarkovTrainingDataAsset*> TrainingData;
+
+	void DoWork();
+
+	FORCEINLINE TStatId GetStatId() const 
+	{ 
+		RETURN_QUICK_DECLARE_CYCLE_STAT(FWorldGenTask, STATGROUP_ThreadPoolAsyncTasks); 
+	}
 };

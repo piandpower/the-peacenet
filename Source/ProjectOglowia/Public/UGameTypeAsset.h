@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "ECountry.h"
-#include "TutorialBase.h"
 #include "UGameTypeAsset.generated.h"
 
 USTRUCT(BlueprintType)
@@ -55,9 +54,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool EnableTutorial = false;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<ATutorialBase> TutorialActor;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool EnablePeacegateFirstTimeSetupIntroText = false;

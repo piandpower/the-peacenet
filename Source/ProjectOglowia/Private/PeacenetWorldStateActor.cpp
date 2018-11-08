@@ -104,42 +104,7 @@ void APeacenetWorldStateActor::BeginPlay()
 	Super::BeginPlay();
 
 	// Do we have an existing OS?
-	if(HasExistingOS())
-	{
-		AsyncTask(ENamedThreads::AnyBackgroundThreadNormalTask, [this]() {
-			// Load the OS from disk.
-			this->SaveGame = Cast<UPeacenetSaveGame>(UGameplayStatics::LoadGameFromSlot(TEXT("PeacegateOS"), 0));
-		
-			AsyncTask(ENamedThreads::GameThread, [this]()
-			{
-				// we need to look up the game type assets in the game.
-				TArray<UPeacenetGameTypeAsset*> GameTypeAssets;
-
-				// load them all in. Crash if we can't.
-				check(this->LoadAssets<UPeacenetGameTypeAsset>(TEXT("PeacenetGameTypeAsset"), GameTypeAssets));
-
-				// look through the assets and check if one matches the save file
-				for (auto Asset : GameTypeAssets)
-				{
-					if (Asset->Info.Name == SaveGame->GameTypeName)
-					{
-						this->GameType = Asset;
-						break;
-					}
-				}
-
-				// crash if we didn't find any
-				check(this->GameType);
-
-				// desktop class is stored in the save, too.
-				this->DesktopClass = this->SaveGame->DesktopClass;
-
-				// And we need a window decorator.
-				this->WindowClass = this->SaveGame->WindowClass;
-			});
-		});
-	}
-	else
+	if (!HasExistingOS())
 	{
 		// Create a new save game object.
 		this->SaveGame = NewObject<UPeacenetSaveGame>(this);
@@ -180,9 +145,16 @@ void APeacenetWorldStateActor::Tick(float DeltaTime)
 void APeacenetWorldStateActor::StartGame()
 {
 	AsyncTask(ENamedThreads::AnyBackgroundThreadNormalTask, [this]() {
+		if (HasExistingOS())
+		{
+			this->SaveGame = Cast<UPeacenetSaveGame>(UGameplayStatics::LoadGameFromSlot(TEXT("PeacegateOS"), 0));
 
-		// Wait until save game is ready.
-		while(!SaveGame) {}
+			// desktop class is stored in the save, too.
+			this->DesktopClass = this->SaveGame->DesktopClass;
+
+			// And we need a window decorator.
+			this->WindowClass = this->SaveGame->WindowClass;
+		}
 
 		// Let's go through all the computers in the save file.
 		for (auto& Computer : SaveGame->Computers)
@@ -224,6 +196,25 @@ void APeacenetWorldStateActor::StartGame()
 
 		AsyncTask(ENamedThreads::GameThread, [this]() 
 		{
+			// we need to look up the game type assets in the game.
+			TArray<UPeacenetGameTypeAsset*> GameTypeAssets;
+
+			// load them all in. Crash if we can't.
+			check(this->LoadAssets<UPeacenetGameTypeAsset>(TEXT("PeacenetGameTypeAsset"), GameTypeAssets));
+
+			// look through the assets and check if one matches the save file
+			for (auto Asset : GameTypeAssets)
+			{
+				if (Asset->Info.Name == SaveGame->GameTypeName)
+				{
+					this->GameType = Asset;
+					break;
+				}
+			}
+
+			// crash if we didn't find any
+			check(this->GameType);
+
 			FComputer PlayerPC = SaveGame->Computers[SaveGame->PlayerComputerID];
 
 			USystemContext* PlayerContext = NewObject<USystemContext>();

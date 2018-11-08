@@ -9,6 +9,7 @@
 #include "TerminalCommand.h"
 #include "AssetRegistry/Public/IAssetRegistry.h"
 #include "AssetRegistry/Public/AssetRegistryModule.h"
+#include "Async.h"
 #include "UWindow.h"
 
 bool APeacenetWorldStateActor::UpdateComputer(int InEntityID, FComputer & InComputer)
@@ -105,33 +106,38 @@ void APeacenetWorldStateActor::BeginPlay()
 	// Do we have an existing OS?
 	if(HasExistingOS())
 	{
-		// Load the OS from disk.
-		this->SaveGame = Cast<UPeacenetSaveGame>(UGameplayStatics::LoadGameFromSlot(TEXT("PeacegateOS"), 0));
+		AsyncTask(ENamedThreads::AnyBackgroundThreadNormalTask, [this]() {
+			// Load the OS from disk.
+			this->SaveGame = Cast<UPeacenetSaveGame>(UGameplayStatics::LoadGameFromSlot(TEXT("PeacegateOS"), 0));
 		
-		// we need to look up the game type assets in the game.
-		TArray<UPeacenetGameTypeAsset*> GameTypeAssets;
-
-		// load them all in. Crash if we can't.
-		check(this->LoadAssets<UPeacenetGameTypeAsset>(TEXT("PeacenetGameTypeAsset"), GameTypeAssets));
-
-		// look through the assets and check if one matches the save file
-		for (auto Asset : GameTypeAssets)
-		{
-			if (Asset->Info.Name == SaveGame->GameTypeName)
+			AsyncTask(ENamedThreads::GameThread, [this]()
 			{
-				this->GameType = Asset;
-				break;
-			}
-		}
+				// we need to look up the game type assets in the game.
+				TArray<UPeacenetGameTypeAsset*> GameTypeAssets;
 
-		// crash if we didn't find any
-		check(this->GameType);
+				// load them all in. Crash if we can't.
+				check(this->LoadAssets<UPeacenetGameTypeAsset>(TEXT("PeacenetGameTypeAsset"), GameTypeAssets));
 
-		// desktop class is stored in the save, too.
-		this->DesktopClass = this->SaveGame->DesktopClass;
+				// look through the assets and check if one matches the save file
+				for (auto Asset : GameTypeAssets)
+				{
+					if (Asset->Info.Name == SaveGame->GameTypeName)
+					{
+						this->GameType = Asset;
+						break;
+					}
+				}
 
-		// And we need a window decorator.
-		this->WindowClass = this->SaveGame->WindowClass;
+				// crash if we didn't find any
+				check(this->GameType);
+
+				// desktop class is stored in the save, too.
+				this->DesktopClass = this->SaveGame->DesktopClass;
+
+				// And we need a window decorator.
+				this->WindowClass = this->SaveGame->WindowClass;
+			});
+		});
 	}
 	else
 	{
@@ -173,64 +179,78 @@ void APeacenetWorldStateActor::Tick(float DeltaTime)
 
 void APeacenetWorldStateActor::StartGame()
 {
-	// Let's go through all the computers in the save file.
-	for (auto& Computer : SaveGame->Computers)
-	{
-		// Are we owned by a player?
-		if (Computer.OwnerType == EComputerOwnerType::Player)
+	AsyncTask(ENamedThreads::AnyBackgroundThreadNormalTask, [this]() {
+
+		// Wait until save game is ready.
+		while(!SaveGame) {}
+
+		// Let's go through all the computers in the save file.
+		for (auto& Computer : SaveGame->Computers)
 		{
-			// Go through all the programs we have loaded.
-			for (auto Program : Programs)
+			// Are we owned by a player?
+			if (Computer.OwnerType == EComputerOwnerType::Player)
 			{
-				// Is it unlocked by default and not installed?
-				if (Program->IsUnlockedByDefault && !Computer.InstalledPrograms.Contains(Program->ExecutableName))
+				// Go through all the programs we have loaded.
+				for (auto Program : Programs)
 				{
-					// Install it.
-					Computer.InstalledPrograms.Add(Program->ExecutableName);
+					// Is it unlocked by default and not installed?
+					if (Program->IsUnlockedByDefault && !Computer.InstalledPrograms.Contains(Program->ExecutableName))
+					{
+						// Install it.
+						Computer.InstalledPrograms.Add(Program->ExecutableName);
+					}
 				}
-			}
 
-			// And now we do the same thing for terminal commands.
-			TArray<FName> CommandNames;
+				// And now we do the same thing for terminal commands.
+				TArray<FName> CommandNames;
 
-			this->CommandInfo.GetKeys(CommandNames); //retrieve names of all commands
-			
-			for (auto CommandName : CommandNames)
-			{
-				// Get the command info.
-				UCommandInfo* Command = this->CommandInfo[CommandName];
+				this->CommandInfo.GetKeys(CommandNames); //retrieve names of all commands
 
-				// Are we unlocked by default and not installed?
-				if (Command->UnlockedByDefault && !Computer.InstalledCommands.Contains(CommandName))
+				for (auto CommandName : CommandNames)
 				{
-					// Install it.
-					Computer.InstalledCommands.Add(CommandName);
-				}
-			}
+					// Get the command info.
+					UCommandInfo* Command = this->CommandInfo[CommandName];
 
+					// Are we unlocked by default and not installed?
+					if (Command->UnlockedByDefault && !Computer.InstalledCommands.Contains(CommandName))
+					{
+						// Install it.
+						Computer.InstalledCommands.Add(CommandName);
+					}
+				}
+
+			}
 		}
-	}
 
-	FComputer PlayerPC = SaveGame->Computers[SaveGame->PlayerComputerID];
+		AsyncTask(ENamedThreads::GameThread, [this]() 
+		{
+			FComputer PlayerPC = SaveGame->Computers[SaveGame->PlayerComputerID];
 
-	USystemContext* PlayerContext = NewObject<USystemContext>();
+			USystemContext* PlayerContext = NewObject<USystemContext>();
 
-	PlayerContext->Computer = PlayerPC;
-	PlayerContext->Peacenet = this;
+			PlayerContext->Computer = PlayerPC;
+			PlayerContext->Peacenet = this;
 
-	UWorldGenerator::GenerateSystemDirectories(PlayerContext);
-	
-	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+			AsyncTask(ENamedThreads::AnyBackgroundThreadNormalTask, [this, PlayerContext]()
+			{
+				UWorldGenerator::GenerateSystemDirectories(PlayerContext);
+				AsyncTask(ENamedThreads::GameThread, [this, PlayerContext]()
+				{
+					APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 
-	PlayerContext->Desktop = CreateWidget<UDesktopWidget, APlayerController>(PlayerController, this->DesktopClass);
+					PlayerContext->Desktop = CreateWidget<UDesktopWidget, APlayerController>(PlayerController, this->DesktopClass);
 
-	PlayerContext->Desktop->SystemContext = PlayerContext;
-	PlayerContext->Desktop->UserID = SaveGame->PlayerUserID;
+					PlayerContext->Desktop->SystemContext = PlayerContext;
+					PlayerContext->Desktop->UserID = SaveGame->PlayerUserID;
 
-	SystemContexts.Add(PlayerContext);
+					SystemContexts.Add(PlayerContext);
 
 
-	PlayerSystemReady.Broadcast(PlayerContext);
+					PlayerSystemReady.Broadcast(PlayerContext);
+				});
+			});
+		});
+	});
 }
 
 bool APeacenetWorldStateActor::FindProgramByName(FName InName, UPeacegateProgramAsset *& OutProgram)

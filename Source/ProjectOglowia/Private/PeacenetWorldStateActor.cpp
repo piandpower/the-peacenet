@@ -205,7 +205,7 @@ void APeacenetWorldStateActor::StartGame()
 			// look through the assets and check if one matches the save file
 			for (auto Asset : GameTypeAssets)
 			{
-				if (Asset->Info.Name == SaveGame->GameTypeName)
+				if (Asset->Name == SaveGame->GameTypeName)
 				{
 					this->GameType = Asset;
 					break;
@@ -407,7 +407,7 @@ void APeacenetWorldStateActor::SaveWorld()
 {
 	// update game type, window decorator and desktop class
 	SaveGame->DesktopClass = this->DesktopClass;
-	SaveGame->GameTypeName = this->GameType->Info.Name;
+	SaveGame->GameTypeName = this->GameType->Name;
 	SaveGame->WindowClass = this->WindowClass;
 
 	UGameplayStatics::SaveGameToSlot(this->SaveGame, TEXT("PeacegateOS"), 0);

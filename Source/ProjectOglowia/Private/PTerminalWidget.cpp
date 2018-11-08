@@ -112,18 +112,6 @@ UPTerminalWidget* UPTerminalWidget::Clear()
 	return this;
 }
 
-void UPTerminalWidget::SynchronizeProperties()
-{
-	Super::SynchronizeProperties();
-}
-
-void UPTerminalWidget::ReleaseSlateResources(bool bReleaseChildren)
-{
-	Super::ReleaseSlateResources(bReleaseChildren);
-
-	MyPeacegateTerminalWidget.Reset();
-}
-
 FReply UPTerminalWidget::NativeOnFocusReceived(const FGeometry & InGeometry, const FFocusEvent & InFocusEvent)
 {
 	cursorTime = 0;
@@ -471,11 +459,6 @@ const FText UPTerminalWidget::GetPaletteCategory()
 	return FText::FromString(TEXT("Peacegate OS"));
 }
 #endif
-
-TSharedRef<SWidget> UPTerminalWidget::RebuildWidget()
-{
-	return Super::RebuildWidget();
-}
 
 FSlateFontInfo UPTerminalWidget::GetUnrealFont(uint8 fontType) const
 {

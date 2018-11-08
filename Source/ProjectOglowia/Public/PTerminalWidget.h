@@ -8,18 +8,12 @@
 #include "Engine/Font.h"
 
 #include "Fonts/SlateFontInfo.h"
-#include "SPeacegateTerminalWidget.h"
 #include "Slate/SlateBrushAsset.h"
 #include "Misc/Parse.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 
 #include "PTerminalWidget.generated.h"
 
- //in editor
-  
- //Underlying Slate terminal widget that does all the cool rendering shit.
- class SPeacegateTerminalWidget;
- 
  /**
   * Terminal emulator widget for Peacegate OS.
   */
@@ -135,8 +129,6 @@ public:
 
 
 
-	virtual void SynchronizeProperties() override;
-	virtual void ReleaseSlateResources(bool bReleaseChildren) override;
 	virtual FReply NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent) override;
 	virtual void NativeConstruct() override;
 	virtual int32 NativePaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const override;
@@ -151,16 +143,11 @@ public:
 #if WITH_EDITOR
 	virtual const FText GetPaletteCategory() override;
 #endif
-
-	virtual TSharedRef<SWidget> RebuildWidget() override;
-
 	UFUNCTION(BlueprintCallable)
 		FString& GetInputText() { return TextInputBuffer; }
 	void ClearInput() { TextInputBuffer = TEXT(""); }
 
 protected:
-	TSharedPtr<SPeacegateTerminalWidget> MyPeacegateTerminalWidget;
-
 	PROPERTY_BINDING_IMPLEMENTATION(FSlateFontInfo, RegularTextFont);
 	PROPERTY_BINDING_IMPLEMENTATION(FSlateFontInfo, BoldTextFont);
 	PROPERTY_BINDING_IMPLEMENTATION(FSlateFontInfo, ItalicTextFont);

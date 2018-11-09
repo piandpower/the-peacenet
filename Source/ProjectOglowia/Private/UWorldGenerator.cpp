@@ -568,6 +568,10 @@ void FWorldGenTask::DoWork()
 
 			auto& NPC = SaveGame->Characters[i];
 
+			// NEVER EVER EVER do this if the npc isn't actually an npc.
+			if (NPC.CharacterType != EIdentityType::NonPlayer)
+				continue;
+
 			// Allocate memory for the new computer.
 			FComputer Computer;
 

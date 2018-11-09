@@ -23,7 +23,7 @@ class PROJECTOGLOWIA_API UPeacenetSaveGame : public USaveGame
 
 public:
 	UPROPERTY(VisibleAnywhere, Category = "Peacegate")
-	int PlayerComputerID = 0;
+	int PlayerCharacterID = 0;
 
 	UPROPERTY(VisibleAnywhere, Category = "Peacegate")
 	int PlayerUserID = 0;
@@ -48,6 +48,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, Category = "World")
 	TArray<FEnterpriseNetwork> Businesses;
+
+	UPROPERTY(VisibleAnywhere, Category = "Unlocks and Game State")
+	TMap<FName, bool> Booleans;
 
 	const float SECONDS_DAY_LENGTH = 86400.f;
 

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "FComputer.h"
+#include "FPeacenetIdentity.h"
 
 #include "USystemContext.generated.h"
 
@@ -40,6 +41,9 @@ public:
 	UPROPERTY()
 	FComputer Computer;
 	
+	UPROPERTY()
+	FPeacenetIdentity Character;
+
 	UPROPERTY(BlueprintReadOnly)
 	UDesktopWidget* Desktop;
 

@@ -169,7 +169,7 @@ bool UProgram::OpenFile(const FString & InPath, EProgramFileOpenStatus & OutStat
 	UWindow* NewWindow;
 	UProgram* NewProgram = UProgram::CreateProgram(Window->SystemContext->Peacenet, WindowClass, ProgramAsset->ProgramClass, Window->SystemContext, Window->UserID, NewWindow);
 
-	NewWindow->WindowTitle = FText::FromString(ProgramAsset->AppLauncherItem.Name);
+	NewWindow->WindowTitle = ProgramAsset->AppLauncherItem.Name;
 	NewWindow->Icon = ProgramAsset->AppLauncherItem.Icon;
 	NewWindow->EnableMinimizeAndMaximize = ProgramAsset->AppLauncherItem.EnableMinimizeAndMaximize;
 

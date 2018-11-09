@@ -36,6 +36,20 @@ bool APeacenetWorldStateActor::UpdateComputer(int InEntityID, FComputer & InComp
 	return false;
 }
 
+bool APeacenetWorldStateActor::UpdateCharacter(int InEntityID, FPeacenetIdentity & InCharacter)
+{
+	for (int i = 0; i < SaveGame->Characters.Num(); i++)
+	{
+		if (SaveGame->Characters[i].ID == InEntityID)
+		{
+			SaveGame->Characters[i] = InCharacter;
+			return true;
+		}
+	}
+
+	return false;
+}
+
 // Sets default values
 APeacenetWorldStateActor::APeacenetWorldStateActor()
 {
@@ -215,12 +229,13 @@ void APeacenetWorldStateActor::StartGame()
 			// crash if we didn't find any
 			check(this->GameType);
 
-			FComputer PlayerPC = SaveGame->Computers[SaveGame->PlayerComputerID];
+			FComputer PlayerPC = SaveGame->Computers[SaveGame->Characters[SaveGame->PlayerCharacterID].ComputerID];
 
 			USystemContext* PlayerContext = NewObject<USystemContext>();
-
+			
 			PlayerContext->Computer = PlayerPC;
 			PlayerContext->Peacenet = this;
+			PlayerContext->Character = SaveGame->Characters[SaveGame->PlayerCharacterID];
 
 			AsyncTask(ENamedThreads::AnyBackgroundThreadNormalTask, [this, PlayerContext]()
 			{
@@ -377,16 +392,29 @@ APeacenetWorldStateActor* APeacenetWorldStateActor::GenerateAndCreateWorld(const
 	// World generator can generate the computer's filesystem.
 	UWorldGenerator::CreateFilesystem(PlayerComputer, WorldGenerator);
 
+	// Now we create the Peacenet Identity for the player.
+	FPeacenetIdentity PlayerIdentity;
+	PlayerIdentity.ID = 0;
+	PlayerIdentity.Country = InGameType->SpawnCountry;
+	PlayerIdentity.CharacterType = EIdentityType::Player;
+	PlayerIdentity.CharacterName = InWorldInfo.PlayerName;
+	PlayerIdentity.Skill = 0;
+	PlayerIdentity.Reputation = 0.f;
+	PlayerIdentity.ComputerID = PlayerComputer.ID;
+
 	// Note: The save file would have been loaded as soon as the actor spawned - BeginPlay gets called during UWorld::SpawnActor.
 	// So, at this point, we've had a save file created and ready for us for a few CPU cycles now...
 	UPeacenetSaveGame* WorldSave = NewPeacenet->SaveGame;
 
 	// Tell the game what user and computer to possess.
-	WorldSave->PlayerComputerID = PlayerComputer.ID;
+	WorldSave->PlayerCharacterID = PlayerIdentity.ID;
 	WorldSave->PlayerUserID = PlayerUser.ID;
 
 	// We can then add our player's computer to the save file.
 	WorldSave->Computers.Add(PlayerComputer);
+
+	// Add the character
+	WorldSave->Characters.Add(PlayerIdentity);
 
 	// And we can generate non-story NPCs.
 	auto Status = UWorldGenerator::GenerateCharacters(WorldGenerator, WorldSave);

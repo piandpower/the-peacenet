@@ -76,6 +76,9 @@ public:
 	UFUNCTION()
 	bool UpdateComputer(int InEntityID, FComputer& InComputer);
 	
+	UFUNCTION()
+	bool UpdateCharacter(int InEntityID, FPeacenetIdentity& InCharacter);
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Meta = (ExposeOnSpawn))
 	TSubclassOf<UWindow> WindowClass;
 

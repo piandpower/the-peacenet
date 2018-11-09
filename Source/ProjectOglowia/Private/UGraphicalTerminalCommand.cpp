@@ -17,7 +17,7 @@ void UGraphicalTerminalCommand::RunCommand(UConsoleContext * InConsole, const TM
 
 	UProgram* Program = UProgram::CreateProgram(InConsole->SystemContext->Peacenet, InConsole->SystemContext->Peacenet->WindowClass, this->ProgramAsset->ProgramClass, InConsole->SystemContext, InConsole->UserID, OutputWindow);
 
-	OutputWindow->WindowTitle = FText::FromString(this->ProgramAsset->AppLauncherItem.Name);
+	OutputWindow->WindowTitle = this->ProgramAsset->AppLauncherItem.Name;
 	OutputWindow->Icon = this->ProgramAsset->AppLauncherItem.Icon;
 	OutputWindow->EnableMinimizeAndMaximize = this->ProgramAsset->AppLauncherItem.EnableMinimizeAndMaximize;
 

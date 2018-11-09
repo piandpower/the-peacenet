@@ -85,10 +85,10 @@ struct FAppLauncherItemInformation
 
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FString Category;
+	FText Category;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FString Name;
+	FText Name;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UTexture2D* Icon;

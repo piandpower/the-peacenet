@@ -56,7 +56,7 @@ bool USystemContext::OpenProgram(FName InExecutableName)
 			if (MyWindow && MyProgram)
 			{
 				MyWindow->Icon = Program->AppLauncherItem.Icon;
-				MyWindow->WindowTitle = FText::FromString(Program->AppLauncherItem.Name);
+				MyWindow->WindowTitle = Program->AppLauncherItem.Name;
 			}
 
 			return true;

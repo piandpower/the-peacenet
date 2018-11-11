@@ -6,6 +6,8 @@
 #include "UPeacegateFileSystem.h"
 #include "CommonUtils.h"
 #include "UPeacegateProgramAsset.h"
+#include "WallpaperAsset.h"
+#include "ImageLoader.h"
 #include "UGraphicalTerminalCommand.h"
 #include "CommandInfo.h"
 
@@ -68,7 +70,12 @@ bool USystemContext::OpenProgram(FName InExecutableName)
 
 UPeacegateFileSystem * USystemContext::GetFilesystem(const int UserID)
 {
-	return UCommonUtils::CreateFilesystem(this, UserID);
+	if (!RegisteredFilesystems.Contains(UserID))
+	{
+		this->RegisteredFilesystems.Add(UserID, UCommonUtils::CreateFilesystem(this, UserID));
+	}
+
+	return this->RegisteredFilesystems[UserID];
 }
 
 bool USystemContext::TryGetTerminalCommand(FName CommandName, UTerminalCommand *& OutCommand, FString& InternalUsage, FString& FriendlyUsage)
@@ -199,7 +206,7 @@ void USystemContext::PushFolderTree(const TArray<FFolder>& InFolderTree)
 {
 	Computer.Filesystem = InFolderTree;
 	if(Peacenet)
-		Peacenet->UpdateComputer(Computer.ID, Computer);
+		Peacenet->UpdateComputer(Computer.ID, Computer, false);
 }
 
 FText USystemContext::GetTimeOfDay()
@@ -250,4 +257,28 @@ void USystemContext::ParseCharacterName(const FString InCharacterName, FString &
 
 	OutUsername = FirstName;
 	OutHostname = FirstName + TEXT("-pc");
+}
+
+void USystemContext::UpdateSystemFiles()
+{
+	// This function updates the system based on save data and in-game assets.
+	//
+	// A.K.A: This is the function that updates things like what wallpapers are installed.
+
+	// So first we need a root fs context.
+	UPeacegateFileSystem* RootFS = this->GetFilesystem(0);
+
+	// We're going to set up wallpapers.
+	for (auto Wallpaper : this->Peacenet->Wallpapers)
+	{
+		// Is the wallpaper available? We don't care about removing those that aren't available but already exist on disk. We just want to update the ones that are unlocked.
+		if (Wallpaper->UnlockedByDefault)
+		{
+			// Grab the texture's bitmap data.
+			TArray<uint8> UETextureData = UImageLoader::GetBitmapData(Wallpaper->WallpaperTexture);
+
+			// Now we just need to write it to disk.
+			RootFS->WriteBinary(TEXT("/usr/share/wallpapers/") + Wallpaper->FriendlyName.ToString() + TEXT(".png"), UETextureData);
+		}
+	}
 }

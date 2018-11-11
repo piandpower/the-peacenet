@@ -5,6 +5,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "UComputerTypeAsset.h"
 #include "UPeacegateProgramAsset.h"
+#include "WallpaperAsset.h"
 #include "CommandInfo.h"
 #include "TerminalCommand.h"
 #include "AssetRegistry/Public/IAssetRegistry.h"
@@ -12,7 +13,7 @@
 #include "Async.h"
 #include "UWindow.h"
 
-bool APeacenetWorldStateActor::UpdateComputer(int InEntityID, FComputer & InComputer)
+bool APeacenetWorldStateActor::UpdateComputer(int InEntityID, FComputer & InComputer, bool InSaveGame)
 {
 	if (!SaveGame)
 	{
@@ -27,7 +28,10 @@ bool APeacenetWorldStateActor::UpdateComputer(int InEntityID, FComputer & InComp
 			SaveGame->Computers[i] = InComputer;
 			if (InComputer.OwnerType == EComputerOwnerType::Player)
 			{
-				this->SaveWorld();
+				if (InSaveGame)
+				{
+					this->SaveWorld();
+				}
 			}
 			return true;
 		}
@@ -117,6 +121,9 @@ void APeacenetWorldStateActor::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// Load wallpaper assets.
+	this->LoadAssets<UWallpaperAsset>(TEXT("WallpaperAsset"), this->Wallpapers);
+
 	// Do we have an existing OS?
 	if (!HasExistingOS())
 	{
@@ -129,6 +136,11 @@ void APeacenetWorldStateActor::BeginPlay()
 
 	// Load terminal command assets, build usage strings, populate command map.
 	this->LoadTerminalCommands();
+}
+
+void APeacenetWorldStateActor::EndPlay(const EEndPlayReason::Type InReason)
+{
+	this->SaveWorld();
 }
 
 // Called every frame
@@ -240,8 +252,12 @@ void APeacenetWorldStateActor::StartGame()
 			AsyncTask(ENamedThreads::AnyBackgroundThreadNormalTask, [this, PlayerContext]()
 			{
 				UWorldGenerator::GenerateSystemDirectories(PlayerContext);
+								
 				AsyncTask(ENamedThreads::GameThread, [this, PlayerContext]()
 				{
+					// Update the system's files.
+					PlayerContext->UpdateSystemFiles();
+
 					APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 
 					PlayerContext->Desktop = CreateWidget<UDesktopWidget, APlayerController>(PlayerController, this->DesktopClass);
@@ -433,11 +449,14 @@ APeacenetWorldStateActor* APeacenetWorldStateActor::GenerateAndCreateWorld(const
 
 void APeacenetWorldStateActor::SaveWorld()
 {
+	
+
 	// update game type, window decorator and desktop class
 	SaveGame->DesktopClass = this->DesktopClass;
 	SaveGame->GameTypeName = this->GameType->Name;
 	SaveGame->WindowClass = this->WindowClass;
 
+	// Actually save the game.
 	UGameplayStatics::SaveGameToSlot(this->SaveGame, TEXT("PeacegateOS"), 0);
 }
 

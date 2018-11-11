@@ -48,6 +48,9 @@ public:
 	UDesktopWidget* Desktop;
 
 public:
+	UFUNCTION()
+	void UpdateSystemFiles();
+
 	UFUNCTION(BlueprintCallable, Category = "System Context")
 	FString GetHostname() const;
 
@@ -62,6 +65,9 @@ public:
 
 	UFUNCTION()
 		bool TryGetTerminalCommand(FName CommandName, UTerminalCommand*& OutCommand, FString& InternalUsage, FString& FriendlyUsage);
+
+	UPROPERTY()
+	TMap<int, UPeacegateFileSystem*> RegisteredFilesystems;
 
 	UFUNCTION(BlueprintCallable, Category = "System Context")
 		FUserInfo GetUserInfo(const int InUserID);

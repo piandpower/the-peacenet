@@ -11,6 +11,7 @@
 
 class UComputerTypeAsset;
 class USystemContext;
+class UWallpaperAsset;
 class UPeacegateProgramAsset;
 class UTerminalCommand;
 class UCommandInfo;
@@ -67,6 +68,9 @@ public:
 	UFUNCTION()
 	void SaveWorld();
 
+	UPROPERTY()
+	TArray<UWallpaperAsset*> Wallpapers;
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Meta=(ExposeOnSpawn))
 	TSubclassOf<UDesktopWidget> DesktopClass;
 
@@ -74,7 +78,7 @@ public:
 	UPeacenetGameTypeAsset* GameType;
 
 	UFUNCTION()
-	bool UpdateComputer(int InEntityID, FComputer& InComputer);
+	bool UpdateComputer(int InEntityID, FComputer& InComputer, bool InSaveGame = true);
 	
 	UFUNCTION()
 	bool UpdateCharacter(int InEntityID, FPeacenetIdentity& InCharacter);
@@ -117,6 +121,8 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	virtual void EndPlay(const EEndPlayReason::Type InReason) override;
+	
 public:	
 
 	UFUNCTION()

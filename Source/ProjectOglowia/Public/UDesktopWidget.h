@@ -5,9 +5,11 @@
 #include "CoreMinimal.h"
 #include "UserWidget.h"
 #include "UPeacegateProgramAsset.h" 
+#include "UPeacegateFileSystem.h"
 #include "UDesktopWidget.generated.h"
 
 class USystemContext;
+class UImageLoader;
 
 USTRUCT()
 struct PROJECTOGLOWIA_API FDesktopNotification
@@ -36,15 +38,32 @@ class PROJECTOGLOWIA_API UDesktopWidget : public UUserWidget
 private:
 	bool bIsWaitingForNotification = false;
 
+protected:
+	UPROPERTY()
+	UImageLoader* ImageLoader;
+
 public:
 	UPROPERTY()
 	USystemContext * SystemContext;
+
+	UFUNCTION()
+	void SetWallpaper(UTexture2D* InTexture);
+
+	UFUNCTION()
+	void OnFilesystemOperation(EFilesystemEventType InType, FString InPath);
 
 	UPROPERTY()
 	int UserID = 0;
 
 	virtual void NativeConstruct() override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+
+protected:
+	UPROPERTY()
+	FString UserHomeDirectory;
+
+	UPROPERTY()
+	UPeacegateFileSystem* Filesystem;
 
 public:
 	UPROPERTY(BlueprintReadOnly, Category = "Desktop")
@@ -67,6 +86,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Desktop")
 	FText CurrentPeacenetName;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Desktop")
+	UTexture2D* WallpaperTexture;
 
 public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Desktop")

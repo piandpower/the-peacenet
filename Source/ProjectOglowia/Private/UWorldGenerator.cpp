@@ -119,6 +119,9 @@ void UWorldGenerator::GenerateSystemDirectories(USystemContext * InSystemContext
 	Filesystem->CreateDirectory(TEXT("/etc"), InstallStatusCode);
 	Filesystem->CreateDirectory(TEXT("/home"), InstallStatusCode);
 	Filesystem->CreateDirectory(TEXT("/usr"), InstallStatusCode);
+	Filesystem->CreateDirectory(TEXT("/usr/share"), InstallStatusCode);
+	Filesystem->CreateDirectory(TEXT("/usr/share/wallpapers"), InstallStatusCode);
+	Filesystem->CreateDirectory(TEXT("/usr/share/themes"), InstallStatusCode);
 	Filesystem->CreateDirectory(TEXT("/var"), InstallStatusCode);
 	Filesystem->CreateDirectory(TEXT("/run"), InstallStatusCode);
 	Filesystem->CreateDirectory(TEXT("/tmp"), InstallStatusCode);
@@ -467,8 +470,8 @@ void FWorldGenTask::DoWork()
 		//
 		// When the relevant value reaches zero or below, the game starts generating the next
 		// part of the world.
-		int NPCCounter = 1000;
-		int BusinessCounter = 400;
+		int NPCCounter = 200;
+		int BusinessCounter = 75;
 
 
 		// Now we have all our training data for name generation.

@@ -38,8 +38,10 @@ public:
 		/** This accessor function allows C++ code to bind to the event. */ 
 	FOnImageLoadCompleted& OnLoadCompleted() { return LoadCompleted; }
 
-private: /** Helper function that initiates the loading operation and fires the event when loading is done. */ 
+	/** Helper function that initiates the loading operation and fires the event when loading is done. */ 
 	void LoadImageAsync(UPeacegateFileSystem* InFilesystem, UObject* Outer, const FString& ImagePath);
+
+private: 
 
 		 /** Helper function to dynamically create a new texture from raw pixel data. */ 
 	static UTexture2D* CreateTexture(UObject* Outer, const TArray<uint8>& PixelData, int32 InSizeX, int32 InSizeY, EPixelFormat PixelFormat = EPixelFormat::PF_B8G8R8A8, FName BaseName = NAME_None);

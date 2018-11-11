@@ -623,7 +623,13 @@ void UPeacegateFileSystem::WriteBinary(const FString & InPath, TArray<uint8> InB
 
 		if (File.FileName == FileName)
 		{
-			File.FileContent = FBase64::Encode(InBinary);
+			FString FileContentB64 = FBase64::Encode(InBinary);
+			if (FileContentB64 == File.FileContent)
+			{
+				// Return. The file's the exact same.
+				return;
+			}
+			File.FileContent = FileContentB64;
 			Folder.Files[i] = File;
 			FoundFile = true;
 			break;

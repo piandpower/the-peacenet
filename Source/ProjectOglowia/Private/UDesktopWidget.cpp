@@ -4,13 +4,80 @@
 #include "PeacenetWorldStateActor.h"
 #include "USystemContext.h"
 #include "FComputer.h"
+#include "ImageLoader.h"
+#include "WallpaperAsset.h"
 #include "UPeacegateProgramAsset.h"
+
+
 
 void UDesktopWidget::NativeConstruct()
 {
+	// Reset the app launcher.
 	this->ResetAppLauncher();
 
+	// Grab the user's home directory.
+	this->UserHomeDirectory = this->SystemContext->GetUserHomeDirectory(this->UserID);
+
+	// Get the filesystem context for this user.
+	this->Filesystem = this->SystemContext->GetFilesystem(this->UserID);
+
+	// Make sure that we intercept filesystem write operations that pertain to us.
+	TScriptDelegate<> FSOperation;
+	FSOperation.BindUFunction(this, "OnFilesystemOperation");
+
+	this->Filesystem->FilesystemOperation.Add(FSOperation);
+
+	// Create an image loader to use for wallpaper loading.
+	this->ImageLoader = NewObject<UImageLoader>(this);
+
+	// Create a function binding.
+	TScriptDelegate<> ImageLoaded;
+	ImageLoaded.BindUFunction(this, "SetWallpaper");
+	this->ImageLoader->OnLoadCompleted().Add(ImageLoaded);
+
+	// Does this user have an existing wallpaper?
+	if (this->Filesystem->FileExists(this->UserHomeDirectory + TEXT("/.peacegate/wallpaper.png")))
+	{
+		this->ImageLoader->LoadImageAsync(this->Filesystem, this, this->UserHomeDirectory + TEXT("/.peacegate/wallpaper.png"));
+	}
+	else 
+	{
+		// We need to find and set the default wallpaper.
+		for (auto WallpaperAsset : this->SystemContext->Peacenet->Wallpapers)
+		{
+			if (WallpaperAsset->IsDefault)
+			{
+				this->SetWallpaper(WallpaperAsset->WallpaperTexture);
+				this->Filesystem->WriteBinary(this->UserHomeDirectory + TEXT("/.peacegate/wallpaper.png"), UImageLoader::GetBitmapData(this->WallpaperTexture));
+				break;
+			}
+		}
+	}
+
 	Super::NativeConstruct();
+}
+
+void UDesktopWidget::SetWallpaper(UTexture2D* InTexture)
+{
+	this->WallpaperTexture = InTexture;
+}
+
+void UDesktopWidget::OnFilesystemOperation(EFilesystemEventType InType, FString InPath)
+{
+	switch (InType)
+	{
+		case EFilesystemEventType::WriteFile:
+			if (InPath == this->UserHomeDirectory + TEXT("/.peacegate/wallpaper.png"))
+			{
+				// Wallpaper update.
+				this->WallpaperTexture = UImageLoader::LoadImageFromDisk(this->Filesystem, this, this->UserHomeDirectory + TEXT("/.peacegate/wallpaper.png"));
+
+				this->EnqueueNotification(FText::FromString("New wallpaper"), FText::FromString("A new wallpaper has been set by a program."), this->WallpaperTexture);
+
+				this->SystemContext->Peacenet->SaveWorld();
+			}
+			break;
+	}
 }
 
 void UDesktopWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)

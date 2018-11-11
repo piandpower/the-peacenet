@@ -60,6 +60,7 @@ class PROJECTOGLOWIA_API UPeacegateFileSystem : public UObject
 private:
 	void BuildChildNavigators(UFolderNavigator* RootNav);
 
+public:
 	int UserID = 0;
 	
 public:

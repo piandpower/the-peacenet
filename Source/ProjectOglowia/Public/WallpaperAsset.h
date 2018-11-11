@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
+#include "Engine/Texture2D.h"
 #include "WallpaperAsset.generated.h"
 
 /**
@@ -25,9 +26,8 @@ public:
 	UTexture2D * WallpaperTexture;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	bool UnlockedByDefault;
+	bool UnlockedByDefault = true;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	bool IsMultiplayerOnly = false;
-
+	bool IsDefault = false;
 };

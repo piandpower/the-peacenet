@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "ECountry.h"
+#include "UMissionAsset.h"
 #include "UGameTypeAsset.generated.h"
 
 /**
@@ -32,4 +33,7 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	bool UnlockAllProgramsByDefault = false;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UMissionAsset* TutorialMission;
 };

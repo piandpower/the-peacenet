@@ -9,6 +9,7 @@
 #include "UGameTypeAsset.h"
 #include "PeacenetWorldStateActor.generated.h"
 
+class UMissionAsset;
 class UComputerTypeAsset;
 class USystemContext;
 class UWallpaperAsset;
@@ -61,8 +62,14 @@ class PROJECTOGLOWIA_API APeacenetWorldStateActor : public AActor
 	GENERATED_BODY()
 	
 private:
+	UPROPERTY()
+	UMissionAsset* CurrentMissionAsset;
+
 	UFUNCTION()
 	void LoadTerminalCommands();
+
+	UPROPERTY()
+	TArray<UMissionAsset*> Missions;
 
 public:	
 	UFUNCTION()

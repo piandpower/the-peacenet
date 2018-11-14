@@ -6,6 +6,7 @@
 #include "UComputerTypeAsset.h"
 #include "UPeacegateProgramAsset.h"
 #include "WallpaperAsset.h"
+#include "UMissionAsset.h"
 #include "CommandInfo.h"
 #include "TerminalCommand.h"
 #include "AssetRegistry/Public/IAssetRegistry.h"
@@ -241,6 +242,12 @@ void APeacenetWorldStateActor::StartGame()
 			// crash if we didn't find any
 			check(this->GameType);
 
+			// If we have missions enabled in this game mode then we load the missions in.
+			if (this->GameType->EnableMissions)
+			{
+				this->LoadAssets<UMissionAsset>("MissionAsset", this->Missions);
+			}
+
 			FComputer PlayerPC = SaveGame->Computers[SaveGame->Characters[SaveGame->PlayerCharacterID].ComputerID];
 
 			USystemContext* PlayerContext = NewObject<USystemContext>();
@@ -449,7 +456,9 @@ APeacenetWorldStateActor* APeacenetWorldStateActor::GenerateAndCreateWorld(const
 
 void APeacenetWorldStateActor::SaveWorld()
 {
-	
+	// Never save the game during a mission.
+	if (this->CurrentMissionAsset)
+		return;
 
 	// update game type, window decorator and desktop class
 	SaveGame->DesktopClass = this->DesktopClass;

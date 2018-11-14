@@ -98,6 +98,8 @@ bool APeacenetWorldStateActor::StartMission(UMissionAsset * InMission, USystemCo
 		for (auto Action : InMission->Actions)
 		{
 			UMissionAction* DuplicateAction = DuplicateObject<UMissionAction>(Action.Action, this);
+			DuplicateAction->SaveGame = this->SaveGame;
+			DuplicateAction->SystemContext = this->MissionContext;
 			NewActionList.Add(DuplicateAction);
 		}
 		this->CurrentMissionActions = NewActionList;
@@ -210,6 +212,59 @@ void APeacenetWorldStateActor::Tick(float DeltaTime)
 		if (TimeOfDay >= SaveGame->SECONDS_DAY_LENGTH)
 		{
 			TimeOfDay = 0;
+		}
+
+		// Are we in a mission?
+		if (CurrentMissionAsset && MissionContext)
+		{
+			// Do we have a latent action in progress?
+			if (CurrentLatentMissionAction)
+			{
+				// Tick it.
+				this->CurrentLatentMissionAction->Tick(DeltaTime);
+
+				// Check if it's completed.
+				if (this->CurrentLatentMissionAction->IsCompleted())
+				{
+					// Do something.
+				}
+				else if (this->CurrentLatentMissionAction->IsFailed())
+				{
+					// Do something.
+				}
+			}
+			else
+			{
+				// Check if we have any actions to perform.
+				if (this->CurrentMissionActions.Num())
+				{
+					// Pull down the first action.
+					UMissionAction* NextAction = this->CurrentMissionActions[0];
+					
+					// We essentially de-queue it.
+					this->CurrentMissionActions.RemoveAt(0);
+
+					// Then we execute it.
+					NextAction->ExecuteMissionAction();
+
+					// Is it latent?
+					if (NextAction->IsA<ULatentMissionAction>())
+					{
+						// TODO: Duplicate the current save file and store it in memory.
+						// That way, if the action fails, the player can easily start from this action and try again.
+						// We may need to make sure that all system contexts are rolled back when we restore that save file, though.
+						// That is, to roll back all player/npc filesystems.
+						// Every latent action is treated as a checkpoint, basically.
+
+						// Assign it as our current latent action.
+						this->CurrentLatentMissionAction = Cast<ULatentMissionAction>(NextAction);
+					}
+				}
+				else
+				{
+					// The mission is most probably completed.
+				}
+			}
 		}
 
 		// Save it

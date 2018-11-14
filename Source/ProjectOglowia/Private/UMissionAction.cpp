@@ -17,6 +17,12 @@ FString ULatentMissionAction::GetFailReasonText()
 	return this->FailReason;
 }
 
+void ULatentMissionAction::Tick(float InDeltaTime)
+{
+	this->NativeTick(InDeltaTime);
+	this->K2_Tick(InDeltaTime);
+}
+
 void ULatentMissionAction::Complete()
 {
 	this->bIsActionFinished = true;
@@ -26,4 +32,10 @@ void ULatentMissionAction::Fail(const FString& InFailReason)
 {
 	this->bIsActionFailed = true;
 	this->FailReason = InFailReason;
+}
+
+void UMissionAction::ExecuteMissionAction()
+{
+	this->NativeExecuteMissionAction();
+	this->K2_ExecuteMissionAction();
 }

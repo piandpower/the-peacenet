@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "UDesktopWidget.h"
 #include "UPeacenetSaveGame.h"
+#include "UMissionAction.h"
 #include "UGameTypeAsset.h"
 #include "PeacenetWorldStateActor.generated.h"
 
@@ -73,6 +74,12 @@ private:
 
 	UPROPERTY()
 	USystemContext* MissionContext;
+
+	UPROPERTY()
+	TArray<UMissionAction*> CurrentMissionActions;
+
+	UPROPERTY()
+	ULatentMissionAction* CurrentLatentMissionAction;
 
 public:	
 	UFUNCTION()

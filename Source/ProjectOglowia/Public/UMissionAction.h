@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "USystemContext.h"
 #include "Text.h"
+#include "UPeacenetSaveGame.h"
 #include "UMissionAction.generated.h"
 
 /**
@@ -19,7 +20,16 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Mission Action")
 	USystemContext* SystemContext;
 
+	UPROPERTY(BlueprintReadOnly, Category = "Mission Action")
+	UPeacenetSaveGame* SaveGame;
+
 	UFUNCTION(BlueprintImplementableEvent, Category = "Mission Action")
+	void K2_ExecuteMissionAction();
+
+	UFUNCTION()
+	virtual void NativeExecuteMissionAction() {}
+
+	UFUNCTION()
 	void ExecuteMissionAction();
 
 };
@@ -46,7 +56,16 @@ public:
 	UFUNCTION()
 	FString GetFailReasonText();
 
+	UFUNCTION()
+	void Tick(float InDeltaTime);
+
 protected:
+	UFUNCTION(BlueprintImplementableEvent, Category = "Latent Mission Action")
+	void K2_Tick(float InDeltaTime);
+
+	UFUNCTION()
+	virtual void NativeTick(float InDeltaTime) {}
+
 	UFUNCTION(BlueprintCallable, Category = "Latent Mission Action")
 	void Complete();
 

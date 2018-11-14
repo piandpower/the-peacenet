@@ -5,7 +5,21 @@
 #include "CoreMinimal.h"
 #include "Text.h"
 #include "Engine/DataAsset.h"
+#include "UMissionAction.h"
 #include "UMissionAsset.generated.h"
+
+/** 
+ * Contains information about a mission action to start.
+ */
+USTRUCT(BlueprintType)
+struct PROJECTOGLOWIA_API FMissionActionInfo
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Instanced)
+	UMissionAction* Action;
+};
 
 /**
  * Represents a playable mission.
@@ -27,4 +41,7 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	TArray<UMissionAsset*> Prerequisites;
+
+	UPROPERTY(BlueprintReadOnly, Editanywhere)
+	TArray<FMissionActionInfo> Actions;
 };

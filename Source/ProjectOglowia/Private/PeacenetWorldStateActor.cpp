@@ -91,6 +91,17 @@ bool APeacenetWorldStateActor::StartMission(UMissionAsset * InMission, USystemCo
 		this->CurrentMissionAsset = InMission;
 		this->MissionContext = InMissionSystem;
 
+		// Now, we need to get a DUPLICATE ARRAY of mission actions.
+		// We need to duplicate every action so that the player doesn't fuck up the mission's data asset
+		// by completing objectives. The way UE4's data asset system works, that is completely possible.
+		TArray<UMissionAction*> NewActionList;
+		for (auto Action : InMission->Actions)
+		{
+			UMissionAction* DuplicateAction = DuplicateObject<UMissionAction>(Action.Action, this);
+			NewActionList.Add(DuplicateAction);
+		}
+		this->CurrentMissionActions = NewActionList;
+
 		if (InMissionSystem->Desktop)
 		{
 			InMissionSystem->Desktop->EnqueueNotification(FText::FromString("Mission start"), InMission->MissionName, nullptr);

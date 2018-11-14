@@ -38,10 +38,10 @@ public:
 	UPROPERTY()
 	APeacenetWorldStateActor * Peacenet;
 	
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY()
 	FComputer Computer;
 	
-	UPROPERTY(BlueprintReadOnly)
+	UPROPERTY()
 	FPeacenetIdentity Character;
 
 	UPROPERTY(BlueprintReadOnly)

@@ -52,6 +52,9 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Unlocks and Game State")
 	TMap<FName, bool> Booleans;
 
+	UPROPERTY(VisibleAnywhere, Category = "Missions")
+	TArray<FName> Missions;
+
 	const float SECONDS_DAY_LENGTH = 86400.f;
 
 	UFUNCTION()

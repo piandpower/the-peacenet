@@ -63,6 +63,43 @@ APeacenetWorldStateActor::APeacenetWorldStateActor()
 
 }
 
+bool APeacenetWorldStateActor::StartMission(UMissionAsset * InMission, USystemContext * InMissionSystem)
+{
+	check(InMission);
+	check(InMissionSystem);
+	check(!InMission->InternalID.ToString().IsEmpty());
+	check(InMissionSystem->Computer.OwnerType == EComputerOwnerType::Player);
+
+	check(!this->CurrentMissionAsset);
+	check(!this->MissionContext);
+
+	check(this->SaveGame);
+	check(this->GameType);
+	check(this->GameType->EnableMissions);
+
+	if (!this->SaveGame->Missions.Contains(InMission->InternalID))
+	{
+		for (auto Prerequisite : InMission->Prerequisites)
+		{
+			if (!this->SaveGame->Missions.Contains(Prerequisite->InternalID))
+			{
+				return false;
+			}
+		}
+
+		// if we make it this far, we can start the mission.
+		this->CurrentMissionAsset = InMission;
+		this->MissionContext = InMissionSystem;
+
+		if (InMissionSystem->Desktop)
+		{
+			InMissionSystem->Desktop->EnqueueNotification(FText::FromString("Mission start"), InMission->MissionName, nullptr);
+		}
+	}
+
+	return false;
+}
+
 // Loads all the terminal commands in the game
 void APeacenetWorldStateActor::LoadTerminalCommands()
 {
@@ -274,8 +311,16 @@ void APeacenetWorldStateActor::StartGame()
 
 					SystemContexts.Add(PlayerContext);
 
-
 					PlayerSystemReady.Broadcast(PlayerContext);
+
+					// If we have missions enabled, and we have a tutorial, and it's not complete, we should start that mission.
+					if (this->GameType->EnableMissions)
+					{
+						if (this->GameType->TutorialMission && !this->SaveGame->Missions.Contains(this->GameType->TutorialMission->InternalID))
+						{
+							this->StartMission(this->GameType->TutorialMission, PlayerContext);
+						}
+					}
 				});
 			});
 		});

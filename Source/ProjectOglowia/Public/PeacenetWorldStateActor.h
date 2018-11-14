@@ -71,6 +71,9 @@ private:
 	UPROPERTY()
 	TArray<UMissionAsset*> Missions;
 
+	UPROPERTY()
+	USystemContext* MissionContext;
+
 public:	
 	UFUNCTION()
 	void SaveWorld();
@@ -118,6 +121,9 @@ public:
 	APeacenetWorldStateActor();
 
 private:
+	UFUNCTION()
+	bool StartMission(UMissionAsset* InMission, USystemContext* InMissionSystem);
+
 	UPROPERTY()
 	TArray<USystemContext*> SystemContexts;
 

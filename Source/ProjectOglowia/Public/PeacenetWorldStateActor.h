@@ -81,6 +81,9 @@ private:
 	UPROPERTY()
 	ULatentMissionAction* CurrentLatentMissionAction;
 
+	UFUNCTION()
+	void CompleteMission();
+
 public:	
 	UFUNCTION()
 	void SaveWorld();

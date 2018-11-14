@@ -43,6 +43,9 @@ protected:
 	UImageLoader* ImageLoader;
 
 public:
+	UFUNCTION(BlueprintImplementableEvent, Category = "Missions")
+	void OnMissionCompleted(const UMissionAsset* InMission, const USystemContext* InMissionContext);
+
 	UPROPERTY()
 	USystemContext * SystemContext;
 

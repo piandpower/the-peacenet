@@ -262,7 +262,7 @@ void APeacenetWorldStateActor::Tick(float DeltaTime)
 				}
 				else
 				{
-					// The mission is most probably completed.
+					this->CompleteMission();
 				}
 			}
 		}
@@ -563,6 +563,26 @@ APeacenetWorldStateActor* APeacenetWorldStateActor::GenerateAndCreateWorld(const
 
 	// Give our new Peacenet back to the Blueprint land or whoever else happened to call us.
 	return NewPeacenet;
+}
+
+void APeacenetWorldStateActor::CompleteMission()
+{
+	check(CurrentMissionAsset);
+	check(CurrentMissionActions.Num() == 0);
+
+	check(MissionContext);
+	
+	if (MissionContext->Desktop)
+	{
+		MissionContext->Desktop->OnMissionCompleted(CurrentMissionAsset, MissionContext);
+	}
+
+	CurrentMissionAsset = nullptr;
+	MissionContext = nullptr;
+
+	CurrentLatentMissionAction = nullptr;
+
+	this->SaveWorld();
 }
 
 void APeacenetWorldStateActor::SaveWorld()

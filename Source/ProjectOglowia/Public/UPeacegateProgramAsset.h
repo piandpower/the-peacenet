@@ -31,6 +31,9 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Missions")
 	void StartMission(UMissionAsset* InMissionAsset);
 
+	UFUNCTION(BlueprintCallable, Category = "Desktop")
+		void PushNotification(const FText& InNotificationMessage);
+
 public:
 	UFUNCTION(BlueprintCallable, Category = "Peacegate")
 	static UProgram* CreateProgram(const TSubclassOf<UWindow> InWindowClass, const TSubclassOf<UProgram> InProgramClass, USystemContext* InSystem, const int InUserID, UWindow*& OutWindow);

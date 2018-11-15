@@ -9,6 +9,11 @@
 #include "PeacenetWorldStateActor.h"
 #include "Kismet/GameplayStatics.h"
 
+void UProgram::PushNotification(const FText & InNotificationMessage)
+{
+	this->Window->SystemContext->Desktop->EnqueueNotification(this->Window->WindowTitle, InNotificationMessage, this->Window->Icon);
+}
+
 UProgram* UProgram::CreateProgram(const TSubclassOf<UWindow> InWindow, const TSubclassOf<UProgram> InProgramClass, USystemContext* InSystem, const int InUserID, UWindow*& OutWindow)
 {
 	check(InSystem->Peacenet);

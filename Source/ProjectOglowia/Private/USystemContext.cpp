@@ -53,7 +53,7 @@ bool USystemContext::OpenProgram(FName InExecutableName)
 		{
 			UWindow* MyWindow = nullptr;
 
-			UProgram* MyProgram = UProgram::CreateProgram(Peacenet, Peacenet->WindowClass, Program->ProgramClass, this, Desktop->UserID, MyWindow);
+			UProgram* MyProgram = UProgram::CreateProgram(Peacenet->WindowClass, Program->ProgramClass, this, Desktop->UserID, MyWindow);
 
 			if (MyWindow && MyProgram)
 			{

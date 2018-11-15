@@ -15,7 +15,7 @@ void UGraphicalTerminalCommand::RunCommand(UConsoleContext * InConsole, const TM
 {
 	UWindow* OutputWindow = nullptr;
 
-	UProgram* Program = UProgram::CreateProgram(InConsole->SystemContext->Peacenet, InConsole->SystemContext->Peacenet->WindowClass, this->ProgramAsset->ProgramClass, InConsole->SystemContext, InConsole->UserID, OutputWindow);
+	UProgram* Program = UProgram::CreateProgram(InConsole->SystemContext->Peacenet->WindowClass, this->ProgramAsset->ProgramClass, InConsole->SystemContext, InConsole->UserID, OutputWindow);
 
 	OutputWindow->WindowTitle = this->ProgramAsset->AppLauncherItem.Name;
 	OutputWindow->Icon = this->ProgramAsset->AppLauncherItem.Icon;

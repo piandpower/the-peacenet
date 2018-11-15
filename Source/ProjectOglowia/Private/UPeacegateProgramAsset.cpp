@@ -9,9 +9,11 @@
 #include "PeacenetWorldStateActor.h"
 #include "Kismet/GameplayStatics.h"
 
-UProgram* UProgram::CreateProgram(const APeacenetWorldStateActor* InWorldState, const TSubclassOf<UWindow> InWindow, const TSubclassOf<UProgram> InProgramClass, USystemContext* InSystem, const int InUserID, UWindow*& OutWindow)
+UProgram* UProgram::CreateProgram(const TSubclassOf<UWindow> InWindow, const TSubclassOf<UProgram> InProgramClass, USystemContext* InSystem, const int InUserID, UWindow*& OutWindow)
 {
-	APlayerController* MyPlayer = UGameplayStatics::GetPlayerController(InWorldState->GetWorld(), 0);
+	check(InSystem->Peacenet);
+
+	APlayerController* MyPlayer = UGameplayStatics::GetPlayerController(InSystem->Peacenet->GetWorld(), 0);
 
 	// The window is what contains the program's UI.
 	UWindow* Window = CreateWidget<UWindow, APlayerController>(MyPlayer, InWindow);
@@ -225,7 +227,7 @@ bool UProgram::OpenFile(const FString & InPath, EProgramFileOpenStatus & OutStat
 	TSubclassOf<UWindow> WindowClass(Window->GetClass());
 
 	UWindow* NewWindow;
-	UProgram* NewProgram = UProgram::CreateProgram(Window->SystemContext->Peacenet, WindowClass, ProgramAsset->ProgramClass, Window->SystemContext, Window->UserID, NewWindow);
+	UProgram* NewProgram = UProgram::CreateProgram(WindowClass, ProgramAsset->ProgramClass, Window->SystemContext, Window->UserID, NewWindow);
 
 	NewWindow->WindowTitle = ProgramAsset->AppLauncherItem.Name;
 	NewWindow->Icon = ProgramAsset->AppLauncherItem.Icon;

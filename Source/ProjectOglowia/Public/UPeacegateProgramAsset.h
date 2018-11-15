@@ -33,7 +33,7 @@ protected:
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "Peacegate")
-	static UProgram* CreateProgram(const APeacenetWorldStateActor* InWorldState, const TSubclassOf<UWindow> InWindowClass, const TSubclassOf<UProgram> InProgramClass, USystemContext* InSystem, const int InUserID, UWindow*& OutWindow);
+	static UProgram* CreateProgram(const TSubclassOf<UWindow> InWindowClass, const TSubclassOf<UProgram> InProgramClass, USystemContext* InSystem, const int InUserID, UWindow*& OutWindow);
 	
 	UFUNCTION(BlueprintCallable, Category = "Missions")
 	bool GetAvailableMissions(TArray<UMissionAsset*>& OutMissions);

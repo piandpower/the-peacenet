@@ -10,6 +10,7 @@
 
 class UConsoleContext;
 class UPTerminalWidget;
+class UMissionAsset;
 class APeacenetWorldStateActor;
 
 UENUM(BlueprintType)
@@ -26,9 +27,22 @@ class PROJECTOGLOWIA_API UProgram : public UUserWidget
 {
 	GENERATED_BODY()
 
+protected:
+	UFUNCTION(BlueprintCallable, Category = "Missions")
+	void StartMission(UMissionAsset* InMissionAsset);
+
 public:
 	UFUNCTION(BlueprintCallable, Category = "Peacegate")
 	static UProgram* CreateProgram(const APeacenetWorldStateActor* InWorldState, const TSubclassOf<UWindow> InWindowClass, const TSubclassOf<UProgram> InProgramClass, USystemContext* InSystem, const int InUserID, UWindow*& OutWindow);
+	
+	UFUNCTION(BlueprintCallable, Category = "Missions")
+	bool GetAvailableMissions(TArray<UMissionAsset*>& OutMissions);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Missions")
+	bool IsMissionActive();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Missions")
+	bool MissionsEnabled();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Peacegate")
 	FText GetUsername();
@@ -61,7 +75,6 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Program")
 	void FileOpened(const FString& InPath);
-
 protected:
 	UFUNCTION()
 	virtual void NativeProgramLaunched();

@@ -7,6 +7,7 @@
 #include "UPeacegateProgramAsset.h"
 #include "WallpaperAsset.h"
 #include "UMissionAsset.h"
+#include "UMissionUnlock.h"
 #include "CommandInfo.h"
 #include "TerminalCommand.h"
 #include "AssetRegistry/Public/IAssetRegistry.h"
@@ -91,6 +92,12 @@ bool APeacenetWorldStateActor::StartMission(UMissionAsset * InMission, USystemCo
 		this->CurrentMissionAsset = InMission;
 		this->MissionContext = InMissionSystem;
 
+		// We need a save file to go back to if the player abandons/restarts the mission.
+		this->MissionStartSaveGame = DuplicateObject<UPeacenetSaveGame>(this->SaveGame, this);
+
+		// Clear the mission unlock list.
+		this->MissionUnlocks.Empty();
+
 		// Now, we need to get a DUPLICATE ARRAY of mission actions.
 		// We need to duplicate every action so that the player doesn't fuck up the mission's data asset
 		// by completing objectives. The way UE4's data asset system works, that is completely possible.
@@ -108,6 +115,8 @@ bool APeacenetWorldStateActor::StartMission(UMissionAsset * InMission, USystemCo
 		{
 			InMissionSystem->Desktop->EnqueueNotification(FText::FromString("Mission start"), InMission->MissionName, nullptr);
 		}
+
+		return true;
 	}
 
 	return false;
@@ -215,7 +224,7 @@ void APeacenetWorldStateActor::Tick(float DeltaTime)
 		}
 
 		// Are we in a mission?
-		if (CurrentMissionAsset && MissionContext)
+		if (CurrentMissionAsset && MissionContext && !bIsMissionPaused)
 		{
 			// Do we have a latent action in progress?
 			if (CurrentLatentMissionAction)
@@ -230,7 +239,11 @@ void APeacenetWorldStateActor::Tick(float DeltaTime)
 				}
 				else if (this->CurrentLatentMissionAction->IsFailed())
 				{
-					// Do something.
+					// Announce that the mission's been failed.
+					MissionContext->Desktop->OnMissionFailed(CurrentMissionAsset, MissionContext, CurrentLatentMissionAction->GetFailReasonText());
+				
+					// Stop ticking the mission.
+					bIsMissionPaused = true;
 				}
 			}
 			else
@@ -241,24 +254,34 @@ void APeacenetWorldStateActor::Tick(float DeltaTime)
 					// Pull down the first action.
 					UMissionAction* NextAction = this->CurrentMissionActions[0];
 					
+					// Is it latent?
+					if (NextAction->IsA<ULatentMissionAction>())
+					{
+						// We've hit a checkpoint, so back up the save file.
+						this->CheckpointSaveGame = DuplicateObject<UPeacenetSaveGame>(this->SaveGame, this);
+
+						// Do the same for mission unlocks.
+						this->CheckpointMissionUnlocks = this->MissionUnlocks;
+
+						// Now we need to create a checkpoint array of all mission actions at/after this point.
+						// So we need to empty it.
+						this->CheckpointMissionActions.Empty();
+
+						// And this does the duplication.
+						for (auto Action : this->CurrentMissionActions)
+						{
+							this->CheckpointMissionActions.Add(DuplicateObject<UMissionAction>(Action, this));
+						}
+
+						// Assign it as our current latent action.
+						this->CurrentLatentMissionAction = Cast<ULatentMissionAction>(NextAction);
+					}
+				
 					// We essentially de-queue it.
 					this->CurrentMissionActions.RemoveAt(0);
 
 					// Then we execute it.
 					NextAction->ExecuteMissionAction();
-
-					// Is it latent?
-					if (NextAction->IsA<ULatentMissionAction>())
-					{
-						// TODO: Duplicate the current save file and store it in memory.
-						// That way, if the action fails, the player can easily start from this action and try again.
-						// We may need to make sure that all system contexts are rolled back when we restore that save file, though.
-						// That is, to roll back all player/npc filesystems.
-						// Every latent action is treated as a checkpoint, basically.
-
-						// Assign it as our current latent action.
-						this->CurrentLatentMissionAction = Cast<ULatentMissionAction>(NextAction);
-					}
 				}
 				else
 				{
@@ -449,6 +472,11 @@ bool APeacenetWorldStateActor::LoadAssets(FName ClassName, TArray<AssetType*>& O
 	return true;
 }
 
+bool APeacenetWorldStateActor::IsMissionActive()
+{
+	return this->CurrentMissionAsset;
+}
+
 bool APeacenetWorldStateActor::HasExistingOS()
 {
 	return UGameplayStatics::DoesSaveGameExist(TEXT("PeacegateOS"), 0);
@@ -574,15 +602,50 @@ void APeacenetWorldStateActor::CompleteMission()
 	
 	if (MissionContext->Desktop)
 	{
-		MissionContext->Desktop->OnMissionCompleted(CurrentMissionAsset, MissionContext);
+		MissionContext->Desktop->OnMissionCompleted(CurrentMissionAsset, MissionContext, MissionUnlocks);
 	}
+
+	SaveGame->Missions.Add(CurrentMissionAsset->InternalID);
 
 	CurrentMissionAsset = nullptr;
 	MissionContext = nullptr;
 
 	CurrentLatentMissionAction = nullptr;
 
+	CheckpointSaveGame = nullptr;
+	MissionStartSaveGame = nullptr;
+	CheckpointMissionActions.Empty();
+	CheckpointMissionUnlocks.Empty();
+	MissionUnlocks.Empty();
+
+	
+
 	this->SaveWorld();
+}
+
+void APeacenetWorldStateActor::ResynchronizeSystemContexts()
+{
+	for (auto Context : SystemContexts)
+	{
+		int ComputerID = Context->Computer.ID;
+		int CharacterID = Context->Character.ID;
+
+		for (auto Computer : SaveGame->Computers)
+		{
+			if (Computer.ID == ComputerID)
+			{
+				Context->Computer = Computer;
+			}
+		}
+
+		for (auto Character : SaveGame->Characters)
+		{
+			if (Character.ID == CharacterID)
+			{
+				Context->Character = Character;
+			}
+		}
+	}
 }
 
 void APeacenetWorldStateActor::SaveWorld()

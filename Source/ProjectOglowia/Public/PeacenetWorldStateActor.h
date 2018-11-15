@@ -18,6 +18,7 @@ class UPeacegateProgramAsset;
 class UTerminalCommand;
 class UCommandInfo;
 class UWindow;
+class UMissionUnlock;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPlayerSystemContextReadyEvent, USystemContext*, InSystemContext);
 DECLARE_DYNAMIC_DELEGATE_OneParam(FShowLoadingScreenEvent, UWorldGeneratorStatus*, InStatus);
@@ -64,13 +65,27 @@ class PROJECTOGLOWIA_API APeacenetWorldStateActor : public AActor
 	
 private:
 	UPROPERTY()
+	bool bIsMissionPaused = false;
+
+	UPROPERTY()
+	UPeacenetSaveGame* MissionStartSaveGame;
+
+	UPROPERTY()
+	UPeacenetSaveGame* CheckpointSaveGame;
+
+public:
+	UPROPERTY()
+	TArray<UMissionUnlock*> MissionUnlocks;
+
+private:
+	UPROPERTY()
+	TArray<UMissionUnlock*> CheckpointMissionUnlocks;
+
+	UPROPERTY()
 	UMissionAsset* CurrentMissionAsset;
 
 	UFUNCTION()
 	void LoadTerminalCommands();
-
-	UPROPERTY()
-	TArray<UMissionAsset*> Missions;
 
 	UPROPERTY()
 	USystemContext* MissionContext;
@@ -79,12 +94,21 @@ private:
 	TArray<UMissionAction*> CurrentMissionActions;
 
 	UPROPERTY()
+	TArray<UMissionAction*> CheckpointMissionActions;
+
+	UPROPERTY()
 	ULatentMissionAction* CurrentLatentMissionAction;
 
 	UFUNCTION()
 	void CompleteMission();
 
+	UFUNCTION()
+	void ResynchronizeSystemContexts();
+
 public:	
+	UPROPERTY()
+	TArray<UMissionAsset*> Missions;
+
 	UFUNCTION()
 	void SaveWorld();
 
@@ -130,9 +154,11 @@ public:
 	// Sets default values for this actor's properties
 	APeacenetWorldStateActor();
 
-private:
+public:
 	UFUNCTION()
 	bool StartMission(UMissionAsset* InMission, USystemContext* InMissionSystem);
+
+private:
 
 	UPROPERTY()
 	TArray<USystemContext*> SystemContexts;
@@ -162,6 +188,9 @@ public:
 public:
 	UPROPERTY()
 	UWorldGeneratorStatus* WorldGeneratorStatus = nullptr;
+
+	UFUNCTION()
+	bool IsMissionActive();
 
 public:
 	// Used by the Ubiquity menu to see if the "Boot existing OS" screen should show.

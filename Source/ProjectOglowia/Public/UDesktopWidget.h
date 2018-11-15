@@ -44,7 +44,10 @@ protected:
 
 public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Missions")
-	void OnMissionCompleted(const UMissionAsset* InMission, const USystemContext* InMissionContext);
+	void OnMissionCompleted(const UMissionAsset* InMission, const USystemContext* InMissionContext, const TArray<UMissionUnlock*>& InMissionUnlocks);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Missions")
+	void OnMissionFailed(const UMissionAsset* InMission, const USystemContext* InMissionContext, const FString& InFailReason);
 
 	UPROPERTY()
 	USystemContext * SystemContext;

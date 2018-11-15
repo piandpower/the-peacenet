@@ -8,6 +8,8 @@
 #include "UMissionAction.h"
 #include "UMissionAsset.generated.h"
 
+class UMissionUnlock;
+
 /** 
  * Contains information about a mission action to start.
  */
@@ -40,8 +42,17 @@ public:
 	FText Description;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	FText Author;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	TArray<UMissionAsset*> Prerequisites;
 
-	UPROPERTY(BlueprintReadOnly, Editanywhere)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	TArray<FMissionActionInfo> Actions;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	bool IsSideMission = false;
+
+	UFUNCTION(BlueprintCallable, Category = "Missions")
+	bool GetUnlocks(TArray<UMissionUnlock*>& OutUnlocks);
 };

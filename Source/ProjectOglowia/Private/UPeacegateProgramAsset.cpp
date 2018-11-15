@@ -3,6 +3,7 @@
 #include "UPeacegateProgramAsset.h"
 #include "CommonUtils.h"
 #include "PTerminalWidget.h"
+#include "UMissionAsset.h"
 #include "UConsoleContext.h"
 #include "UPeacegateFileSystem.h"
 #include "PeacenetWorldStateActor.h"
@@ -37,6 +38,63 @@ UProgram* UProgram::CreateProgram(const APeacenetWorldStateActor* InWorldState, 
 void UProgram::ShowInfoWithCallbacks(const FText & InTitle, const FText & InMessage, const EInfoboxIcon InIcon, const EInfoboxButtonLayout ButtonLayout, const bool ShowTextInput, const FInfoboxDismissedEvent & OnDismissed, const FInfoboxInputValidator & ValidatorFunction)
 {
 	Window->ShowInfoWithCallbacks(InTitle, InMessage, InIcon, ButtonLayout, ShowTextInput, OnDismissed, ValidatorFunction);
+}
+
+void UProgram::StartMission(UMissionAsset* InMissionAsset)
+{
+	if (!this->IsMissionActive() && this->MissionsEnabled())
+	{
+		if (this->Window->SystemContext->Peacenet->StartMission(InMissionAsset, this->Window->SystemContext))
+		{
+			this->Window->Close();
+		}
+	}
+}
+
+bool UProgram::GetAvailableMissions(TArray<UMissionAsset*>& OutMissions)
+{
+	if (this->IsMissionActive() || !this->MissionsEnabled())
+	{
+		return false;
+	}
+
+	for (auto Mission : this->Window->SystemContext->Peacenet->Missions)
+	{
+		if (this->Window->SystemContext->Peacenet->SaveGame->Missions.Contains(Mission->InternalID))
+			continue;
+
+		bool shouldAdd = true;
+
+		for (auto SubMission : Mission->Prerequisites)
+		{
+			if (!this->Window->SystemContext->Peacenet->SaveGame->Missions.Contains(SubMission->InternalID))
+			{
+				shouldAdd = false;
+				break;
+			}
+		}
+
+		if (shouldAdd)
+		{
+			OutMissions.Add(Mission);
+		}
+	}
+	
+	return OutMissions.Num() > 0;
+}
+
+bool UProgram::IsMissionActive()
+{
+	return this->Window->SystemContext->Peacenet->IsMissionActive();
+}
+
+bool UProgram::MissionsEnabled()
+{
+	if (this->Window->SystemContext->Computer.OwnerType != EComputerOwnerType::Player)
+	{
+		return false;
+	}
+	return this->Window->SystemContext->Peacenet->GameType->EnableMissions;
 }
 
 FText UProgram::GetUsername()

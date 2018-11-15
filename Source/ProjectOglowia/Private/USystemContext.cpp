@@ -193,7 +193,19 @@ bool USystemContext::Authenticate(const FString & Username, const FString & Pass
 
 bool USystemContext::GetSuitableProgramForFileExtension(const FString & InExtension, UPeacegateProgramAsset *& OutProgram)
 {
-
+	for (auto ProgramName : Computer.InstalledPrograms)
+	{
+		UPeacegateProgramAsset* Program;
+		if (!Peacenet->FindProgramByName(ProgramName, Program))
+		{
+			continue;
+		}
+		if (Program->SupportedFileExtensions.Contains(InExtension))
+		{
+			OutProgram = Program;
+			return true;
+		}
+	}
 	return false;
 }
 

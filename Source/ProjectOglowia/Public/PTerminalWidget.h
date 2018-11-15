@@ -30,6 +30,13 @@ public:
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStdInCharWrittenEvent, const FText&, Character);
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStdInLineWrittenEvent, const FText&, Text);
 	DECLARE_DYNAMIC_DELEGATE_RetVal(UFont*, FGetFont);
+	
+private:
+	UPROPERTY()
+	float ZoomFactor = 1.f;
+
+	UFUNCTION()
+	FSlateFontInfo ZoomText(FSlateFontInfo InFont) const;
 
 public:
 

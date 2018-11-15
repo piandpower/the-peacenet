@@ -31,6 +31,13 @@ UPTerminalWidget::UPTerminalWidget(const FObjectInitializer& ObjectInitializer)
 
 }
 
+FSlateFontInfo UPTerminalWidget::ZoomText(FSlateFontInfo InFont) const
+{
+	FSlateFontInfo Zoomed = FSlateFontInfo(InFont);
+	Zoomed.Size = (int)(Zoomed.Size * ZoomFactor);
+	return Zoomed;
+}
+
 void UPTerminalWidget::Exit()
 {
 	OnExit.Broadcast();
@@ -172,9 +179,9 @@ int32 UPTerminalWidget::NativePaint(const FPaintArgs& Args, const FGeometry& All
 	const UFont* FontPtr = Cast<UFont>(font.FontObject);
 
 	//The width of a character.
-	float char_w = CharacterWidth;
+	float char_w = CharacterWidth * ZoomFactor;
 	//The height of a character.
-	float char_h = CharacterHeight;
+	float char_h = CharacterHeight * ZoomFactor;
 
 	TArray<TCHAR> arr = TextBuffer.GetCharArray();
 
@@ -230,7 +237,7 @@ int32 UPTerminalWidget::NativePaint(const FPaintArgs& Args, const FGeometry& All
 
 		if (Last != TEXT('\0'))
 		{
-			kerning = FontPtr->GetCharKerning(Last, c);
+			kerning = FontPtr->GetCharKerning(Last, c) * ZoomFactor;
 		}
 
 		// If the character is a tab ('\t'), handle it.
@@ -276,6 +283,8 @@ int32 UPTerminalWidget::NativePaint(const FPaintArgs& Args, const FGeometry& All
 			continue;
 
 		FontPtr->GetCharSize(c, char_w, char_h);
+		char_w = char_w * ZoomFactor;
+		char_h = char_h * ZoomFactor;
 
 		char_x += kerning;
 
@@ -306,7 +315,7 @@ int32 UPTerminalWidget::NativePaint(const FPaintArgs& Args, const FGeometry& All
 			LayerId,
 			AllottedGeometry.ToOffsetPaintGeometry(FVector2D(char_x, char_y)),
 			FText::FromString(FString::Chr(c)),
-			font,
+			this->ZoomText(font),
 			ESlateDrawEffect::None,
 			ColorPalette[term_fg_color]);
 
@@ -420,6 +429,27 @@ FReply UPTerminalWidget::NativeOnKeyChar(const FGeometry & InGeometry, const FCh
 {	
 	TCHAR c = InCharEvent.GetCharacter();
 
+	if (InCharEvent.IsControlDown() || InCharEvent.IsCommandDown())
+	{
+		if (c == TEXT('-'))
+		{
+			if (ZoomFactor - 0.25f < 1.f)
+			{
+				ZoomFactor = 1.f;
+			}
+			else
+			{
+				ZoomFactor -= 0.25f;
+			}
+			return FReply::Handled();
+		}
+		else if (c == TEXT('='))
+		{
+			ZoomFactor += 0.25f;
+			return FReply::Handled();
+		}
+	}
+
 	if (c == TEXT('\b'))
 	{
 		if (!TextInputBuffer.IsEmpty())
@@ -479,45 +509,69 @@ FSlateFontInfo UPTerminalWidget::GetUnrealFont(uint8 fontType) const
 
 float UPTerminalWidget::GetLineHeight()
 {
-	float maxWidth = GeometrySize.X;
+	// Get the size in pixels of the geometry so we know how big our widget is.
+	FVector2D size = this->GetCachedGeometry().GetLocalSize();
 
-	float x = 0;
-	float y = 0;
+	uint8 term_font = 0; // What kind of font are we using?
+	uint8 term_bg_color = 0; //What entry in the color palette are we using for the background?
+	uint8 term_fg_color = 1; //What entry in the color palette are we using for the foreground?
 
-	float char_w = CharacterWidth;
-	float char_h = CharacterHeight;
+	float char_x = 0.f; //Where will the character be rendered on the X coordinate?
+	float char_y = 0.f; //The current text position on the Y axis, accounting for the scroll offset.
 
-	bool skipEscape = false;
+	bool bSkipEscape = false; //Should we skip reading an escape sequence when we come across a char '`'?
+
+	FSlateFontInfo font = this->GetUnrealFont(term_font); //Grab the regular font.
+	const UFont* FontPtr = Cast<UFont>(font.FontObject);
+
+	//The width of a character.
+	float char_w = CharacterWidth * ZoomFactor;
+	//The height of a character.
+	float char_h = CharacterHeight * ZoomFactor;
 
 	TArray<TCHAR> arr = TextBuffer.GetCharArray();
 
-	int arrNum = arr.Num();
+	TCHAR Last = TEXT('\0');
 
-	uint8 dummy = 0;
+	//How many elements are in the text array?
+	int arrNum = arr.Num();
 
 	for (int i = 0; i < arrNum; i++)
 	{
+
+		//Get the character.
 		TCHAR c = arr[i];
 
-		if (c == TEXT('`'))
-		{
-			if (skipEscape)
+		// Handle reading an escape sequence if the current char is a backtick (`).
+		if (c == TEXT('`')) {
+			if (bSkipEscape)
 			{
-				skipEscape = false;
+				//Skip this escape, but set bSkipEscape to false for the next value.
+				bSkipEscape = false;
 			}
 			else {
+				//If we're not the last char in the array:
 				if (i < arrNum - 1)
 				{
-					TCHAR e = arr[i + 1];
+					//Seek ahead to the next char.
+					TCHAR nextChar = arr[i + 1];
 
-					if (e == TEXT('`'))
+					//Skip if it's a backtick. Double-backticks mean "render a literal backtick."
+					if (nextChar == TEXT('`'))
 					{
-						skipEscape = true;
+						bSkipEscape = true;
 						continue;
 					}
 
-					if (ParseEscape(e, dummy, dummy))
+					//Attempt to parse the escape sequence. If it succeeds, i += 1 and continue.
+					if (ParseEscape(nextChar, term_font, term_fg_color))
 					{
+						//update font from font code
+						font = this->GetUnrealFont(term_font);
+
+						// update the ufont ptr
+						FontPtr = Cast<UFont>(font.FontObject);
+
 						i++;
 						continue;
 					}
@@ -525,34 +579,88 @@ float UPTerminalWidget::GetLineHeight()
 			}
 		}
 
+		float kerning = 0.f;
+
+		if (Last != TEXT('\0'))
+		{
+			kerning = FontPtr->GetCharKerning(Last, c) * ZoomFactor;
+		}
+
+		// If the character is a tab ('\t'), handle it.
+		if (c == TEXT('\t'))
+		{
+			// Get remainder of char_x divided by 8 * char_w.
+			float space = FMath::Fmod(char_x, char_w * 8);
+
+			// Realistically, truncating the value won't make much of a difference.
+			// But we'll store it as a float simply to make Unreal's life easier.
+			// All we need to do is add this value to char_x.
+			char_x += (char_w * 8) - space;
+
+			Last = TEXT('\0');
+
+			// Go to next char.
+			continue;
+		}
+
+		//return to char 0 if we're a \r
 		if (c == TEXT('\r'))
 		{
-			x = 0;
+			char_x = 0;
+			kerning = 0;
+			Last = TEXT('\0');
 			continue;
 		}
 
+		if (c == TEXT('\0'))
+			break; //Stop rendering at a null terminator because this is C++. I hate this.
+
+		//Drop down to a new line.
 		if (c == TEXT('\n'))
 		{
-			x = 0;
-			y += char_h;
+			char_x = 0;
+			char_y += char_h;
+			Last = TEXT('\0');
+			continue;
 		}
 
-		//if tab, backspace, null or vertical tab, fuck off.
-		if (c == TEXT('\t') || c == TEXT('\v') || c == TEXT('\b') || c == TEXT('\0'))
+		//Skip vertical tabs.
+		if (c == TEXT('\v'))
 			continue;
 
-		if (x + char_w > maxWidth)
+		FontPtr->GetCharSize(c, char_w, char_h);
+		char_w = char_w * ZoomFactor;
+		char_h = char_h * ZoomFactor;
+
+		char_x += kerning;
+
+		//If char_x + char_w is greater than our width, drop down to a new line.
+		if (char_x + char_w > size.X)
 		{
-			x = 0;
-			y += char_h;
-		}
-		else {
-			x += char_w;
+			kerning = 0;
+			Last = TEXT('\0');
+			char_x = 0;
+			char_y += char_h;
 		}
 
+		//if char_y is >= our control's height, we have NO REASON to continue rendering.
+		if (char_y >= size.Y)
+			break;
+
+		Last = c;
+
+		//Advance the x coordinate by a single char.
+		char_x += char_w;
 	}
 
-	return y + char_h;
+	//One last time so the cursor isn't cut off and is an accurate representation of where new text will be placed.
+	if (char_x + char_w > size.X)
+	{
+		char_x = 0;
+		char_y += char_h;
+	}
+
+	return char_y + char_h;
 }
 
 bool UPTerminalWidget::ParseEscape(TCHAR character, uint8 & termFont, uint8 & termForegroundColorCode) const

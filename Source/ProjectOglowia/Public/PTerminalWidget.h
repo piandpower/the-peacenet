@@ -144,7 +144,7 @@ public:
 	virtual FReply NativeOnKeyChar(const FGeometry& InGeometry, const FCharacterEvent& InCharEvent) override;
 	virtual bool NativeIsInteractable() const override { return true; }
 	virtual bool NativeSupportsKeyboardFocus() const override { return true; }
-
+	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
 
 
 #if WITH_EDITOR
@@ -160,6 +160,14 @@ protected:
 	PROPERTY_BINDING_IMPLEMENTATION(FSlateFontInfo, ItalicTextFont);
 	PROPERTY_BINDING_IMPLEMENTATION(FSlateFontInfo, BoldItalicTextFont);
 
+public:
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FTerminalZoomedEvent, float, InNewCharWidth, float, InNewCharHeight);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Terminal")
+	void TerminalZoomed(float NewCharWidth, float NewCharHeight);
+
+	UPROPERTY(BlueprintAssignable)
+	FTerminalZoomedEvent TerminalZoomedEvent;
 private:
 	bool bCursorActive = true;
 	float cursorTime = 0;

@@ -429,27 +429,6 @@ FReply UPTerminalWidget::NativeOnKeyChar(const FGeometry & InGeometry, const FCh
 {	
 	TCHAR c = InCharEvent.GetCharacter();
 
-	if (InCharEvent.IsControlDown() || InCharEvent.IsCommandDown())
-	{
-		if (c == TEXT('-'))
-		{
-			if (ZoomFactor - 0.25f < 1.f)
-			{
-				ZoomFactor = 1.f;
-			}
-			else
-			{
-				ZoomFactor -= 0.25f;
-			}
-			return FReply::Handled();
-		}
-		else if (c == TEXT('='))
-		{
-			ZoomFactor += 0.25f;
-			return FReply::Handled();
-		}
-	}
-
 	if (c == TEXT('\b'))
 	{
 		if (!TextInputBuffer.IsEmpty())
@@ -481,6 +460,53 @@ FReply UPTerminalWidget::NativeOnKeyChar(const FGeometry & InGeometry, const FCh
 	cursorTime = 0;
 
 	return FReply::Handled();
+}
+
+FReply UPTerminalWidget::NativeOnKeyDown(const FGeometry & InGeometry, const FKeyEvent & InKeyEvent)
+{
+	TCHAR c = InKeyEvent.GetCharacter();
+
+	if (InKeyEvent.IsControlDown() || InKeyEvent.IsCommandDown())
+	{
+		if (c == TEXT('-'))
+		{
+			if (ZoomFactor - 0.25f < 1.f)
+			{
+				ZoomFactor = 1.f;
+			}
+			else
+			{
+				ZoomFactor -= 0.25f;
+			}
+			// Force the scroll offset to be recalculated.
+			NewTextAdded = true;
+
+			// Alert BP that we zoomed.
+			float NewCharWidth = this->CharacterWidth*ZoomFactor;
+			float NewCharHeight = this->CharacterHeight*ZoomFactor;
+			this->TerminalZoomed(NewCharWidth, NewCharHeight);
+			this->TerminalZoomedEvent.Broadcast(NewCharWidth, NewCharHeight);
+
+			return FReply::Handled();
+		}
+		else if (c == TEXT('='))
+		{
+			ZoomFactor += 0.25f;
+			// Force the scroll offset to be recalculated.
+			NewTextAdded = true;
+			
+			// Alert BP that we zoomed.
+			float NewCharWidth = this->CharacterWidth*ZoomFactor;
+			float NewCharHeight = this->CharacterHeight*ZoomFactor;
+			this->TerminalZoomed(NewCharWidth, NewCharHeight);
+			this->TerminalZoomedEvent.Broadcast(NewCharWidth, NewCharHeight);
+
+			return FReply::Handled();
+		}
+	}
+
+
+	return FReply::Unhandled();
 }
 
 #if WITH_EDITOR
@@ -642,10 +668,6 @@ float UPTerminalWidget::GetLineHeight()
 			char_x = 0;
 			char_y += char_h;
 		}
-
-		//if char_y is >= our control's height, we have NO REASON to continue rendering.
-		if (char_y >= size.Y)
-			break;
 
 		Last = c;
 

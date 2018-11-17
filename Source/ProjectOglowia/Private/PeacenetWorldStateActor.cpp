@@ -215,6 +215,33 @@ void APeacenetWorldStateActor::EndPlay(const EEndPlayReason::Type InReason)
 	this->SaveWorld();
 }
 
+bool APeacenetWorldStateActor::ResolveHost(FString InHost, FString& ResolvedIP, USystemContext*& ResolvedContext)
+{
+	// TODO: Business network resolving. Can't output a system context with that.
+	// TODO: This just checks the IP address, we should really implement some in-game version of DNS.
+	for(auto& Computer : this->SaveGame->Computers)
+	{
+		if(Computer.IPAddress == InHost)
+		{
+			ResolvedIP = Computer.IPAddress;
+			ResolvedContext = NewObject<USystemContext>();
+			ResolvedContext->Computer = Computer;
+			for(auto& Character : this->SaveGame->Characters)
+			{
+				if(Character.ComputerID == Computer.ID)
+				{
+					ResolvedContext->Character = Character;
+					break;
+				}
+			}
+			ResolvedContext->Peacenet = this;
+			this->SystemContexts.Add(ResolvedContext);
+			return true;
+		}
+	}
+	return false;
+}
+
 // Called every frame
 void APeacenetWorldStateActor::Tick(float DeltaTime)
 {

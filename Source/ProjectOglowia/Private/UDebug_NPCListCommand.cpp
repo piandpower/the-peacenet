@@ -1,7 +1,7 @@
 // Copyright (c) 2018 The Peacenet & Alkaline Thunder.
 
 #include "UDebug_NPCListCommand.h"
-#include "Math.h"
+#include "UnrealMathUtility.h"
 #include "CommonUtils.h"
 
 void UDebug_NPCListCommand::RunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments)

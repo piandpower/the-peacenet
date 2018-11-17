@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "UMissionUnlock.h"
 #include "UUnlockPack.h"
-#include "UMissionaction.h"
+#include "UMissionAction.h"
 #include "UUnlockAction.generated.h"
 
 /**

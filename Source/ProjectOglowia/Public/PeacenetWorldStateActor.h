@@ -106,6 +106,9 @@ private:
 	void ResynchronizeSystemContexts();
 
 public:	
+	UFUNCTION()
+	bool ResolveHost(FString InHost, FString& ResolvedIP, USystemContext*& ResolvedContext);
+
 	UPROPERTY()
 	TArray<UMissionAsset*> Missions;
 

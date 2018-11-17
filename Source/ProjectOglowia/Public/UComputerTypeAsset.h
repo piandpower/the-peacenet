@@ -32,4 +32,7 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UTexture2D* Icon;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	bool IsPlayerType = false;
 };

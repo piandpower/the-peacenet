@@ -173,6 +173,8 @@ protected:
 	virtual void EndPlay(const EEndPlayReason::Type InReason) override;
 	
 public:	
+	UPROPERTY()
+	TArray<UComputerTypeAsset*> ComputerTypes;
 
 	UFUNCTION()
 	bool FindProgramByName(FName InName, UPeacegateProgramAsset*& OutProgram);

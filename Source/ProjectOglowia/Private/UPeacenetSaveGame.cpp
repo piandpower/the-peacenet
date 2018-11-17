@@ -13,3 +13,15 @@ bool UPeacenetSaveGame::CharacterNameExists(FText CharacterName)
 	}
 	return false;
 }
+
+bool UPeacenetSaveGame::IPAddressAllocated(FString InIPAddress)
+{
+	for (auto& Computer : this->Computers)
+	{
+		if (Computer.IPAddress == InIPAddress)
+		{
+			return true;
+		}
+	}
+	return false;
+}

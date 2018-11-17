@@ -14,6 +14,8 @@
 #include "UWorldGenerator.generated.h"
 
 class USystemContext;
+class UComputerTypeAsset;
+class APeacenetWorldStateActor;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FWorldGenCompleteEvent);
 
@@ -115,7 +117,10 @@ public:
 	static FString GenerateRandomName(const FRandomStream& InGenerator, const TArray<FString> InFirstNames, TArray<FString> InLastNames);
 
 	UFUNCTION(BlueprintCallable, Category = "World Generation")
-	static UWorldGeneratorStatus* GenerateCharacters(const FRandomStream& InRandomStream, UPeacenetSaveGame* InSaveGame);
+	static UWorldGeneratorStatus* GenerateCharacters(const APeacenetWorldStateActor* InWorld, const FRandomStream& InRandomStream, UPeacenetSaveGame* InSaveGame);
+
+	UFUNCTION()
+	static FString GenerateIPAddress(const FRandomStream& InRandomStream, const ECountry InCountry, const FComputer& InComputer);
 
 	UFUNCTION()
 	static void GenerateSystemDirectories(USystemContext* InSystemContext);
@@ -127,7 +132,7 @@ public:
 	static FString GenerateWordString(UMarkovChain* InMarkovChain, int Length);
 
 	UFUNCTION()
-	static void CreateFilesystem(FComputer& InComputer, const FRandomStream& InGenerator);
+	static void CreateFilesystem(FPeacenetIdentity& InCharacter, FComputer& InComputer, const FRandomStream& InGenerator, FString InHostname = "");
 };
 
 class PROJECTOGLOWIA_API FWorldGenTask : public FNonAbandonableTask
@@ -135,16 +140,20 @@ class PROJECTOGLOWIA_API FWorldGenTask : public FNonAbandonableTask
 	friend class FAutoDeleteAsyncTask<FWorldGenTask>;
 
 public:
-	FWorldGenTask(UPeacenetSaveGame* InSaveGame, const FRandomStream InRandomStream, UWorldGeneratorStatus* InStatus, TArray<UMarkovTrainingDataAsset*> InTrainingData)
+	FWorldGenTask(UPeacenetSaveGame* InSaveGame, const FRandomStream InRandomStream, UWorldGeneratorStatus* InStatus, TArray<UMarkovTrainingDataAsset*> InTrainingData, TArray<UComputerTypeAsset*> InComputerTypes, UComputerTypeAsset* InPersonalComputerType)
 		: SaveGame(InSaveGame)
 		, RandomStream(InRandomStream)
 		, Status(InStatus)
-		, TrainingData(InTrainingData) {}
+		, TrainingData(InTrainingData)
+		, ComputerTypes(InComputerTypes)
+		, PersonalComputerType(InPersonalComputerType) {}
 
 	UPeacenetSaveGame* SaveGame;
 	FRandomStream RandomStream;
 	UWorldGeneratorStatus* Status;
 	TArray<UMarkovTrainingDataAsset*> TrainingData;
+	TArray<UComputerTypeAsset*> ComputerTypes;
+	UComputerTypeAsset* PersonalComputerType;
 
 	void DoWork();
 

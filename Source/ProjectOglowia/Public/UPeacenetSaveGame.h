@@ -59,4 +59,7 @@ public:
 
 	UFUNCTION()
 	bool CharacterNameExists(FText CharacterName);
+
+	UFUNCTION()
+	bool IPAddressAllocated(FString InIPAddress);
 };

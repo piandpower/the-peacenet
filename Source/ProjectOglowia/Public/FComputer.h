@@ -70,8 +70,8 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Computer")
 	EComputerOwnerType OwnerType = EComputerOwnerType::NPC;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Computer")
-	FText Hostname;
+	UPROPERTY(BlueprintReadOnly)
+	FString IPAddress;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Computer")
 	FName ComputerType = NAME_None;

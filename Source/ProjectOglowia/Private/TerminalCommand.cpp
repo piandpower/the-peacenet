@@ -37,6 +37,8 @@ void UHelpCommand::RunCommand(UConsoleContext* InConsole, const TMap<FString, UD
 
 	for (auto Command : InConsole->SystemContext->Computer.InstalledCommands)
 	{
+		if (!InConsole->SystemContext->Peacenet->ManPages.Contains(Command))
+			continue;
 		FManPage ManPage = InConsole->SystemContext->Peacenet->ManPages[Command];
 		CommandList.Add(Command, ManPage.Description);
 		int Length = Command.ToString().GetCharArray().Num();
@@ -56,7 +58,6 @@ void UHelpCommand::RunCommand(UConsoleContext* InConsole, const TMap<FString, UD
 
 		InConsole->WriteLine(TEXT("`8`*") + NameStr + TEXT("`r`1: ") + FString::ChrN(DistLength, TEXT(' ')) + CommandList[Name]);
 	}
-
 	this->Complete();
 }
 

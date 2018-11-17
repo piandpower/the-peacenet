@@ -34,6 +34,9 @@ class PROJECTOGLOWIA_API USystemContext : public UObject
 {
 	GENERATED_BODY()
 
+private:
+	FString CurrentHostname;
+
 public:
 	UPROPERTY()
 	APeacenetWorldStateActor * Peacenet;
@@ -52,7 +55,7 @@ public:
 	void UpdateSystemFiles();
 
 	UFUNCTION(BlueprintCallable, Category = "System Context")
-	FString GetHostname() const;
+	FString GetHostname();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "System Context")
 	TArray<UPeacegateProgramAsset*> GetInstalledPrograms();

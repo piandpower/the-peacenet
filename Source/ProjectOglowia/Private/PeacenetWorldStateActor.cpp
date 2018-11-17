@@ -194,6 +194,18 @@ void APeacenetWorldStateActor::BeginPlay()
 	// Load all the game's programs
 	LoadAssets(TEXT("PeacegateProgramAsset"), this->Programs);
 
+	LoadAssets("ComputerTypeAsset", ComputerTypes);
+
+	for (auto ComputerType : ComputerTypes)
+	{
+		if (ComputerType->IsPlayerType)
+		{
+			this->PlayerComputerType = ComputerType;
+		}
+	}
+
+	check(PlayerComputerType);
+
 	// Load terminal command assets, build usage strings, populate command map.
 	this->LoadTerminalCommands();
 }
@@ -530,7 +542,6 @@ APeacenetWorldStateActor* APeacenetWorldStateActor::GenerateAndCreateWorld(const
 	// Set its entity metadata.
 	PlayerComputer.ID = 0;
 	PlayerComputer.ComputerType = TEXT("c_desktop"); // TODO: shouldn't be hardcoded.
-	PlayerComputer.Hostname = InWorldInfo.PlayerHostname;
 	PlayerComputer.OwnerType = EComputerOwnerType::Player;
 
 	// Create a unix root user.
@@ -551,9 +562,6 @@ APeacenetWorldStateActor* APeacenetWorldStateActor::GenerateAndCreateWorld(const
 	PlayerComputer.Users.Add(RootUser);
 	PlayerComputer.Users.Add(PlayerUser);
 
-	// World generator can generate the computer's filesystem.
-	UWorldGenerator::CreateFilesystem(PlayerComputer, WorldGenerator);
-
 	// Now we create the Peacenet Identity for the player.
 	FPeacenetIdentity PlayerIdentity;
 	PlayerIdentity.ID = 0;
@@ -563,6 +571,10 @@ APeacenetWorldStateActor* APeacenetWorldStateActor::GenerateAndCreateWorld(const
 	PlayerIdentity.Skill = 0;
 	PlayerIdentity.Reputation = 0.f;
 	PlayerIdentity.ComputerID = PlayerComputer.ID;
+
+	// World generator can generate the computer's filesystem.
+	UWorldGenerator::CreateFilesystem(PlayerIdentity, PlayerComputer, WorldGenerator, InWorldInfo.PlayerHostname.ToString());
+
 
 	// Note: The save file would have been loaded as soon as the actor spawned - BeginPlay gets called during UWorld::SpawnActor.
 	// So, at this point, we've had a save file created and ready for us for a few CPU cycles now...
@@ -579,7 +591,7 @@ APeacenetWorldStateActor* APeacenetWorldStateActor::GenerateAndCreateWorld(const
 	WorldSave->Characters.Add(PlayerIdentity);
 
 	// And we can generate non-story NPCs.
-	auto Status = UWorldGenerator::GenerateCharacters(WorldGenerator, WorldSave);
+	auto Status = UWorldGenerator::GenerateCharacters(NewPeacenet, WorldGenerator, WorldSave);
 	InShowLoadingScreen.Execute(Status);
 	NewPeacenet->WorldGeneratorStatus = Status;
 

@@ -11,9 +11,24 @@
 #include "UGraphicalTerminalCommand.h"
 #include "CommandInfo.h"
 
-FString USystemContext::GetHostname() const
+FString USystemContext::GetHostname()
 {
-	return Computer.Hostname.ToString();
+	if (!CurrentHostname.IsEmpty())
+	{
+		// Speed increase: No need to consult the filesystem for this.
+		return CurrentHostname;
+	}
+	
+	UPeacegateFileSystem* RootFS = this->GetFilesystem(0);
+	if (RootFS->FileExists("/etc/hostname"))
+	{
+		EFilesystemStatusCode StatusCode;
+		RootFS->ReadText("/etc/hostname", this->CurrentHostname, StatusCode);
+		return this->CurrentHostname;
+	}
+
+	CurrentHostname = "localhost";
+	return CurrentHostname;
 }
 
 TArray<UPeacegateProgramAsset*> USystemContext::GetInstalledPrograms()

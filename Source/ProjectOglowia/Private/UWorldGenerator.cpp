@@ -6,8 +6,10 @@
 #include "USystemContext.h"
 #include "UPeacenetSaveGame.h"
 #include "FEnterpriseNetwork.h"
+#include "UComputerTypeAsset.h"
 #include "Async.h"
 #include "UPeacegateFileSystem.h"
+#include "PeacenetWorldStateActor.h"
 
 FString UWorldGenerator::GenerateRandomName(const FRandomStream& InGenerator, const TArray<FString> InFirstNames, TArray<FString> InLastNames)
 {
@@ -17,7 +19,7 @@ FString UWorldGenerator::GenerateRandomName(const FRandomStream& InGenerator, co
 	return first + TEXT(" ") + last;
 }
 
-UWorldGeneratorStatus* UWorldGenerator::GenerateCharacters(const FRandomStream & InRandomStream, UPeacenetSaveGame * InSaveGame)
+UWorldGeneratorStatus* UWorldGenerator::GenerateCharacters(const APeacenetWorldStateActor* InWorld, const FRandomStream & InRandomStream, UPeacenetSaveGame * InSaveGame)
 {
 	FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
 	
@@ -31,11 +33,41 @@ UWorldGeneratorStatus* UWorldGenerator::GenerateCharacters(const FRandomStream &
 		TrainingData.Add(Cast<UMarkovTrainingDataAsset>(Asset.GetAsset()));
 	}
 
+	TArray<FAssetData> ComputerTypeAssets;
+	TArray<UComputerTypeAsset*> ComputerTypes;
+
+	check(AssetRegistryModule.Get().GetAssetsByClass("ComputerTypeAsset", ComputerTypeAssets));
+	for (auto Asset : ComputerTypeAssets)
+	{
+		ComputerTypes.Add(Cast<UComputerTypeAsset>(Asset.GetAsset()));
+	}
+
 	UWorldGeneratorStatus* WorldGenStatus = NewObject<UWorldGeneratorStatus>();
 
-	(new FAutoDeleteAsyncTask<FWorldGenTask>(InSaveGame, InRandomStream, WorldGenStatus, TrainingData))->StartBackgroundTask();
+	(new FAutoDeleteAsyncTask<FWorldGenTask>(InSaveGame, InRandomStream, WorldGenStatus, TrainingData, ComputerTypes, InWorld->PlayerComputerType))->StartBackgroundTask();
 
 	return WorldGenStatus;
+}
+
+FString UWorldGenerator::GenerateIPAddress(const FRandomStream & InRandomStream, const ECountry InCountry, const FComputer & InComputer)
+{
+	int CountryRangeMaxValue = 0;
+	for (int i = 255; i > 0; i--)
+	{
+		if ((i % (int)ECountry::Num_Countries) == 0)
+		{
+			CountryRangeMaxValue = (i / (int)ECountry::Num_Countries);
+			break;
+		}
+	}
+	check(CountryRangeMaxValue);
+
+	uint8 CountryByte = (uint8)(InRandomStream.RandRange(0, CountryRangeMaxValue - 1) * (int)InCountry) + 1;
+	uint8 SecondByte = ((InComputer.ID % 2) == 0) ? (uint8)InRandomStream.RandRange(0, 127) : (uint8)InRandomStream.RandRange(128, 254);
+	uint8 ThirdByte = (uint8)InRandomStream.RandRange(0, 254);
+	uint8 FourthByte = (uint8)(InComputer.ID % 255);
+
+	return FString::FromInt(CountryByte) + "." + FString::FromInt(SecondByte) + "." + FString::FromInt(ThirdByte) + "." + FString::FromInt(FourthByte);
 }
 
 FString UWorldGenerator::MakeName(FString InWord)
@@ -421,7 +453,7 @@ FString FMarkovSource::ToString() const
 	return Out;
 }
 
-void UWorldGenerator::CreateFilesystem(FComputer& InComputer, const FRandomStream& InGenerator)
+void UWorldGenerator::CreateFilesystem(FPeacenetIdentity& InCharacter, FComputer& InComputer, const FRandomStream& InGenerator, FString InHostname)
 {
 	// Format the filesystem.
 	UFileUtilities::FormatFilesystem(InComputer.Filesystem);
@@ -429,9 +461,22 @@ void UWorldGenerator::CreateFilesystem(FComputer& InComputer, const FRandomStrea
 	// Create a system context.
 	USystemContext* SysCtx = NewObject<USystemContext>();
 	SysCtx->Computer = InComputer;
+	SysCtx->Character = InCharacter;
 	
 	// Creates system directories for the computer. This should include all users' home directories.
 	UWorldGenerator::GenerateSystemDirectories(SysCtx);
+
+	if (InHostname.IsEmpty())
+	{
+		// Parse the character's name to give us a hostname to use.
+		FString Username;
+		USystemContext::ParseCharacterName(InCharacter.CharacterName.ToString(), Username, InHostname);
+	}
+	// Get the root FS context.
+	UPeacegateFileSystem* RootFilesystem = SysCtx->GetFilesystem(0);
+
+	// Write /etc/hostname.
+	RootFilesystem->WriteText("/etc/hostname", InHostname);
 
 	// At this point, we would also generate lootable files. However, that isn't implemented into the game yet.
 
@@ -559,83 +604,111 @@ void FWorldGenTask::DoWork()
 
 			BusinessCounter -= RandomStream.RandRange(1, 5);
 		}
+	}
 
-		// Now we generate each NPC's computer.
-		for (int i = 0; i < SaveGame->Characters.Num(); i++)
+	// WHOA WHOA WHOA. This was once in the loop above. What the actual fuck!? NO WONDER the save files were fucking huge.
+	// Now we generate each NPC's computer.
+	for (int i = 0; i < SaveGame->Characters.Num(); i++)
+	{
+		AsyncTask(ENamedThreads::GameThread, [this, i]()
 		{
-			AsyncTask(ENamedThreads::GameThread, [this, i]()
+			Status->Status = FText::FromString(TEXT("Building NPC computers..."));
+			Status->Percentage = (float)i / (SaveGame->Characters.Num() - 1);
+		});
+
+		auto& NPC = SaveGame->Characters[i];
+
+		// NEVER EVER EVER do this if the npc isn't actually an npc.
+		if (NPC.CharacterType != EIdentityType::NonPlayer)
+			continue;
+
+		// Allocate memory for the new computer.
+		FComputer Computer;
+
+		// set the ID just like a character.
+		Computer.ID = SaveGame->Computers.Num();
+
+		// Update the NPC's computer ID to match.
+		NPC.ComputerID = Computer.ID;
+
+		// Since Characters are single people, the computer they use/run on has to be the personal computer type.
+		Computer.ComputerType = this->PersonalComputerType->InternalID;
+
+		// These values are crucial for the computer.
+		FString Username;
+		FString Hostname;
+		FString Password;
+		FString RootPassword;
+
+		// The password length is equal to rand(3, 5) * (2 ^ skill).
+		int PasswordLength = RandomStream.RandRange(3, 5) * FMath::Pow(2, NPC.Skill);
+
+		// Hostname and user generation is really easy, since this is a personal computer.
+		USystemContext::ParseCharacterName(NPC.CharacterName.ToString(), Username, Hostname);
+
+		// For the password, I probably have a function for that. But who knows?
+		Password = UWorldGenerator::GenerateRandomPassword(RandomStream, PasswordLength);
+
+		// Whether or not we have a root password is based on a random number between 1 and (4 ^ Skill) being less than 2.
+		if (RandomStream.RandRange(1, FMath::Pow(4, NPC.Skill)) > 2)
+		{
+			// Anything above 2 means we get a root password.
+			RootPassword = UWorldGenerator::GenerateRandomPassword(RandomStream, PasswordLength);
+		}
+
+
+		// Create the root user:
+		FUser Root;
+		Root.Username = FText::FromString(TEXT("root"));
+		Root.Password = FText::FromString(RootPassword);
+		Root.Domain = EUserDomain::Administrator;
+
+		// Create the NPC user:
+		FUser NonRoot;
+		NonRoot.Username = FText::FromString(Username);
+		NonRoot.Password = FText::FromString(Password);
+		NonRoot.Domain = EUserDomain::PowerUser;
+
+		// Set their uids.
+		Root.ID = 0;
+		NonRoot.ID = 1;
+
+		// Add them to the computer.
+		Computer.Users.Add(Root);
+		Computer.Users.Add(NonRoot);
+
+		// And add the computer to the world.
+		SaveGame->Computers.Add(Computer);
+	}
+
+	// Now we do a second pass on all the characters in the save to allocate IP addresses as well as generate the filesystems.
+	for (auto& Character : SaveGame->Characters)
+	{
+		for (auto& Computer : SaveGame->Computers)
+		{
+			if (Computer.ID == Character.ComputerID)
 			{
-				Status->Status = FText::FromString(TEXT("Building NPC computers..."));
-				Status->Percentage = (float)i / (SaveGame->Characters.Num() - 1);
-			});
+				FString NewIP;
+				// generate the IP address.
+				do
+				{
+					NewIP = UWorldGenerator::GenerateIPAddress(this->RandomStream, Character.Country, Computer);
+				} while (SaveGame->IPAddressAllocated(NewIP));
 
-			auto& NPC = SaveGame->Characters[i];
+				Computer.IPAddress = NewIP;
 
-			// NEVER EVER EVER do this if the npc isn't actually an npc.
-			if (NPC.CharacterType != EIdentityType::NonPlayer)
-				continue;
+				if (Character.CharacterType == EIdentityType::NonPlayer)
+				{
+					// Generate an npc filesystem.
+					UWorldGenerator::CreateFilesystem(Character, Computer, RandomStream);
+				}
 
-			// Allocate memory for the new computer.
-			FComputer Computer;
-
-			// set the ID just like a character.
-			Computer.ID = SaveGame->Computers.Num();
-
-			// Update the NPC's computer ID to match.
-			NPC.ComputerID = Computer.ID;
-
-			// These values are crucial for the computer.
-			FString Username;
-			FString Hostname;
-			FString Password;
-			FString RootPassword;
-
-			// The password length is equal to rand(3, 5) * (2 ^ skill).
-			int PasswordLength = RandomStream.RandRange(3, 5) * FMath::Pow(2, NPC.Skill);
-
-			// Hostname and user generation is really easy, since this is a personal computer.
-			USystemContext::ParseCharacterName(NPC.CharacterName.ToString(), Username, Hostname);
-
-			// For the password, I probably have a function for that. But who knows?
-			Password = UWorldGenerator::GenerateRandomPassword(RandomStream, PasswordLength);
-
-			// Whether or not we have a root password is based on a random number between 1 and (4 ^ Skill) being less than 2.
-			if (RandomStream.RandRange(1, FMath::Pow(4, NPC.Skill)) > 2)
-			{
-				// Anything above 2 means we get a root password.
-				RootPassword = UWorldGenerator::GenerateRandomPassword(RandomStream, PasswordLength);
+				break;
 			}
-
-			// Now that we have the user info... we can assign it all to the computer.
-			Computer.Hostname = FText::FromString(Hostname);
-
-			// Create the root user:
-			FUser Root;
-			Root.Username = FText::FromString(TEXT("root"));
-			Root.Password = FText::FromString(RootPassword);
-			Root.Domain = EUserDomain::Administrator;
-
-			// Create the NPC user:
-			FUser NonRoot;
-			NonRoot.Username = FText::FromString(Username);
-			NonRoot.Password = FText::FromString(Password);
-			NonRoot.Domain = EUserDomain::PowerUser;
-
-			// Set their uids.
-			Root.ID = 0;
-			NonRoot.ID = 1;
-
-			// Add them to the computer.
-			Computer.Users.Add(Root);
-			Computer.Users.Add(NonRoot);
-
-			// Generate the filesystem!!
-			UWorldGenerator::CreateFilesystem(Computer, RandomStream);
-
-			// And add the computer to the world.
-			SaveGame->Computers.Add(Computer);
 		}
 	}
+
+	
 
 	// Setting this will tell the game thread that we're done without crashing the game or causing bugs.
 	AsyncTask(ENamedThreads::GameThread, [this]() 

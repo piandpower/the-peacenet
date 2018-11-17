@@ -21,7 +21,6 @@ void UNmapCommand::RunCommand(UConsoleContext* InConsole, const TMap<FString, UD
         InConsole->WriteLine("");
         InConsole->WriteLine("PORT\tSTATE\tSERVICE");
 
-        UComputerTypeAsset* ComputerType;
         for(auto ComputerTypeAsset : InConsole->SystemContext->Peacenet->ComputerTypes)
         {
             if(ComputerTypeAsset->InternalID == ResolvedContext->Computer.ComputerType)

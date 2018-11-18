@@ -2,7 +2,7 @@
 
 #include "TerminalCommandParserLibrary.h"
 
-FPeacegateCommandInstruction UTerminalCommandParserLibrary::GetCommandList(const FString& InCommand, FString& OutputError)
+FPeacegateCommandInstruction UTerminalCommandParserLibrary::GetCommandList(const FString& InCommand, FString InHome, FString& OutputError)
 {
 	//This is the list of commands to run in series
 	TArray<FString> commands;
@@ -107,7 +107,7 @@ FPeacegateCommandInstruction UTerminalCommandParserLibrary::GetCommandList(const
 			if (!isFileName)
 			{
 				isFileName = true;
-				shouldOverwriteOnFileRedirect = false;
+				shouldOverwriteOnFileRedirect = true;
 				continue;
 			}
 			else
@@ -116,7 +116,7 @@ FPeacegateCommandInstruction UTerminalCommandParserLibrary::GetCommandList(const
 				{
 					if (!shouldOverwriteOnFileRedirect)
 					{
-						shouldOverwriteOnFileRedirect = true;
+						shouldOverwriteOnFileRedirect = false;
 					}
 					else {
 						OutputError = TEXT("unexpected token '>' (redirect) in filename");
@@ -148,6 +148,25 @@ FPeacegateCommandInstruction UTerminalCommandParserLibrary::GetCommandList(const
 	{
 		commands.Add(current.TrimStartAndEnd());
 		current = TEXT("");
+	}
+	if (!fileName.IsEmpty())
+	{
+		if (fileName.StartsWith("~"))
+		{
+			fileName.RemoveAt(0, 1, true);
+			while (fileName.StartsWith("/"))
+			{
+				fileName.RemoveAt(0, 1);
+			}
+			if (InHome.EndsWith("/"))
+			{
+				fileName = InHome + fileName;
+			}
+			else
+			{
+				fileName = InHome + "/" + fileName;
+			}
+		}
 	}
 	return FPeacegateCommandInstruction(commands, fileName, shouldOverwriteOnFileRedirect);
 }

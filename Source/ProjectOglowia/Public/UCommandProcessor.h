@@ -131,7 +131,7 @@ public:
 	UPROPERTY()
 	bool Overwrite = false;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, Category = "Console Redirection")
 	void DumpToFile(UConsoleContext* InConsole);
 
 

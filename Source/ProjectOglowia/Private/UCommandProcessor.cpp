@@ -8,6 +8,8 @@
 
 TArray<FCommandRunInstruction> UCommandProcessor::ProcessCommand(UConsoleContext* InConsole, const FString& InCommand)
 {
+	check(InConsole);
+
 	TArray<FCommandRunInstruction> CommandsToRun;
 
 	FString TrimmedCommand = InCommand.TrimStartAndEnd();
@@ -17,7 +19,7 @@ TArray<FCommandRunInstruction> UCommandProcessor::ProcessCommand(UConsoleContext
 
 	FString OutError;
 
-	FPeacegateCommandInstruction Instruction = UTerminalCommandParserLibrary::GetCommandList(InCommand, OutError);
+	FPeacegateCommandInstruction Instruction = UTerminalCommandParserLibrary::GetCommandList(InCommand, InConsole->HomeDirectory, OutError);
 
 	
 

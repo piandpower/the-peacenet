@@ -241,6 +241,18 @@ bool APeacenetWorldStateActor::ResolveHost(FString InHost, FString& ResolvedIP, 
 				}
 			}
 			ResolvedContext->Peacenet = this;
+			TArray<FName> Commands;
+			this->CommandInfo.GetKeys(Commands);
+			for(auto Command : Commands)
+			{
+				if (this->CommandInfo[Command]->UnlockedByDefault)
+				{
+					if (!ResolvedContext->Computer.InstalledCommands.Contains(Command))
+					{
+						ResolvedContext->Computer.InstalledCommands.Add(Command);
+					}
+				}
+			}
 			this->SystemContexts.Add(ResolvedContext);
 			return true;
 		}

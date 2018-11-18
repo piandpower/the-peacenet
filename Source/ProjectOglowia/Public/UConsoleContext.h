@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "PTerminalWidget.h"
+#include "PeacenetWorldStateActor.h"
 #include "UPeacegateFileSystem.h"
 #include "UConsoleContext.generated.h"
 
@@ -73,5 +74,5 @@ public:
 	virtual void Clear() { Terminal->Clear(); }
 
 	UFUNCTION(BlueprintCallable, Category="Console", meta=(Latent, LatentInfo="LatentInfo", HidePin="WorldContextObject", DefaultToSelf="WorldContextObject"))
-	virtual void ReadLine(UObject* WorldContextObject, struct FLatentActionInfo LatentInfo, FString& OutText) { Terminal->ReadLine(WorldContextObject, LatentInfo, OutText); }
+	virtual void ReadLine(UObject* WorldContextObject, struct FLatentActionInfo LatentInfo, FString& OutText) { Terminal->ReadLine(this->SystemContext->Peacenet, LatentInfo, OutText); }
 };

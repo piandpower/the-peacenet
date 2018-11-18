@@ -48,7 +48,7 @@ class PROJECTOGLOWIA_API UTerminalCommandParserLibrary : public UBlueprintFuncti
 
 public:
 	UFUNCTION(BlueprintCallable, Category = Bash, meta = (DisplayName = "Get Command Instruction Data"))
-	static FPeacegateCommandInstruction GetCommandList(const FString& InCommand, FString& OutputError);
+	static FPeacegateCommandInstruction GetCommandList(const FString& InCommand, FString InHome, FString& OutputError);
 
 	UFUNCTION(BlueprintCallable, Category = Bash, meta = (DisplayName = "Tokenize"))
 	static TArray<FString> Tokenize(const FString& InCommand, const FString& Home, FString& OutputError);

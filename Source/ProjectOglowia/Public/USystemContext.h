@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "FComputer.h"
+#include "UPeacegateFileSystem.h"
 #include "FPeacenetIdentity.h"
 
 #include "USystemContext.generated.h"
 
-class UPeacegateFileSystem;
 class UDesktopWidget;
 class APeacenetWorldStateActor;
 class UPeacegateProgramAsset;
@@ -49,6 +49,10 @@ public:
 
 	UPROPERTY(BlueprintReadOnly)
 	UDesktopWidget* Desktop;
+
+protected:
+	UFUNCTION()
+		void HandleFileSystemEvent(EFilesystemEventType InType, FString InPath);
 
 public:
 	UFUNCTION()

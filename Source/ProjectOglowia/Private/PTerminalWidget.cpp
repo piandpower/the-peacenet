@@ -446,6 +446,7 @@ FReply UPTerminalWidget::NativeOnKeyChar(const FGeometry & InGeometry, const FCh
 		TextInputBuffer = TextInputBuffer.AppendChar(TEXT('\n'));
 		TextBuffer = TextBuffer.AppendChar(TEXT('\n'));
 		NewTextAdded = true;
+		this->IsInputLineAvailable = true;
 	}
 	else {
 		TextInputBuffer = TextInputBuffer.AppendChar(c);

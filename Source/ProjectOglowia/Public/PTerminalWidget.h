@@ -6,7 +6,7 @@
 #include "Blueprint/UserWidget.h"
 
 #include "Engine/Font.h"
-
+#include "ThreadSafeBool.h"
 #include "Fonts/SlateFontInfo.h"
 #include "Slate/SlateBrushAsset.h"
 #include "Misc/Parse.h"
@@ -24,6 +24,8 @@ class PROJECTOGLOWIA_API UPTerminalWidget : public UUserWidget
 
 
 public:
+	FThreadSafeBool IsInputLineAvailable = false;
+
 	UPTerminalWidget(const FObjectInitializer& ObjectInitializer);
 
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnExitEvent);

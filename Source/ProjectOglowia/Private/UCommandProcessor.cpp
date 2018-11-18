@@ -2,6 +2,7 @@
 
 #include "UCommandProcessor.h"
 #include "USystemContext.h"
+#include "CommonUtils.h"
 #include "TerminalCommand.h"
 #include "TerminalCommandParserLibrary.h"
 
@@ -18,6 +19,8 @@ TArray<FCommandRunInstruction> UCommandProcessor::ProcessCommand(UConsoleContext
 
 	FPeacegateCommandInstruction Instruction = UTerminalCommandParserLibrary::GetCommandList(InCommand, OutError);
 
+	
+
 	if (!OutError.IsEmpty())
 	{
 		InConsole->WriteLine(OutError);
@@ -28,6 +31,15 @@ TArray<FCommandRunInstruction> UCommandProcessor::ProcessCommand(UConsoleContext
 
 	if (CommandNum == 0)
 		return CommandsToRun;
+
+	if (!Instruction.OutputFile.IsEmpty())
+	{
+		if (InConsole->Filesystem->DirectoryExists(Instruction.OutputFile))
+		{
+			InConsole->WriteLine("`3`*error: " + Instruction.OutputFile + ": Directory exists.`1`r");
+			return CommandsToRun;
+		}
+	}
 
 	UPiperContext* LastPiper = nullptr;
 
@@ -105,9 +117,21 @@ TArray<FCommandRunInstruction> UCommandProcessor::ProcessCommand(UConsoleContext
 			}
 			else
 			{
-				UPiperContext* Ctx = NewObject<UPiperContext>();
+				UPiperContext* Ctx = nullptr;
+				if (Instruction.OutputFile.IsEmpty())
+				{
+					Ctx = NewObject<UPiperContext>();
+					Ctx->Output = InConsole;
+				}
+				else
+				{
+					Ctx = NewObject<UPiperContext>(InConsole, URedirectedConsoleContext::StaticClass());
+					auto Redirected = Cast<URedirectedConsoleContext>(Ctx);
+					Redirected->OutputFilePath = Instruction.OutputFile;
+					Redirected->Overwrite = Instruction.Overwrites;
+
+				}
 				Ctx->Input = LastPiper;
-				Ctx->Output = InConsole;
 				if (LastPiper)
 				{
 					Ctx->HomeDirectory = LastPiper->HomeDirectory;
@@ -140,4 +164,58 @@ TArray<FCommandRunInstruction> UCommandProcessor::ProcessCommand(UConsoleContext
 
 
 	return CommandsToRun;
+}
+
+FString UPiperContext::SynchronouslyReadLine()
+{
+	if (Input)
+	{
+		if (Input->Log.IsEmpty())
+			return "\0";
+
+		FString OutText;
+		int NewlineIndex = -1;
+		if (Input->Log.FindChar(TEXT('\n'), NewlineIndex))
+		{
+			OutText = Input->Log.Left(NewlineIndex);
+			Input->Log.RemoveAt(0, NewlineIndex + 1);
+		}
+		else {
+			OutText = FString(Input->Log);
+			Input->Log = TEXT("");
+		}
+		return OutText;
+	}
+	else
+	{
+		return Super::SynchronouslyReadLine();
+	}
+}
+
+void URedirectedConsoleContext::DumpToFile(UConsoleContext* InConsole)
+{
+	if (OutputFilePath.IsEmpty())
+		return;
+
+	this->OutputFilePath = this->CombineWithWorkingDirectory(this->OutputFilePath);
+
+	UPeacegateFileSystem* DumpFS = this->Filesystem;
+
+	EFilesystemStatusCode StatusCode = EFilesystemStatusCode::OK;
+	if (Overwrite || !DumpFS->FileExists(OutputFilePath))
+	{
+		DumpFS->WriteText(OutputFilePath, Log);
+	}
+	else
+	{
+		FString OldText;
+		DumpFS->ReadText(OutputFilePath, OldText, StatusCode);
+		if (StatusCode != EFilesystemStatusCode::OK)
+		{
+			InConsole->WriteLine("`3`*error: " + OutputFilePath + ": " + UCommonUtils::GetFriendlyFilesystemStatusCode(StatusCode).ToString() + "`1`r");
+			return;
+		}
+		DumpFS->WriteText(OutputFilePath, OldText + Log);
+	}
+
 }

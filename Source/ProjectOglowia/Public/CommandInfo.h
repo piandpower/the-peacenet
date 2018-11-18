@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "TerminalCommand.h"
+#include "Engine/DataAsset.h"
 #include "CommandInfo.generated.h"
 
 USTRUCT(BlueprintType)

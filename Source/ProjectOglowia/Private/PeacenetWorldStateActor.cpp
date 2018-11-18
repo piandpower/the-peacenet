@@ -8,6 +8,7 @@
 #include "WallpaperAsset.h"
 #include "UMissionAsset.h"
 #include "UMissionUnlock.h"
+#include "UNativeLatentAction.h"
 #include "CommandInfo.h"
 #include "TerminalCommand.h"
 #include "AssetRegistry/Public/IAssetRegistry.h"
@@ -40,6 +41,11 @@ bool APeacenetWorldStateActor::UpdateComputer(int InEntityID, FComputer & InComp
 	}
 
 	return false;
+}
+
+void APeacenetWorldStateActor::AddLatentAction(UNativeLatentAction* InAction)
+{
+	this->LatentActions.Add(InAction);
 }
 
 bool APeacenetWorldStateActor::UpdateCharacter(int InEntityID, FPeacenetIdentity & InCharacter)
@@ -331,6 +337,16 @@ void APeacenetWorldStateActor::Tick(float DeltaTime)
 
 		// Save it
 		SaveGame->EpochTime = TimeOfDay;
+	}
+
+	for (int i = 0; i < LatentActions.Num(); i++)
+	{
+		auto Action = LatentActions[0];
+		if (Action->Tick(DeltaTime))
+		{
+			LatentActions.RemoveAt(i);
+			i--;
+		}
 	}
 }
 

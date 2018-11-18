@@ -36,6 +36,9 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	UPeacegateFileSystem* Filesystem;
 
+	UFUNCTION()
+	virtual FString SynchronouslyReadLine();
+
 	UFUNCTION(BlueprintCallable, Category = "Peacegate")
 	virtual UConsoleContext* CreateChildContext(USystemContext* InSystemContext, int InUserID);
 

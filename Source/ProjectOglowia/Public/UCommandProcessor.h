@@ -84,6 +84,8 @@ public:
 			Log = TEXT("");
 	}
 
+	virtual FString SynchronouslyReadLine() override;
+
 	virtual void ReadLine(UObject* WorldContextObject, struct FLatentActionInfo LatentInfo, FString& OutText) override
 	{
 		if (Input)
@@ -115,6 +117,24 @@ public:
 			Terminal->ReadLine(WorldContextObject, LatentInfo, OutText);
 		}
 	}
+};
+
+UCLASS()
+class PROJECTOGLOWIA_API URedirectedConsoleContext : public UPiperContext
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY()
+	FString OutputFilePath;
+
+	UPROPERTY()
+	bool Overwrite = false;
+
+	UFUNCTION()
+	void DumpToFile(UConsoleContext* InConsole);
+
+
 };
 
 USTRUCT(BlueprintType)

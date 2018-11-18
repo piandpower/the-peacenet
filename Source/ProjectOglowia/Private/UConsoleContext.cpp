@@ -3,6 +3,19 @@
 #include "UConsoleContext.h"
 #include "USystemContext.h"
 
+FString UConsoleContext::SynchronouslyReadLine()
+{
+	while (!this->Terminal->IsInputLineAvailable) {	} //this is thread safe woo
+	this->Terminal->IsInputLineAvailable = false;
+	FString Input = this->Terminal->GetInputText();
+	if (Input.EndsWith("\n"))
+	{
+		Input.RemoveFromEnd("\n");
+	}
+	this->Terminal->ClearInput();
+	return Input;
+}
+
 UConsoleContext * UConsoleContext::CreateChildContext(USystemContext* InSystemContext, int InUserID)
 {
 	UConsoleContext* NewCtx = NewObject<UConsoleContext>();

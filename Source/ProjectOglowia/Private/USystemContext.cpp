@@ -11,6 +11,20 @@
 #include "UGraphicalTerminalCommand.h"
 #include "CommandInfo.h"
 
+FString ReadFirstLine(FString InText)
+{
+	if (InText.Contains("\n"))
+	{
+		int NewLineIndex;
+		InText.FindChar('\n', NewLineIndex);
+		return InText.Left(NewLineIndex).TrimStartAndEnd();
+	}
+	else
+	{
+		return InText.TrimStartAndEnd();
+	}
+}
+
 FString USystemContext::GetHostname()
 {
 	if (!CurrentHostname.IsEmpty())
@@ -24,6 +38,7 @@ FString USystemContext::GetHostname()
 	{
 		EFilesystemStatusCode StatusCode;
 		RootFS->ReadText("/etc/hostname", this->CurrentHostname, StatusCode);
+		CurrentHostname = ReadFirstLine(CurrentHostname);
 		return this->CurrentHostname;
 	}
 
@@ -87,7 +102,12 @@ UPeacegateFileSystem * USystemContext::GetFilesystem(const int UserID)
 {
 	if (!RegisteredFilesystems.Contains(UserID))
 	{
-		this->RegisteredFilesystems.Add(UserID, UCommonUtils::CreateFilesystem(this, UserID));
+		UPeacegateFileSystem* NewFS = UCommonUtils::CreateFilesystem(this, UserID);
+		TScriptDelegate<> ModifiedDelegate;
+		ModifiedDelegate.BindUFunction(this, "HandleFileSystemEvent");
+		NewFS->FilesystemOperation.Add(ModifiedDelegate);
+		this->RegisteredFilesystems.Add(UserID, NewFS);
+		return NewFS;
 	}
 
 	return this->RegisteredFilesystems[UserID];
@@ -284,6 +304,22 @@ void USystemContext::ParseCharacterName(const FString InCharacterName, FString &
 
 	OutUsername = FirstName;
 	OutHostname = FirstName + TEXT("-pc");
+}
+
+void USystemContext::HandleFileSystemEvent(EFilesystemEventType InType, FString InPath)
+{
+	switch (InType)
+	{
+	case EFilesystemEventType::WriteFile:
+		if (InPath == "/etc/hostname")
+		{
+			auto fs = GetFilesystem(0);
+			EFilesystemStatusCode err;
+			fs->ReadText("/etc/hostname", this->CurrentHostname, err);
+			CurrentHostname = ReadFirstLine(CurrentHostname);
+		}
+		break;
+	}
 }
 
 void USystemContext::UpdateSystemFiles()

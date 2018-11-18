@@ -10,6 +10,7 @@
 #include "UGameTypeAsset.h"
 #include "PeacenetWorldStateActor.generated.h"
 
+class UNativeLatentAction;
 class UMissionAsset;
 class UComputerTypeAsset;
 class USystemContext;
@@ -63,7 +64,12 @@ class PROJECTOGLOWIA_API APeacenetWorldStateActor : public AActor
 {
 	GENERATED_BODY()
 	
+
+
 private:
+	UPROPERTY()
+	TArray<UNativeLatentAction*> LatentActions;
+
 	UPROPERTY()
 	bool bIsMissionPaused = false;
 
@@ -106,6 +112,9 @@ private:
 	void ResynchronizeSystemContexts();
 
 public:	
+	UFUNCTION()
+	void AddLatentAction(UNativeLatentAction* InAction);
+
 	UFUNCTION()
 	bool ResolveHost(FString InHost, FString& ResolvedIP, USystemContext*& ResolvedContext);
 

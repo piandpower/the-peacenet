@@ -5,8 +5,11 @@
 #include "USystemContext.h"
 #include "FComputer.h"
 #include "ImageLoader.h"
+#include "PTerminalWidget.h"
+#include "FPeacenetIdentity.h"
 #include "WallpaperAsset.h"
 #include "UPeacegateProgramAsset.h"
+#include "UConsoleContext.h"
 
 
 
@@ -57,6 +60,22 @@ void UDesktopWidget::NativeConstruct()
 	Super::NativeConstruct();
 }
 
+UConsoleContext * UDesktopWidget::CreateConsole(UPTerminalWidget* InTerminal)
+{
+	UConsoleContext* Console = NewObject<UConsoleContext>(this);
+
+	Console->SystemContext = this->SystemContext;
+	Console->UserID = this->UserID;
+	Console->Terminal = InTerminal;
+
+	Console->HomeDirectory = Console->SystemContext->GetUserHomeDirectory(this->UserID);
+	Console->WorkingDirectory = Console->HomeDirectory;
+
+	Console->Filesystem = this->Filesystem;
+
+	return Console;
+}
+
 void UDesktopWidget::SetWallpaper(UTexture2D* InTexture)
 {
 	this->WallpaperTexture = InTexture;
@@ -84,6 +103,9 @@ void UDesktopWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	check(this->SystemContext);
 	check(this->SystemContext->Peacenet);
+
+	this->MyCharacter = this->SystemContext->Character;
+	this->MyComputer = this->SystemContext->Computer;
 
 	// If a notification isn't currently active...
 	if (!bIsWaitingForNotification)

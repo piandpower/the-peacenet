@@ -9,6 +9,8 @@
 #include "UDesktopWidget.generated.h"
 
 class USystemContext;
+class UConsoleContext;
+class UPTerminalWidget;
 class UImageLoader;
 
 USTRUCT()
@@ -35,8 +37,19 @@ class PROJECTOGLOWIA_API UDesktopWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
+protected:
+	UPROPERTY(BlueprintReadOnly, Category = "Desktop")
+	FPeacenetIdentity MyCharacter;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Desktop")
+	FComputer MyComputer;
+
 private:
 	bool bIsWaitingForNotification = false;
+
+protected:
+	UFUNCTION(BlueprintCallable, Category = "Console")
+	UConsoleContext* CreateConsole(UPTerminalWidget* InTerminal);
 
 protected:
 	UPROPERTY()

@@ -253,6 +253,13 @@ bool APeacenetWorldStateActor::ResolveHost(FString InHost, FString& ResolvedIP, 
 					}
 				}
 			}
+			for (auto Program : this->Programs)
+			{
+				if (Program->IsUnlockedByDefault && !ResolvedContext->Computer.InstalledPrograms.Contains(Program->ExecutableName))
+				{
+					ResolvedContext->Computer.InstalledPrograms.Add(Program->ExecutableName);
+				}
+			}
 			this->SystemContexts.Add(ResolvedContext);
 			return true;
 		}

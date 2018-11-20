@@ -33,6 +33,9 @@ public:
 	FText CharacterName;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FVector2D NodePosition;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	int Skill;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)

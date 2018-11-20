@@ -9,9 +9,16 @@
 #include "FPeacenetIdentity.h"
 #include "WallpaperAsset.h"
 #include "UPeacegateProgramAsset.h"
+#include "UNetMapWidget.h"
 #include "UConsoleContext.h"
 
-
+UNetMapWidget* UDesktopWidget::CreateNetMap(TSubclassOf<UNetMapWidget> InSubclass)
+{
+	UNetMapWidget* Result = CreateWidget<UNetMapWidget, APlayerController>(this->GetOwningPlayer(), InSubclass);
+	Result->Desktop = this;
+	this->NetMap = Result;
+	return Result;
+}
 
 void UDesktopWidget::NativeConstruct()
 {

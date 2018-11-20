@@ -534,6 +534,13 @@ void FWorldGenTask::DoWork()
 			// This NPC's entity ID becomes the number of entities in the world.
 			NPC.ID = SaveGame->Characters.Num();
 
+			do
+			{
+				float x = RandomStream.FRandRange(-1.f, 1.f);
+				float y = RandomStream.FRandRange(-1.f, 1.f);
+				NPC.NodePosition = FVector2D(x, y);
+			} while (SaveGame->IsCharacterNodePositionTaken(Country, NPC.NodePosition));
+
 			// Now we get to generate their name.
 
 			// To do this, we need to know their gender. Sorry, 21st century, but Peacenet's world generator only recognizes males and females as genders.

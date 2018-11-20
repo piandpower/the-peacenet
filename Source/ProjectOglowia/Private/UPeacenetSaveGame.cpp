@@ -25,3 +25,24 @@ bool UPeacenetSaveGame::IPAddressAllocated(FString InIPAddress)
 	}
 	return false;
 }
+
+bool UPeacenetSaveGame::IsCharacterNodePositionTaken(ECountry InCountry, FVector2D InPosition)
+{
+	for (auto& Character : this->Characters)
+	{
+		if (Character.Country != InCountry)
+			continue;
+
+		float x = InPosition.X;
+		float y = InPosition.Y;
+
+		float cX = Character.NodePosition.X;
+		float cY = Character.NodePosition.Y;
+
+		if (FMath::IsNearlyEqual(x, cX, 0.1f) && FMath::IsNearlyEqual(y, cY, 0.1f))
+		{
+			return true;
+		}
+	}
+	return false;
+}

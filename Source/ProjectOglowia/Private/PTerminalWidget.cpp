@@ -160,20 +160,22 @@ int32 UPTerminalWidget::NativePaint(const FPaintArgs& Args, const FGeometry& All
 
 	bool bSkipEscape = false; //Should we skip reading an escape sequence when we come across a char '`'?
 
-	//Draws the background of the terminal.
-	LayerId++;
-
-	if (TerminalBrush)
+	if (bRenderBackground)
 	{
-		FSlateDrawElement::MakeBox(
-			OutDrawElements,
-			LayerId,
-			AllottedGeometry.ToPaintGeometry(FVector2D::ZeroVector, size),
-			&TerminalBrush->Brush,
-			ESlateDrawEffect::None,
-			FLinearColor::Black);
-	}
+		//Draws the background of the terminal.
+		LayerId++;
 
+		if (TerminalBrush)
+		{
+			FSlateDrawElement::MakeBox(
+				OutDrawElements,
+				LayerId,
+				AllottedGeometry.ToPaintGeometry(FVector2D::ZeroVector, size),
+				&TerminalBrush->Brush,
+				ESlateDrawEffect::None,
+				FLinearColor::Black);
+		}
+	}
 
 	FSlateFontInfo font = this->GetUnrealFont(term_font); //Grab the regular font.
 	const UFont* FontPtr = Cast<UFont>(font.FontObject);

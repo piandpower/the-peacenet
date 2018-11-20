@@ -628,6 +628,7 @@ APeacenetWorldStateActor* APeacenetWorldStateActor::GenerateAndCreateWorld(const
 	FPeacenetIdentity PlayerIdentity;
 	PlayerIdentity.ID = 0;
 	PlayerIdentity.Country = InGameType->SpawnCountry;
+	PlayerIdentity.NodePosition = FVector2D::ZeroVector;
 	PlayerIdentity.CharacterType = EIdentityType::Player;
 	PlayerIdentity.CharacterName = InWorldInfo.PlayerName;
 	PlayerIdentity.Skill = 0;

@@ -55,6 +55,9 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Missions")
 	TArray<FName> Missions;
 
+	UPROPERTY(VisibleAnywhere, Category = "NetMap")
+	TArray<int> DiscoveredCharacterIds;
+
 	const float SECONDS_DAY_LENGTH = 86400.f;
 
 	UFUNCTION()
@@ -62,4 +65,7 @@ public:
 
 	UFUNCTION()
 	bool IPAddressAllocated(FString InIPAddress);
+
+	UFUNCTION()
+	bool IsCharacterNodePositionTaken(ECountry InCountry, FVector2D InPosition);
 };

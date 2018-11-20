@@ -81,6 +81,9 @@ public:
 		float CharacterHeight;
 
 public:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Appearance")
+	bool bRenderBackground = true;
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		int CommandLayer = 0;
 

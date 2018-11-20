@@ -11,6 +11,7 @@
 class USystemContext;
 class UConsoleContext;
 class UPTerminalWidget;
+class UNetMapWidget;
 class UImageLoader;
 
 USTRUCT()
@@ -38,6 +39,12 @@ class PROJECTOGLOWIA_API UDesktopWidget : public UUserWidget
 	GENERATED_BODY()
 
 protected:
+	UFUNCTION(BlueprintCallable, Category = "NetMap")
+	UNetMapWidget* CreateNetMap(TSubclassOf<UNetMapWidget> InSubclass);
+
+	UPROPERTY(BlueprintReadOnly, Category = "NetMap")
+	UNetMapWidget* NetMap;
+
 	UPROPERTY(BlueprintReadOnly, Category = "Desktop")
 	FPeacenetIdentity MyCharacter;
 

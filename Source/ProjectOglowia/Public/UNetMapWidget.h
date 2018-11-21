@@ -76,6 +76,9 @@ protected:
 	void NodesCleared();
 
 public:
+	UFUNCTION(BlueprintCallable, Category = "NetMap")
+	void SelectNode(const FNetMapNode& InNode);
+
 	UFUNCTION()
 	void CollectDiscoveredNodes();
 

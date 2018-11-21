@@ -12,12 +12,37 @@
 #include "UNetMapWidget.h"
 #include "UConsoleContext.h"
 
+UProgram * UDesktopWidget::SpawnProgramFromClass(TSubclassOf<UProgram> InClass, const FText& InTitle, UTexture2D* InIcon)
+{
+	UWindow* OutputWindow = nullptr;
+
+	UProgram* Program = UProgram::CreateProgram(this->SystemContext->Peacenet->WindowClass, InClass, this->SystemContext, this->UserID, OutputWindow);
+
+	OutputWindow->WindowTitle = InTitle;
+	OutputWindow->Icon = InIcon;
+	OutputWindow->EnableMinimizeAndMaximize = false;
+
+	return Program;
+}
+
 UNetMapWidget* UDesktopWidget::CreateNetMap(TSubclassOf<UNetMapWidget> InSubclass)
 {
 	UNetMapWidget* Result = CreateWidget<UNetMapWidget, APlayerController>(this->GetOwningPlayer(), InSubclass);
 	Result->Desktop = this;
 	this->NetMap = Result;
 	return Result;
+}
+
+void UDesktopWidget::SelectCharacterNode(int InEntityID)
+{
+	for (auto& Character : this->SystemContext->Peacenet->SaveGame->Characters)
+	{
+		if (Character.ID == InEntityID)
+		{
+			this->CharacterNodeSelected(Character);
+			return;
+		}
+	}
 }
 
 void UDesktopWidget::NativeConstruct()

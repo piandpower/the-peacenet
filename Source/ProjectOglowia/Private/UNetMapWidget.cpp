@@ -37,6 +37,16 @@ void UNetMapWidget::CollectDiscoveredNodes()
 	}
 }
 
+void UNetMapWidget::SelectNode(const FNetMapNode& InNode)
+{
+	switch (InNode.EmblemType)
+	{
+	case ENetMapEmblemType::Character:
+		this->Desktop->SelectCharacterNode(InNode.EntityID);
+		break;
+	}
+}
+
 FVector2D UNetMapWidget::CalculateLocation(const FPeacenetIdentity & InCharacter, const FComputer & InComputer)
 {
 	return InCharacter.NodePosition;

@@ -38,7 +38,17 @@ class PROJECTOGLOWIA_API UDesktopWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
+public:
+	UFUNCTION()
+	void SelectCharacterNode(int InEntityID);
+
 protected:
+	UFUNCTION(BlueprintCallable, Category = "Desktop")
+	UProgram* SpawnProgramFromClass(TSubclassOf<UProgram> InClass, const FText& InTitle, UTexture2D* InIcon);
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "NetMap")
+	void CharacterNodeSelected(const FPeacenetIdentity& InIdentity);
+
 	UFUNCTION(BlueprintCallable, Category = "NetMap")
 	UNetMapWidget* CreateNetMap(TSubclassOf<UNetMapWidget> InSubclass);
 

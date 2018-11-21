@@ -8,6 +8,8 @@
 #include "FEnterpriseNetwork.h"
 #include "UComputerTypeAsset.h"
 #include "Async.h"
+#include "FEnterpriseNetwork.h"
+#include "UCompanyTypeAsset.h"
 #include "UPeacegateFileSystem.h"
 #include "PeacenetWorldStateActor.h"
 
@@ -25,6 +27,8 @@ UWorldGeneratorStatus* UWorldGenerator::GenerateCharacters(const APeacenetWorldS
 	
 	TArray<FAssetData> TrainingAssets;
 	TArray<UMarkovTrainingDataAsset*> TrainingData;
+	TArray<FAssetData> CompanyAssets;
+	TArray<UCompanyTypeAsset*> CompanyTypes;
 
 	check(AssetRegistryModule.Get().GetAssetsByClass(TEXT("MarkovTrainingDataAsset"), TrainingAssets));
 
@@ -32,6 +36,14 @@ UWorldGeneratorStatus* UWorldGenerator::GenerateCharacters(const APeacenetWorldS
 	{
 		TrainingData.Add(Cast<UMarkovTrainingDataAsset>(Asset.GetAsset()));
 	}
+
+	check(AssetRegistryModule.Get().GetAssetsByClass(TEXT("CompanyTypeAsset"), CompanyAssets));
+
+	for (auto Asset : CompanyAssets)
+	{
+		CompanyTypes.Add(Cast<UCompanyTypeAsset>(Asset.GetAsset()));
+	}
+
 
 	TArray<FAssetData> ComputerTypeAssets;
 	TArray<UComputerTypeAsset*> ComputerTypes;
@@ -44,7 +56,7 @@ UWorldGeneratorStatus* UWorldGenerator::GenerateCharacters(const APeacenetWorldS
 
 	UWorldGeneratorStatus* WorldGenStatus = NewObject<UWorldGeneratorStatus>();
 
-	(new FAutoDeleteAsyncTask<FWorldGenTask>(InSaveGame, InRandomStream, WorldGenStatus, TrainingData, ComputerTypes, InWorld->PlayerComputerType))->StartBackgroundTask();
+	(new FAutoDeleteAsyncTask<FWorldGenTask>(InSaveGame, InRandomStream, WorldGenStatus, TrainingData, ComputerTypes, InWorld->PlayerComputerType, CompanyTypes))->StartBackgroundTask();
 
 	return WorldGenStatus;
 }

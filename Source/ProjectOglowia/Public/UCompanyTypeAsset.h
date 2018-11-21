@@ -6,6 +6,7 @@
 #include "Engine/DataAsset.h"
 #include "Engine/Texture2D.h"
 #include "UComputerTypeAsset.h"
+#include "UMarkovTrainingDataAsset.h"
 #include "UCompanyTypeAsset.generated.h"
 
 /**
@@ -31,5 +32,11 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Network")
 	TArray<UComputerTypeAsset*> ComputerTypes;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Name Generation")
+	UMarkovTrainingDataAsset* NameTrainingData;
+
+	UFUNCTION()
+	void GenerateName(const FRandomStream& InRandomStream, TArray<FString> BaseTrainingData, FString& OutRealName, FString& OutDomainName);
 
 };

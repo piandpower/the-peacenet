@@ -15,6 +15,7 @@
 
 class USystemContext;
 class UComputerTypeAsset;
+class UCompanyTypeAsset;
 class APeacenetWorldStateActor;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FWorldGenCompleteEvent);
@@ -140,19 +141,21 @@ class PROJECTOGLOWIA_API FWorldGenTask : public FNonAbandonableTask
 	friend class FAutoDeleteAsyncTask<FWorldGenTask>;
 
 public:
-	FWorldGenTask(UPeacenetSaveGame* InSaveGame, const FRandomStream InRandomStream, UWorldGeneratorStatus* InStatus, TArray<UMarkovTrainingDataAsset*> InTrainingData, TArray<UComputerTypeAsset*> InComputerTypes, UComputerTypeAsset* InPersonalComputerType)
+	FWorldGenTask(UPeacenetSaveGame* InSaveGame, const FRandomStream InRandomStream, UWorldGeneratorStatus* InStatus, TArray<UMarkovTrainingDataAsset*> InTrainingData, TArray<UComputerTypeAsset*> InComputerTypes, UComputerTypeAsset* InPersonalComputerType, TArray<UCompanyTypeAsset*> InCompanyTypes)
 		: SaveGame(InSaveGame)
 		, RandomStream(InRandomStream)
 		, Status(InStatus)
 		, TrainingData(InTrainingData)
 		, ComputerTypes(InComputerTypes)
-		, PersonalComputerType(InPersonalComputerType) {}
+		, PersonalComputerType(InPersonalComputerType)
+		, CompanyTypes(InCompanyTypes) {}
 
 	UPeacenetSaveGame* SaveGame;
 	FRandomStream RandomStream;
 	UWorldGeneratorStatus* Status;
 	TArray<UMarkovTrainingDataAsset*> TrainingData;
 	TArray<UComputerTypeAsset*> ComputerTypes;
+	TArray<UCompanyTypeAsset*> CompanyTypes;
 	UComputerTypeAsset* PersonalComputerType;
 
 	void DoWork();

@@ -22,6 +22,14 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Peacenet|Company")
 	int ID = 0;
 
+	// Where is this company?
+	UPROPERTY(BlueprintReadOnly, Category = "Peacenet|Company")
+	ECountry Country;
+
+	// Where in the netmap is this company?
+	UPROPERTY()
+	FVector2D NodePosition;
+
 	// This is the name of the company, displayed in the UI. No two companies should have the same name unless in different countries. If it does have the same name in a different country, both companies inherit similar stats.
 	UPROPERTY(BlueprintReadOnly, Category = "Peacenet|Company")
 	FText Name;
@@ -30,11 +38,10 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Peacenet|Company")
 	TArray<int> Computers;
 
-	// What country is this company located in?
-	UPROPERTY(BlueprintReadOnly, Category = "Peacenet|Company")
-	ECountry Country;
-
 	// Info about the type of company this is.
 	UPROPERTY()
 	TSubclassOf<UCompanyTypeAsset> CompanyType;
+
+	UPROPERTY()
+	FString PublicIPAddress;
 };

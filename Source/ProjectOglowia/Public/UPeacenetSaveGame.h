@@ -52,6 +52,9 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Unlocks and Game State")
 	TMap<FName, bool> Booleans;
 
+	UPROPERTY(VisibleAnywhere, Category = "Networking")
+	TMap<FString, FString> DomainNameMap;
+
 	UPROPERTY(VisibleAnywhere, Category = "Missions")
 	TArray<FName> Missions;
 
@@ -62,6 +65,12 @@ public:
 
 	UFUNCTION()
 	bool CharacterNameExists(FText CharacterName);
+
+	UFUNCTION()
+	bool CompanyNameExists(FText CompanyName);
+
+	UFUNCTION()
+	bool DomainNameExists(FString InDomainName);
 
 	UFUNCTION()
 	bool IPAddressAllocated(FString InIPAddress);

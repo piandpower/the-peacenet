@@ -93,4 +93,8 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Hacking")
 	TArray<FName> ActiveServices;
+
+	// If true then the IP address of this computer is local to an enterprise network. No connections can be made to this computer directly.
+	UPROPERTY()
+	bool IsNATted = false;
 };

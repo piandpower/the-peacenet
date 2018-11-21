@@ -14,6 +14,21 @@ bool UPeacenetSaveGame::CharacterNameExists(FText CharacterName)
 	return false;
 }
 
+bool UPeacenetSaveGame::CompanyNameExists(FText CompanyName)
+{
+	for (auto& Company : Businesses)
+	{
+		if (Company.Name.EqualTo(CompanyName))
+			return true;
+	}
+	return false;
+}
+
+bool UPeacenetSaveGame::DomainNameExists(FString InDomainName)
+{
+	return DomainNameMap.Contains(InDomainName);
+}
+
 bool UPeacenetSaveGame::IPAddressAllocated(FString InIPAddress)
 {
 	for (auto& Computer : this->Computers)
@@ -28,6 +43,25 @@ bool UPeacenetSaveGame::IPAddressAllocated(FString InIPAddress)
 
 bool UPeacenetSaveGame::IsCharacterNodePositionTaken(ECountry InCountry, FVector2D InPosition)
 {
+	const float DISTANCE = 0.1f;
+
+	for (auto& Company : this->Businesses)
+	{
+		if (Company.Country != InCountry)
+			continue;
+
+		float cX = Company.NodePosition.X;
+		float cY = Company.NodePosition.Y;
+
+		float x = InPosition.X;
+		float y = InPosition.Y;
+
+		if (FMath::IsNearlyEqual(x, cX, DISTANCE) && FMath::IsNearlyEqual(y, cY, DISTANCE))
+		{
+			return true;
+		}
+	}
+
 	for (auto& Character : this->Characters)
 	{
 		if (Character.Country != InCountry)
@@ -39,7 +73,7 @@ bool UPeacenetSaveGame::IsCharacterNodePositionTaken(ECountry InCountry, FVector
 		float cX = Character.NodePosition.X;
 		float cY = Character.NodePosition.Y;
 
-		if (FMath::IsNearlyEqual(x, cX, 0.1f) && FMath::IsNearlyEqual(y, cY, 0.1f))
+		if (FMath::IsNearlyEqual(x, cX, DISTANCE) && FMath::IsNearlyEqual(y, cY, DISTANCE))
 		{
 			return true;
 		}

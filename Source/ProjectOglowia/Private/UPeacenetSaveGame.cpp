@@ -50,13 +50,7 @@ bool UPeacenetSaveGame::IsCharacterNodePositionTaken(ECountry InCountry, FVector
 		if (Company.Country != InCountry)
 			continue;
 
-		float cX = Company.NodePosition.X;
-		float cY = Company.NodePosition.Y;
-
-		float x = InPosition.X;
-		float y = InPosition.Y;
-
-		if (FMath::IsNearlyEqual(x, cX, DISTANCE) && FMath::IsNearlyEqual(y, cY, DISTANCE))
+		if(FVector2D::Distance(InPosition, Company.NodePosition) <= DISTANCE)
 		{
 			return true;
 		}
@@ -67,16 +61,16 @@ bool UPeacenetSaveGame::IsCharacterNodePositionTaken(ECountry InCountry, FVector
 		if (Character.Country != InCountry)
 			continue;
 
-		float x = InPosition.X;
-		float y = InPosition.Y;
-
-		float cX = Character.NodePosition.X;
-		float cY = Character.NodePosition.Y;
-
-		if (FMath::IsNearlyEqual(x, cX, DISTANCE) && FMath::IsNearlyEqual(y, cY, DISTANCE))
+		if (FVector2D::Distance(InPosition, Character.NodePosition) <= DISTANCE) 
 		{
 			return true;
 		}
 	}
 	return false;
+}
+
+bool UPeacenetSaveGame::CountryHasEmailService(ECountry InCountry)
+{
+	// TODO: What is an email service?
+	return true;
 }

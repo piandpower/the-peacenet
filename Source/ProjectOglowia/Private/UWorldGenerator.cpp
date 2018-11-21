@@ -61,7 +61,7 @@ UWorldGeneratorStatus* UWorldGenerator::GenerateCharacters(const APeacenetWorldS
 	return WorldGenStatus;
 }
 
-FString UWorldGenerator::GenerateIPAddress(const FRandomStream & InRandomStream, const ECountry InCountry, const FComputer & InComputer)
+FString UWorldGenerator::GenerateIPAddress(const FRandomStream & InRandomStream, const ECountry InCountry, int InEntityID)
 {
 	int CountryRangeMaxValue = 0;
 	for (int i = 255; i > 0; i--)
@@ -75,11 +75,16 @@ FString UWorldGenerator::GenerateIPAddress(const FRandomStream & InRandomStream,
 	check(CountryRangeMaxValue);
 
 	uint8 CountryByte = (uint8)(InRandomStream.RandRange(0, CountryRangeMaxValue - 1) * (int)InCountry) + 1;
-	uint8 SecondByte = ((InComputer.ID % 2) == 0) ? (uint8)InRandomStream.RandRange(0, 127) : (uint8)InRandomStream.RandRange(128, 254);
+	uint8 SecondByte = ((InEntityID % 2) == 0) ? (uint8)InRandomStream.RandRange(0, 127) : (uint8)InRandomStream.RandRange(128, 254);
 	uint8 ThirdByte = (uint8)InRandomStream.RandRange(0, 254);
-	uint8 FourthByte = (uint8)(InComputer.ID % 255);
+	uint8 FourthByte = (uint8)(InEntityID % 255);
 
 	return FString::FromInt(CountryByte) + "." + FString::FromInt(SecondByte) + "." + FString::FromInt(ThirdByte) + "." + FString::FromInt(FourthByte);
+}
+
+FString UWorldGenerator::GenerateIPAddress(const FRandomStream & InRandomStream, const ECountry InCountry, const FComputer & InComputer)
+{
+	return GenerateIPAddress(InRandomStream, InCountry, InComputer.ID);
 }
 
 FString UWorldGenerator::MakeName(FString InWord)
@@ -505,10 +510,13 @@ void FWorldGenTask::DoWork()
 	TArray<FString> FemaleFirstNames = UWorldGenerator::FilterTrainingData(TrainingData, EMarkovTrainingDataUsage::FemaleFirstNames);
 	TArray<FString> BusinessWords = UWorldGenerator::FilterTrainingData(TrainingData, EMarkovTrainingDataUsage::Hostnames);
 	TArray<FString> LastNames = UWorldGenerator::FilterTrainingData(TrainingData, EMarkovTrainingDataUsage::LastNames);
+	TArray<FString> BusinessNames = UWorldGenerator::FilterTrainingData(TrainingData, EMarkovTrainingDataUsage::Hostnames);
+
 
 	// Create markov chains for first names.
 	UMarkovChain* MaleGenerator = UWorldGenerator::CreateMarkovChain(MaleFirstNames, RandomStream);
 	UMarkovChain* FemaleGenerator = UWorldGenerator::CreateMarkovChain(FemaleFirstNames, RandomStream);
+
 
 
 	// And one for the last names.
@@ -527,9 +535,43 @@ void FWorldGenTask::DoWork()
 		//
 		// When the relevant value reaches zero or below, the game starts generating the next
 		// part of the world.
-		int NPCCounter = 200;
-		int BusinessCounter = 75;
+		int NPCCounter = 150;
+		int BusinessCounter = 25;
 
+		while (BusinessCounter > 0 || !this->SaveGame->CountryHasEmailService(Country))
+		{
+			FEnterpriseNetwork Business;
+			Business.ID = this->SaveGame->Businesses.Num();
+			UCompanyTypeAsset* CompanyType = this->CompanyTypes[this->RandomStream.RandRange(0, this->CompanyTypes.Num() - 1)];
+			Business.CompanyType = CompanyType->GetClass();
+			FString DomainName;
+			do
+			{
+				FString CompanyName;
+				CompanyType->GenerateName(this->RandomStream, BusinessNames, CompanyName, DomainName);
+				Business.Name = FText::FromString(CompanyName);
+			} while (this->SaveGame->CompanyNameExists(Business.Name));
+			
+			do
+			{
+				Business.PublicIPAddress = UWorldGenerator::GenerateIPAddress(this->RandomStream, Country, Business.ID);
+			} while (this->SaveGame->IPAddressAllocated(Business.PublicIPAddress));
+
+			Business.Country = Country;
+			
+			do
+			{
+				float x = this->RandomStream.FRandRange(-1.f, 1.f);
+				float y = this->RandomStream.FRandRange(-1.f, 1.f);
+				Business.NodePosition = FVector2D(x, y);
+			} while (this->SaveGame->IsCharacterNodePositionTaken(Country, Business.NodePosition));
+
+			// TODO: computer generation.
+
+			this->SaveGame->Businesses.Add(Business);
+
+			BusinessCounter -= RandomStream.RandRange(1, 5);
+		}
 
 		// Now we have all our training data for name generation.
 		// So, now we'll start generating NPCs.
@@ -598,30 +640,6 @@ void FWorldGenTask::DoWork()
 
 			// Decrease counter.
 			NPCCounter -= RandomStream.RandRange(1, 5);
-		}
-
-		while (BusinessCounter > 0)
-		{
-			AsyncTask(ENamedThreads::GameThread, [this, BusinessCounter]()
-			{
-				Status->Status = FText::FromString(TEXT("Generating businesses..."));
-				Status->Percentage = 1.f - ((float)BusinessCounter / 400);
-			});
-
-			FEnterpriseNetwork Business;
-
-			// Set the ID of the network.
-			Business.ID = SaveGame->Businesses.Num();
-
-			// TODO: business names.
-			Business.Name = FText::FromString(TEXT("Business Inc."));
-
-			// Set the country.
-			Business.Country = Country;
-
-			SaveGame->Businesses.Add(Business);
-
-			BusinessCounter -= RandomStream.RandRange(1, 5);
 		}
 	}
 

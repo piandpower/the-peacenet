@@ -5,8 +5,12 @@
 
 void UCompanyTypeAsset::GenerateName(const FRandomStream& InRandomStream, TArray<FString> BaseTrainingData, FString & OutRealName, FString & OutDomainName)
 {
-	// We add our training data into the base data to get company names that match our type.
-	BaseTrainingData.Append(this->NameTrainingData->TrainingData);
+	// Only use type-specific names if we have our own training data.
+	if (this->NameTrainingData)
+	{
+		// We add our training data into the base data to get company names that match our type.
+		BaseTrainingData.Append(this->NameTrainingData->TrainingData);
+	}
 
 	// Now we create a new markov chain.
 	UMarkovChain* Markov = UWorldGenerator::CreateMarkovChain(BaseTrainingData, InRandomStream);
@@ -18,14 +22,13 @@ void UCompanyTypeAsset::GenerateName(const FRandomStream& InRandomStream, TArray
 	FString KeptChars = "abcdefghijklmnopqrstuvwxyz1234567890-_";
 
 	// convert it to lowercase
-	OutDomainName = OutRealName.ToLower();
+	FString TempDomainName = OutRealName.ToLower();
 
-	for (int i = 0; i < OutDomainName.GetCharArray().Num(); i++)
+	for (TCHAR Char : TempDomainName.GetCharArray())
 	{
-		if (!KeptChars.Contains(FString::Chr(OutDomainName[i])))
+		if (KeptChars.Contains(FString::Chr(Char)))
 		{
-			OutDomainName.RemoveAt(i, 1);
-			i--;
+			OutDomainName = OutDomainName.AppendChar(Char);
 		}
 	}
 

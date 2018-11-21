@@ -77,4 +77,7 @@ public:
 
 	UFUNCTION()
 	bool IsCharacterNodePositionTaken(ECountry InCountry, FVector2D InPosition);
+
+	UFUNCTION()
+	bool CountryHasEmailService(ECountry InCountry);
 };

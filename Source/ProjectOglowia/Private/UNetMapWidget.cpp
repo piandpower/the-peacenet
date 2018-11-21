@@ -34,6 +34,20 @@ void UNetMapWidget::CollectDiscoveredNodes()
 				}
 			}
 		}
+
+		for (auto& Business : this->Desktop->SystemContext->Peacenet->SaveGame->Businesses)
+		{
+			if (Business.Country != this->Desktop->SystemContext->Character.Country)
+			{
+				FNetMapNode BusinessNode;
+				BusinessNode.Location = Business.NodePosition;
+				BusinessNode.EntityID = Business.ID;
+				BusinessNode.ColorValue = 0.f;
+				BusinessNode.EmblemType = ENetMapEmblemType::Business;
+				NodeAdded(BusinessNode);
+				Nodes.Add(BusinessNode);
+			}
+		}
 	}
 }
 

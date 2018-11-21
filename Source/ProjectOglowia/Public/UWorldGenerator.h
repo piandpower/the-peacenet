@@ -120,7 +120,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "World Generation")
 	static UWorldGeneratorStatus* GenerateCharacters(const APeacenetWorldStateActor* InWorld, const FRandomStream& InRandomStream, UPeacenetSaveGame* InSaveGame);
 
-	UFUNCTION()
+	static FString GenerateIPAddress(const FRandomStream& InRandomStream, const ECountry InCountry, int InEntityID);
 	static FString GenerateIPAddress(const FRandomStream& InRandomStream, const ECountry InCountry, const FComputer& InComputer);
 
 	UFUNCTION()

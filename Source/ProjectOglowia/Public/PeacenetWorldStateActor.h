@@ -12,6 +12,7 @@
 
 class UNativeLatentAction;
 class UMissionAsset;
+class UComputerService;
 class UComputerTypeAsset;
 class USystemContext;
 class UWallpaperAsset;
@@ -112,6 +113,9 @@ private:
 	void ResynchronizeSystemContexts();
 
 public:	
+	UPROPERTY()
+	TArray<UComputerService*> ComputerServices;
+
 	UFUNCTION()
 	void AddLatentAction(UNativeLatentAction* InAction);
 

@@ -8,6 +8,7 @@
 #include "WallpaperAsset.h"
 #include "UMissionAsset.h"
 #include "UMissionUnlock.h"
+#include "UComputerService.h"
 #include "UNativeLatentAction.h"
 #include "CommandInfo.h"
 #include "TerminalCommand.h"
@@ -186,6 +187,9 @@ void APeacenetWorldStateActor::LoadTerminalCommands()
 void APeacenetWorldStateActor::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// Load computer services.
+	this->LoadAssets<UComputerService>("ComputerService", this->ComputerServices);
 
 	// Load wallpaper assets.
 	this->LoadAssets<UWallpaperAsset>(TEXT("WallpaperAsset"), this->Wallpapers);

@@ -14,6 +14,11 @@ void UProgram::PushNotification(const FText & InNotificationMessage)
 	this->Window->SystemContext->Desktop->EnqueueNotification(this->Window->WindowTitle, InNotificationMessage, this->Window->Icon);
 }
 
+void UProgram::ExecuteCommand(FString InCommand)
+{
+	this->Window->SystemContext->ExecuteCommand(InCommand);
+}
+
 UProgram* UProgram::CreateProgram(const TSubclassOf<UWindow> InWindow, const TSubclassOf<UProgram> InProgramClass, USystemContext* InSystem, const int InUserID, UWindow*& OutWindow)
 {
 	check(InSystem->Peacenet);

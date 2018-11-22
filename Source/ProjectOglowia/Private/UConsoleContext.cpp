@@ -3,6 +3,14 @@
 #include "UConsoleContext.h"
 #include "USystemContext.h"
 
+void UConsoleContext::InjectInput(const FString & Input)
+{
+	if (this->Terminal)
+	{
+		this->Terminal->InjectInput(Input);
+	}
+}
+
 FString UConsoleContext::SynchronouslyReadLine()
 {
 	while (!this->Terminal->IsInputLineAvailable) {	} //this is thread safe woo

@@ -42,6 +42,9 @@ public:
 	UFUNCTION()
 	void SelectCharacterNode(int InEntityID);
 
+	UFUNCTION(BlueprintImplementableEvent, Category = "System")
+	void ExecuteCommand(const FString& InCommand);
+
 protected:
 	UFUNCTION(BlueprintCallable, Category = "Desktop")
 	UProgram* SpawnProgramFromClass(TSubclassOf<UProgram> InClass, const FText& InTitle, UTexture2D* InIcon);

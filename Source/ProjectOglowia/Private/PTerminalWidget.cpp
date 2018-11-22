@@ -367,6 +367,15 @@ int32 UPTerminalWidget::NativePaint(const FPaintArgs& Args, const FGeometry& All
 	return LayerId;
 }
 
+void UPTerminalWidget::InjectInput(const FString& Input)
+{
+	this->TextInputBuffer = Input + "\n";
+	if (this->EchoInputText)
+	{
+		this->WriteLine(Input);
+	}
+}
+
 void UPTerminalWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);

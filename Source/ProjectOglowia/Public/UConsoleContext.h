@@ -37,6 +37,9 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 	UPeacegateFileSystem* Filesystem;
 
+	UFUNCTION(BlueprintCallable)
+		void InjectInput(const FString& Input);
+	
 	UFUNCTION()
 	virtual FString SynchronouslyReadLine();
 

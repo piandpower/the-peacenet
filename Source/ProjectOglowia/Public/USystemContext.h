@@ -38,6 +38,9 @@ private:
 	FString CurrentHostname;
 
 public:
+	UFUNCTION()
+	void ExecuteCommand(FString InCommand);
+
 	UPROPERTY()
 	APeacenetWorldStateActor * Peacenet;
 	

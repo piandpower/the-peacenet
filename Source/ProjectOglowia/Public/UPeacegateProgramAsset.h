@@ -35,6 +35,9 @@ protected:
 		void PushNotification(const FText& InNotificationMessage);
 
 public:
+	UFUNCTION(BlueprintCallable, Category = "System")
+	void ExecuteCommand(FString InCommand);
+
 	UFUNCTION(BlueprintCallable, Category = "Peacegate")
 	static UProgram* CreateProgram(const TSubclassOf<UWindow> InWindowClass, const TSubclassOf<UProgram> InProgramClass, USystemContext* InSystem, const int InUserID, UWindow*& OutWindow);
 	

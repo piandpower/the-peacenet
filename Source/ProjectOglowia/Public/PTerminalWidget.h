@@ -24,6 +24,8 @@ class PROJECTOGLOWIA_API UPTerminalWidget : public UUserWidget
 
 
 public:
+	void InjectInput(const FString& Input);
+
 	FThreadSafeBool IsInputLineAvailable = false;
 
 	UPTerminalWidget(const FObjectInitializer& ObjectInitializer);

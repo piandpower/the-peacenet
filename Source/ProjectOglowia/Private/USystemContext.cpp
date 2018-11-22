@@ -306,6 +306,13 @@ void USystemContext::ParseCharacterName(const FString InCharacterName, FString &
 	OutHostname = FirstName + TEXT("-pc");
 }
 
+void USystemContext::ExecuteCommand(FString InCommand)
+{
+	check(this->Desktop);
+
+	this->Desktop->ExecuteCommand(InCommand);
+}
+
 void USystemContext::HandleFileSystemEvent(EFilesystemEventType InType, FString InPath)
 {
 	switch (InType)

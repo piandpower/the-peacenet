@@ -505,6 +505,8 @@ void UWorldGenerator::CreateFilesystem(FPeacenetIdentity& InCharacter, FComputer
 
 void FWorldGenTask::DoWork()
 {
+	const int MAX_SKILL_LEVEL = 15;
+
 	// These arrays contain aggregated training data for Markov chains.
 	TArray<FString> MaleFirstNames = UWorldGenerator::FilterTrainingData(TrainingData, EMarkovTrainingDataUsage::MaleFirstNames);
 	TArray<FString> FemaleFirstNames = UWorldGenerator::FilterTrainingData(TrainingData, EMarkovTrainingDataUsage::FemaleFirstNames);
@@ -633,7 +635,7 @@ void FWorldGenTask::DoWork()
 			NPC.Country = Country;
 
 			// TODO: Skill generation.
-			NPC.Skill = 1;
+			NPC.Skill = RandomStream.RandRange(0, MAX_SKILL_LEVEL);
 
 			// Add the character to the save!
 			SaveGame->Characters.Add(NPC);

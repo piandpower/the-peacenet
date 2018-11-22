@@ -39,8 +39,14 @@ void UDesktopWidget::SelectCharacterNode(int InEntityID)
 	{
 		if (Character.ID == InEntityID)
 		{
-			this->CharacterNodeSelected(Character);
-			return;
+			for (auto& Computer : this->SystemContext->Peacenet->SaveGame->Computers)
+			{
+				if (Computer.ID == Character.ComputerID)
+				{
+					this->CharacterNodeSelected(Character, Computer);
+					return;
+				}
+			}
 		}
 	}
 }

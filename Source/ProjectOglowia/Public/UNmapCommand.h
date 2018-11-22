@@ -18,5 +18,16 @@ class PROJECTOGLOWIA_API UNmapCommand : public UTerminalCommand
 	GENERATED_BODY()
 
 public:
+	UPROPERTY()
+	USystemContext* ResolvedContext;
+
+	UPROPERTY()
+	TArray<UHackableAsset*> Hackables;
+
+	UPROPERTY()
+	UConsoleContext* Caller;
+
+	void ListNextService();
+
 	virtual void RunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments) override;
 };

@@ -11,7 +11,8 @@ enum class ENetMapScanEventType : uint8
 {
 	ServiceFound,
 	HostResolveFailure,
-	FirewallDetected
+	FirewallDetected,
+	ScanStarted
 };
 
 /**

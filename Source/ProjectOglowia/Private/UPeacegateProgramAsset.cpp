@@ -44,6 +44,11 @@ UProgram* UProgram::CreateProgram(const TSubclassOf<UWindow> InWindow, const TSu
 
 	// Return the window and program.
 	OutWindow = Window;
+
+	TScriptDelegate<> NMS;
+	NMS.BindUFunction(ProgramInstance, "NetMapScan");
+	Window->SystemContext->NetMapScan.Add(NMS);
+
 	return ProgramInstance;
 }
 

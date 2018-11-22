@@ -6,6 +6,7 @@
 #include "UWindow.h"
 #include "USystemContext.h"
 #include "Engine/DataAsset.h"
+#include "FNetMapScanEventArgs.h"
 #include "UPeacegateProgramAsset.generated.h"
 
 class UConsoleContext;
@@ -33,6 +34,10 @@ protected:
 
 	UFUNCTION(BlueprintCallable, Category = "Desktop")
 		void PushNotification(const FText& InNotificationMessage);
+
+protected:
+	UFUNCTION(BlueprintImplementableEvent, Category = "NetMap")
+	void NetMapScan(int InEntityID, FNetMapScanEventArgs EventArgs);
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "System")

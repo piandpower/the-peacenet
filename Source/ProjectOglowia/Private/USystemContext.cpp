@@ -306,6 +306,11 @@ void USystemContext::ParseCharacterName(const FString InCharacterName, FString &
 	OutHostname = FirstName + TEXT("-pc");
 }
 
+void USystemContext::BroadcastNetMapEvent(int InEntityID, FNetMapScanEventArgs EventArgs)
+{
+	this->NetMapScan.Broadcast(InEntityID, EventArgs);
+}
+
 void USystemContext::ExecuteCommand(FString InCommand)
 {
 	check(this->Desktop);

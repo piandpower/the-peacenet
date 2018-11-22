@@ -3,6 +3,7 @@
 
 #include "UNmapCommand.h"
 #include "UComputerTypeAsset.h"
+#include "FNetMapScanEventArgs.h"
 #include "UHackableAsset.h"
 
 void UNmapCommand::RunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments) 
@@ -30,7 +31,12 @@ void UNmapCommand::RunCommand(UConsoleContext* InConsole, const TMap<FString, UD
                     InConsole->Write(FString::FromInt(Hackable->Port)+"\t");
                     InConsole->Write("open\t");
                     InConsole->WriteLine(Hackable->InternalID.ToString());
-                }
+                
+					FNetMapScanEventArgs EventArgs;
+					EventArgs.EventType = ENetMapScanEventType::ServiceFound;
+					EventArgs.Hackable = Hackable;
+					InConsole->SystemContext->BroadcastNetMapEvent(ResolvedContext->Computer.ID, EventArgs);
+				}
             }
         }
     }

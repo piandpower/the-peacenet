@@ -6,12 +6,15 @@
 #include "FComputer.h"
 #include "UPeacegateFileSystem.h"
 #include "FPeacenetIdentity.h"
-
+#include "FNetMapScanEventArgs.h"
 #include "USystemContext.generated.h"
+
 
 class UDesktopWidget;
 class APeacenetWorldStateActor;
 class UPeacegateProgramAsset;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FNetMapScanEvent, int, EntityID, FNetMapScanEventArgs, Args);
 
 USTRUCT(BlueprintType)
 struct PROJECTOGLOWIA_API FUserInfo
@@ -38,6 +41,12 @@ private:
 	FString CurrentHostname;
 
 public:
+	UPROPERTY()
+	FNetMapScanEvent NetMapScan;
+
+	UFUNCTION()
+	void BroadcastNetMapEvent(int InEntityID, FNetMapScanEventArgs EventArgs);
+
 	UFUNCTION()
 	void ExecuteCommand(FString InCommand);
 

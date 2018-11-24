@@ -15,6 +15,7 @@
 
 class USystemContext;
 class UComputerService;
+class UHackableAsset;
 class UComputerTypeAsset;
 class UCompanyTypeAsset;
 class APeacenetWorldStateActor;
@@ -160,6 +161,10 @@ public:
 	TArray<UCompanyTypeAsset*> CompanyTypes;
 	UComputerTypeAsset* PersonalComputerType;
 	TArray<UComputerService*> ComputerServices;
+
+	TArray<UComputerService*> GetSupportedServices(UHackableAsset* InHackable);
+	void FilterSkillLevel(TArray<UComputerService*>& InServices, int InSkill);
+	bool PortIsTaken(int InPort, FComputer& InComputer);
 
 	void DoWork();
 

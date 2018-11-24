@@ -10,6 +10,7 @@
 #include "UComputerService.h"
 #include "Async.h"
 #include "FEnterpriseNetwork.h"
+#include "UHackableAsset.h"
 #include "UCompanyTypeAsset.h"
 #include "UPeacegateFileSystem.h"
 #include "PeacenetWorldStateActor.h"
@@ -504,6 +505,55 @@ void UWorldGenerator::CreateFilesystem(FPeacenetIdentity& InCharacter, FComputer
 }
 
 
+TArray<UComputerService*> FWorldGenTask::GetSupportedServices(UHackableAsset * InHackable)
+{
+	TArray<UComputerService*> ReturnValue;
+
+	for (auto Service : this->ComputerServices)
+	{
+		if (Service->HackableType == InHackable)
+		{
+			ReturnValue.Add(Service);
+		}
+	}
+
+	check(ReturnValue.Num());
+	return ReturnValue;
+}
+
+void FWorldGenTask::FilterSkillLevel(TArray<UComputerService*>& InServices, int InSkill)
+{
+	for (int i = 0; i < InServices.Num(); i++)
+	{
+		bool ShouldLoop = false;
+		do
+		{
+			auto Service = InServices[i];
+			if ((InSkill >= Service->MinimumSkillLevel || Service->MinimumSkillLevel == 0) && (InSkill <= Service->MaximumSkillLevel || Service->MaximumSkillLevel == 0))
+			{
+				ShouldLoop = false;
+			}
+			else
+			{
+				InServices.RemoveAt(i);
+				ShouldLoop = true;
+			}
+		} while (ShouldLoop);
+	}
+}
+
+bool FWorldGenTask::PortIsTaken(int InPort, FComputer & InComputer)
+{
+	for (auto Service : InComputer.ActiveServices)
+	{
+		if (Service.Port == InPort)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 void FWorldGenTask::DoWork()
 {
 	const int MAX_SKILL_LEVEL = 15;
@@ -743,6 +793,78 @@ void FWorldGenTask::DoWork()
 					UWorldGenerator::CreateFilesystem(Character, Computer, RandomStream);
 				}
 
+				break;
+			}
+		}
+	}
+
+	// This is the final step, computer service generation.
+	// Once we've gotten this far, every business network and every NPC computer, and even the player's computer, has been generated.
+	// And every computer has a computer type asset associated with it, which is great.
+	// However, the computer type asset just tells the game what hackable service types are supported
+	// on the given computer. It doesn't actually give any stats on each service's strengths/weaknesses/vulnerabilities etc
+	// which means you can't hack them.
+	//
+	// This section of the world generator fixes that issue by using the computer type asset and other stats from its owning NPC/business
+	// to pick the right services with the right stats.
+
+	// First we start with NPCs, because business are way fucking harder. Not doing them both at the same time. Fuck that.
+	for (auto& Character : this->SaveGame->Characters)
+	{
+		for (auto& Computer : this->SaveGame->Computers)
+		{
+			// check if the computer belongs to the npc.
+			if (Computer.ID == Character.ComputerID)
+			{
+				// we need to get the computer type for this PC.
+				// however, we don't have a peacenet context because fucking multithreading
+				// so this is gonna look dirtier than a dog's ass.
+				for (auto ComputerTypeAsset : this->ComputerTypes)
+				{
+					if (ComputerTypeAsset->InternalID == Computer.ComputerType)
+					{
+						// Hell yeah.
+
+						// Now we go through each hackable supported by this computer type.
+						for (auto Hackable : ComputerTypeAsset->Services)
+						{
+							// Yay. We have a hackable asset! Finally! Now we can grab all supported service implementations.
+							auto SupportedServices = this->GetSupportedServices(Hackable); // This crashes if we didn't make any.
+
+							// Filter based on skill level.
+							this->FilterSkillLevel(SupportedServices, Character.Skill);
+
+							// WOOHOO WE HAVE A CHOSEN SERVICE
+							auto TheChosenOne = SupportedServices[this->RandomStream.RandRange(0, SupportedServices.Num() - 1)];
+							
+							// But should we use a non-standard port?
+							bool UseNonstandardPort = ((RandomStream.RandRange(0, 6) % 2) == 0) && (Character.Skill >= 10);
+							int Port = 0;
+							if (UseNonstandardPort)
+							{
+								do
+								{
+									Port = RandomStream.RandRange(0, 40000);
+								} while (PortIsTaken(Port, Computer));
+							}
+							else
+							{
+								Port = Hackable->Port;
+							}
+
+							// Create a new ServiceInfo struct.
+							FServiceInfo ServiceInfo;
+							ServiceInfo.Port = Port;
+							ServiceInfo.ServiceName = TheChosenOne->InternalID;
+							Computer.ActiveServices.Add(ServiceInfo);
+						}
+
+						// We're done with that.
+						break;
+					}
+				}
+
+				// break the loop. So we don't keep iterating, we're done with this character.
 				break;
 			}
 		}

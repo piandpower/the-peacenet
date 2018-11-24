@@ -14,6 +14,7 @@
 #include "UWorldGenerator.generated.h"
 
 class USystemContext;
+class UComputerService;
 class UComputerTypeAsset;
 class UCompanyTypeAsset;
 class APeacenetWorldStateActor;
@@ -141,14 +142,15 @@ class PROJECTOGLOWIA_API FWorldGenTask : public FNonAbandonableTask
 	friend class FAutoDeleteAsyncTask<FWorldGenTask>;
 
 public:
-	FWorldGenTask(UPeacenetSaveGame* InSaveGame, const FRandomStream InRandomStream, UWorldGeneratorStatus* InStatus, TArray<UMarkovTrainingDataAsset*> InTrainingData, TArray<UComputerTypeAsset*> InComputerTypes, UComputerTypeAsset* InPersonalComputerType, TArray<UCompanyTypeAsset*> InCompanyTypes)
+	FWorldGenTask(UPeacenetSaveGame* InSaveGame, const FRandomStream InRandomStream, UWorldGeneratorStatus* InStatus, TArray<UMarkovTrainingDataAsset*> InTrainingData, TArray<UComputerTypeAsset*> InComputerTypes, UComputerTypeAsset* InPersonalComputerType, TArray<UCompanyTypeAsset*> InCompanyTypes, TArray<UComputerService*> InComputerServices)
 		: SaveGame(InSaveGame)
 		, RandomStream(InRandomStream)
 		, Status(InStatus)
 		, TrainingData(InTrainingData)
 		, ComputerTypes(InComputerTypes)
 		, PersonalComputerType(InPersonalComputerType)
-		, CompanyTypes(InCompanyTypes) {}
+		, CompanyTypes(InCompanyTypes)
+		, ComputerServices(InComputerServices) {}
 
 	UPeacenetSaveGame* SaveGame;
 	FRandomStream RandomStream;
@@ -157,6 +159,7 @@ public:
 	TArray<UComputerTypeAsset*> ComputerTypes;
 	TArray<UCompanyTypeAsset*> CompanyTypes;
 	UComputerTypeAsset* PersonalComputerType;
+	TArray<UComputerService*> ComputerServices;
 
 	void DoWork();
 

@@ -21,6 +21,18 @@ enum class EUserDomain : uint8
 	DatabaseUser
 };
 
+USTRUCT(BlueprintType)
+struct PROJECTOGLOWIA_API FServiceInfo
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintReadOnly, Category = "Hackable")
+	FName ServiceName;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Hackable")
+	int Port;
+};
 
 /**
  * Represents a Peacegate user.
@@ -92,7 +104,7 @@ public:
 	TArray<FName> InstalledCommands;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Hacking")
-	TArray<FName> ActiveServices;
+	TArray<FServiceInfo> ActiveServices;
 
 	// If true then the IP address of this computer is local to an enterprise network. No connections can be made to this computer directly.
 	UPROPERTY()

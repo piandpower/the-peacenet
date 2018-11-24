@@ -50,6 +50,7 @@ struct FManPage
 	GENERATED_BODY()
 
 public:
+
 	UPROPERTY()
 	FString Description;
 
@@ -65,7 +66,9 @@ class PROJECTOGLOWIA_API APeacenetWorldStateActor : public AActor
 {
 	GENERATED_BODY()
 	
-
+public:
+	UFUNCTION()
+	bool FindServiceByName(FName ServiceName, UComputerService*& OutService);
 
 private:
 	UPROPERTY()

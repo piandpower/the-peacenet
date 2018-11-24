@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "TerminalCommand.h"
 #include "USystemContext.h"
+#include "UComputerService.h"
 #include "PeacenetWorldStateActor.h"
 #include "DocoptForUnrealBPLibrary.h"
 #include "UNmapCommand.generated.h"
@@ -22,7 +23,7 @@ public:
 	USystemContext* ResolvedContext;
 
 	UPROPERTY()
-	TArray<UHackableAsset*> Hackables;
+	TArray<FServiceInfo> Hackables;
 
 	UPROPERTY()
 	UConsoleContext* Caller;

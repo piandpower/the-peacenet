@@ -3,7 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "UComputerService.h"
 #include "UHackableAsset.h"
+#include "FComputer.h"
 #include "FNetMapScanEventArgs.generated.h"
 
 UENUM(BlueprintType)
@@ -13,6 +15,19 @@ enum class ENetMapScanEventType : uint8
 	HostResolveFailure,
 	FirewallDetected,
 	ScanStarted
+};
+
+USTRUCT(BlueprintType)
+struct PROJECTOGLOWIA_API FNetMapServiceInfo
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintReadOnly, Category = "NetMap")
+	UComputerService* ServiceAsset;
+
+	UPROPERTY(BlueprintReadOnly, Category = "NetMap")
+	FServiceInfo ServiceInfo;
 };
 
 /**
@@ -28,7 +43,7 @@ public:
 	ENetMapScanEventType EventType;
 
 	UPROPERTY(BlueprintReadOnly, Category = "NetMap")
-	UHackableAsset* Hackable = nullptr;
+	FNetMapServiceInfo Hackable;
 
 	UPROPERTY(BlueprintReadOnly, Category = "NetMap")
 	int FirewallStrength = -1;

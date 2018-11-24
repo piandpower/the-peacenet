@@ -7,6 +7,7 @@
 #include "UPeacenetSaveGame.h"
 #include "FEnterpriseNetwork.h"
 #include "UComputerTypeAsset.h"
+#include "UComputerService.h"
 #include "Async.h"
 #include "FEnterpriseNetwork.h"
 #include "UCompanyTypeAsset.h"
@@ -56,7 +57,7 @@ UWorldGeneratorStatus* UWorldGenerator::GenerateCharacters(const APeacenetWorldS
 
 	UWorldGeneratorStatus* WorldGenStatus = NewObject<UWorldGeneratorStatus>();
 
-	(new FAutoDeleteAsyncTask<FWorldGenTask>(InSaveGame, InRandomStream, WorldGenStatus, TrainingData, ComputerTypes, InWorld->PlayerComputerType, CompanyTypes))->StartBackgroundTask();
+	(new FAutoDeleteAsyncTask<FWorldGenTask>(InSaveGame, InRandomStream, WorldGenStatus, TrainingData, ComputerTypes, InWorld->PlayerComputerType, CompanyTypes, InWorld->ComputerServices))->StartBackgroundTask();
 
 	return WorldGenStatus;
 }

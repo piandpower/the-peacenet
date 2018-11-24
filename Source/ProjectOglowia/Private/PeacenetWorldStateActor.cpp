@@ -183,6 +183,20 @@ void APeacenetWorldStateActor::LoadTerminalCommands()
 
 }
 
+bool APeacenetWorldStateActor::FindServiceByName(FName ServiceName, UComputerService*& OutService)
+{
+	for (auto Service : this->ComputerServices)
+	{
+		if (Service->InternalID == ServiceName)
+		{
+			OutService = Service;
+			return true;
+		}
+	}
+
+	return false;
+}
+
 // Called when the game starts or when spawned
 void APeacenetWorldStateActor::BeginPlay()
 {

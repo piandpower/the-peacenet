@@ -5,6 +5,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "UComputerTypeAsset.h"
 #include "UPeacegateProgramAsset.h"
+#include "UVulnerability.h"
 #include "WallpaperAsset.h"
 #include "UMissionAsset.h"
 #include "UMissionUnlock.h"
@@ -204,6 +205,9 @@ void APeacenetWorldStateActor::BeginPlay()
 
 	// Load computer services.
 	this->LoadAssets<UComputerService>("ComputerService", this->ComputerServices);
+
+	// load all the vulnerabilities.
+	this->LoadAssets<UVulnerability>("Vulnerability", this->Vulnerabilities);
 
 	// Load wallpaper assets.
 	this->LoadAssets<UWallpaperAsset>(TEXT("WallpaperAsset"), this->Wallpapers);

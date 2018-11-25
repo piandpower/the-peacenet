@@ -20,6 +20,7 @@ class UPeacegateProgramAsset;
 class UTerminalCommand;
 class UCommandInfo;
 class UWindow;
+class UVulnerability;
 class UMissionUnlock;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPlayerSystemContextReadyEvent, USystemContext*, InSystemContext);
@@ -66,6 +67,10 @@ class PROJECTOGLOWIA_API APeacenetWorldStateActor : public AActor
 {
 	GENERATED_BODY()
 	
+private:
+	UPROPERTY()
+	TArray<UVulnerability*> Vulnerabilities;
+
 public:
 	UFUNCTION()
 	bool FindServiceByName(FName ServiceName, UComputerService*& OutService);

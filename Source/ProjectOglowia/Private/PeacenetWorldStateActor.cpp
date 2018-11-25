@@ -205,9 +205,10 @@ void APeacenetWorldStateActor::LoadTerminalCommands()
 
 		ManPages.Add(Info.CommandName, ManPage);
 
-		UCommandInfo* VulnInfo = NewObject<UCommandInfo>(this);
+		UCommandInfo* VulnInfo = NewObject<UCommandInfo>(this, UVulnerabilityCommandInfo::StaticClass());
 		VulnInfo->Info = Info;
 		VulnInfo->UnlockedByDefault = Vuln->UnlockedByDefault;
+		Cast<UVulnerabilityCommandInfo>(VulnInfo)->Vulnerability = Vuln;
 
 		this->CommandInfo.Add(Info.CommandName, VulnInfo);
 	}

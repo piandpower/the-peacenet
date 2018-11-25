@@ -6,6 +6,8 @@
 #include "UPeacegateFileSystem.h"
 #include "CommonUtils.h"
 #include "UPeacegateProgramAsset.h"
+#include "UVulnerability.h"
+#include "UVulnerabilityTerminalCommand.h"
 #include "WallpaperAsset.h"
 #include "ImageLoader.h"
 #include "UGraphicalTerminalCommand.h"
@@ -144,6 +146,12 @@ bool USystemContext::TryGetTerminalCommand(FName CommandName, UTerminalCommand *
 
 	UCommandInfo* Info = Peacenet->CommandInfo[CommandName];
 	OutCommand = NewObject<UTerminalCommand>(this, Info->Info.CommandClass);
+
+	if (Info->IsA<UVulnerabilityCommandInfo>())
+	{
+		UVulnerability* Vuln = Cast<UVulnerabilityCommandInfo>(Info)->Vulnerability;
+		Cast<UVulnerabilityTerminalCommand>(OutCommand)->Vulnerability = Vuln;
+	}
 
 	return true;
 }

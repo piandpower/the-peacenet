@@ -19,7 +19,7 @@ void UProgram::ExecuteCommand(FString InCommand)
 	this->Window->SystemContext->ExecuteCommand(InCommand);
 }
 
-UProgram* UProgram::CreateProgram(const TSubclassOf<UWindow> InWindow, const TSubclassOf<UProgram> InProgramClass, USystemContext* InSystem, const int InUserID, UWindow*& OutWindow)
+UProgram* UProgram::CreateProgram(const TSubclassOf<UWindow> InWindow, const TSubclassOf<UProgram> InProgramClass, USystemContext* InSystem, const int InUserID, UWindow*& OutWindow, bool DoContextSetup)
 {
 	check(InSystem->Peacenet);
 
@@ -38,16 +38,15 @@ UProgram* UProgram::CreateProgram(const TSubclassOf<UWindow> InWindow, const TSu
 	Window->SystemContext = InSystem;
 	Window->UserID = InUserID;
 
-	// Sets up things like the console context, FS context, etc for the current user.
-	// This also injects the program UI into the window.
-	ProgramInstance->SetupContexts();
+	// Set up the program's contexts if we're told to.
+	if (DoContextSetup)
+	{
+		ProgramInstance->SetupContexts();
+		ProgramInstance->Window->SystemContext->ShowWindowOnWorkspace(ProgramInstance);
+	}
 
 	// Return the window and program.
 	OutWindow = Window;
-
-	TScriptDelegate<> NMS;
-	NMS.BindUFunction(ProgramInstance, "NetMapScan");
-	Window->SystemContext->NetMapScan.Add(NMS);
 
 	return ProgramInstance;
 }
@@ -193,11 +192,12 @@ void UProgram::AskForFile(const FString InBaseDirectory, const FString InFilter,
 
 void UProgram::SetupContexts()
 {
+	TScriptDelegate<> NMS;
+	NMS.BindUFunction(this, "NetMapScan");
+	Window->SystemContext->NetMapScan.Add(NMS);
+
 	// Fetch a filesystem context from Peacegate, with the current User ID.
 	this->Filesystem = Window->SystemContext->GetFilesystem(Window->UserID);
-
-	// Show the program on the current workspace.
-	Window->SystemContext->ShowWindowOnWorkspace(this);
 
 	// Add ourself to the window's client slot.
 	Window->AddWindowToClientSlot(this);

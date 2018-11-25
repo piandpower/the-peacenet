@@ -44,7 +44,7 @@ public:
 	void ExecuteCommand(FString InCommand);
 
 	UFUNCTION(BlueprintCallable, Category = "Peacegate")
-	static UProgram* CreateProgram(const TSubclassOf<UWindow> InWindowClass, const TSubclassOf<UProgram> InProgramClass, USystemContext* InSystem, const int InUserID, UWindow*& OutWindow);
+	static UProgram* CreateProgram(const TSubclassOf<UWindow> InWindowClass, const TSubclassOf<UProgram> InProgramClass, USystemContext* InSystem, const int InUserID, UWindow*& OutWindow, bool DoContextSetup = true);
 	
 	UFUNCTION(BlueprintCallable, Category = "Missions")
 	bool GetAvailableMissions(TArray<UMissionAsset*>& OutMissions);

@@ -46,6 +46,9 @@ public:
 	void ExecuteCommand(const FString& InCommand);
 
 protected:
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Missions")
+	bool IsInMission();
+
 	UFUNCTION(BlueprintCallable, Category = "Desktop")
 	UProgram* SpawnProgramFromClass(TSubclassOf<UProgram> InClass, const FText& InTitle, UTexture2D* InIcon);
 

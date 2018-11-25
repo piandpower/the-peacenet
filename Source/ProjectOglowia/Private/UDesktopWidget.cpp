@@ -12,6 +12,11 @@
 #include "UNetMapWidget.h"
 #include "UConsoleContext.h"
 
+bool UDesktopWidget::IsInMission()
+{
+	return this->SystemContext->Peacenet->IsMissionActive();
+}
+
 UProgram * UDesktopWidget::SpawnProgramFromClass(TSubclassOf<UProgram> InClass, const FText& InTitle, UTexture2D* InIcon)
 {
 	UWindow* OutputWindow = nullptr;

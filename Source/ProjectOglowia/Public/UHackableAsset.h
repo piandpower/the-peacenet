@@ -8,6 +8,9 @@
 
 #include "UHackableAsset.generated.h"
 
+class USystemContext;
+class UHackableHandler;
+
 /**
  * Represents a hackable service within The Peacenet.
  */
@@ -28,4 +31,11 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UTexture2D* Icon;
+
+	// Specifies a class that will be used to handle a successful hack of services that implement this hackable type.
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Instanced, Category = "Gameplay")
+	UHackableHandler* Handler;
+
+	UFUNCTION()
+	bool CanHack(USystemContext* InCaller);
 };

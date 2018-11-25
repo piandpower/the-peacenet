@@ -158,6 +158,7 @@ void APeacenetWorldStateActor::LoadTerminalCommands()
 		// Create a manual page for the command
 		FManPage ManPage;
 		ManPage.Description = Command->Info.Description;
+		ManPage.LongDescription = Command->Info.LongDescription;
 		ManPage.InternalUsage = UsageInternal;
 		ManPage.FriendlyUsage = UsageFriendly;
 
@@ -189,7 +190,7 @@ void APeacenetWorldStateActor::LoadTerminalCommands()
 		FCommandInfoS Info;
 		Info.CommandName = Vuln->InternalID;
 		Info.CommandClass = UVulnerabilityTerminalCommand::StaticClass();
-		Info.Description = Vuln->Description.ToString();
+		Info.Description = Vuln->Name.ToString();
 
 		Info.UsageStrings.Add("<host> [port]");
 
@@ -198,6 +199,7 @@ void APeacenetWorldStateActor::LoadTerminalCommands()
 
 		FManPage ManPage;
 		ManPage.Description = Info.Description;
+		ManPage.LongDescription = Vuln->Description.ToString();
 		ManPage.InternalUsage = InternalUsage;
 		ManPage.FriendlyUsage = FriendlyUsage;
 

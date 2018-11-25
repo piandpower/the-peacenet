@@ -34,6 +34,9 @@ struct PROJECTOGLOWIA_API FCommandInfoS
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString Description;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString LongDescription;
+
 	// The usage syntax strings for the command. This is used internally while parsing command-line arguments. Each element in the array represents a different line in the resulting Docopt usage string. You do NOT need to include the "Usage: " delimeter as Peacenet will do this for you when the asset loads.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FString> UsageStrings;

@@ -56,6 +56,9 @@ public:
 	FString Description;
 
 	UPROPERTY()
+	FString LongDescription;
+
+	UPROPERTY()
 	FString InternalUsage;
 
 	UPROPERTY()

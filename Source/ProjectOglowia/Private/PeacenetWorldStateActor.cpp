@@ -11,6 +11,7 @@
 #include "UMissionUnlock.h"
 #include "UComputerService.h"
 #include "UNativeLatentAction.h"
+#include "UVulnerabilityTerminalCommand.h"
 #include "CommandInfo.h"
 #include "TerminalCommand.h"
 #include "AssetRegistry/Public/IAssetRegistry.h"
@@ -182,6 +183,32 @@ void APeacenetWorldStateActor::LoadTerminalCommands()
 		ManPages.Add(Info.CommandName, ManPage);
 	}
 
+	// Now we load in vulnerabilities.
+	for (auto Vuln : this->Vulnerabilities)
+	{
+		FCommandInfoS Info;
+		Info.CommandName = Vuln->InternalID;
+		Info.CommandClass = UVulnerabilityTerminalCommand::StaticClass();
+		Info.Description = Vuln->Description.ToString();
+
+		Info.UsageStrings.Add("<host> [port]");
+
+		FString FriendlyUsage = UCommandInfo::BuildDisplayUsageString(Info);
+		FString InternalUsage = UCommandInfo::BuildInternalUsageString(Info);
+
+		FManPage ManPage;
+		ManPage.Description = Info.Description;
+		ManPage.InternalUsage = InternalUsage;
+		ManPage.FriendlyUsage = FriendlyUsage;
+
+		ManPages.Add(Info.CommandName, ManPage);
+
+		UCommandInfo* VulnInfo = NewObject<UCommandInfo>(this);
+		VulnInfo->Info = Info;
+		VulnInfo->UnlockedByDefault = Vuln->UnlockedByDefault;
+
+		this->CommandInfo.Add(Info.CommandName, VulnInfo);
+	}
 }
 
 bool APeacenetWorldStateActor::FindServiceByName(FName ServiceName, UComputerService*& OutService)

@@ -17,7 +17,7 @@ class PROJECTOGLOWIA_API UTerminalCommand : public UObject
 {
 	GENERATED_BODY()
 
-		DECLARE_DYNAMIC_MULTICAST_DELEGATE(FCommandCompletedEvent);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FCommandCompletedEvent);
 public:
 	UTerminalCommand();
 	~UTerminalCommand();

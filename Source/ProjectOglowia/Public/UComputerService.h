@@ -39,6 +39,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Skill & Rarity")
 	int MaximumSkillLevel = 0;
 
-
+	UFUNCTION()
+	bool CanHack(USystemContext* InCaller);
 
 };

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UPeacegateFileSystem.h"
+#include "SlateFontInfo.h"
 #include "CommonUtils.generated.h"
 
 class USystemContext;
@@ -22,4 +23,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Peacegate")
 	static UPeacegateFileSystem* CreateFilesystem(USystemContext* InSystemContext, int InUserID);
+
+	
+	static void MeasureChar(const TCHAR InChar, const FSlateFontInfo& InSlateFont, float& OutWidth, float& OutHeight);
 };

@@ -6,6 +6,7 @@
 #include "UHackableHandler.h"
 #include "UPeacegateProgramAsset.h"
 #include "UWindow.h"
+#include "UVulnerability.h"
 #include "UDesktopWidget.h"
 #include "UProgramHackableHandler.generated.h"
 
@@ -23,5 +24,5 @@ public:
 	UPeacegateProgramAsset* ProgramToRun;
 
 	virtual bool CanHandle(USystemContext* InCaller) override;
-	virtual void Handle(USystemContext* InCaller, USystemContext* InTarget) override;
+	virtual void Handle(UVulnerability* InVulnerability, USystemContext* InCaller, USystemContext* InTarget, int InUid) override;
 };

@@ -1,6 +1,7 @@
 // Copyright (c) 2018 The Peacenet & Alkaline Thunder.
 
 #include "CommonUtils.h"
+#include "Engine/Font.h"
 #include "USystemContext.h"
 
 FText UCommonUtils::GetFriendlyFilesystemStatusCode(const EFilesystemStatusCode InStatusCode)
@@ -30,5 +31,21 @@ UPeacegateFileSystem * UCommonUtils::CreateFilesystem(USystemContext* InSystemCo
 	FS->SystemContext = InSystemContext;
 	FS->Initialize(InUserID);
 	return FS;
+}
+
+void UCommonUtils::MeasureChar(const TCHAR InChar, const FSlateFontInfo & InSlateFont, float & OutWidth, float & OutHeight)
+{
+	float x, y = 0;
+
+	const UFont* RawFont = Cast<UFont>(InSlateFont.FontObject);
+
+	float MeasureSize = RawFont->LegacyFontSize;
+	float RealSize = InSlateFont.Size;
+	float Scale = RealSize / MeasureSize;
+
+	RawFont->GetCharSize(InChar, x, y);
+
+	OutWidth = x * Scale;
+	OutHeight = y * Scale;
 }
 

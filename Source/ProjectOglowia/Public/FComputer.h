@@ -18,7 +18,8 @@ enum class EUserDomain : uint8
 	FileTransferUser,
 	VaultUser,
 	MailboxUser,
-	DatabaseUser
+	DatabaseUser,
+	Anonymous
 };
 
 USTRUCT(BlueprintType)

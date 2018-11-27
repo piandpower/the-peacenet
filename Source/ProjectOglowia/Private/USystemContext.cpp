@@ -158,6 +158,14 @@ bool USystemContext::TryGetTerminalCommand(FName CommandName, UTerminalCommand *
 
 FUserInfo USystemContext::GetUserInfo(const int InUserID)
 {
+	if (InUserID == -1)
+	{
+		FUserInfo AnonInfo;
+		AnonInfo.IsAdminUser = false;
+		AnonInfo.Username = "<anonymous>";
+		return AnonInfo;
+	}
+
 	for (FUser User : Computer.Users)
 	{
 		if (User.ID == InUserID)
@@ -182,6 +190,11 @@ void USystemContext::ShowWindowOnWorkspace(const UProgram * InProgram)
 
 EUserDomain USystemContext::GetUserDomain(int InUserID)
 {
+	if (InUserID == -1)
+	{
+		return EUserDomain::Anonymous;
+	}
+
 	for (FUser User : Computer.Users)
 	{
 		if (User.ID == InUserID)
@@ -195,18 +208,17 @@ EUserDomain USystemContext::GetUserDomain(int InUserID)
 
 FText USystemContext::GetUsername(int InUserID)
 {
-	for (FUser User : Computer.Users)
-	{
-		if (User.ID == InUserID)
-		{
-			return User.Username;
-		}
-	}
-	return FText();
+	FUserInfo UserInfo = this->GetUserInfo(InUserID);
+	return FText::FromString(UserInfo.Username);
 }
 
 FString USystemContext::GetUserHomeDirectory(int UserID)
 {
+	if (this->GetUserDomain(UserID) == EUserDomain::Anonymous)
+	{
+		return "/";
+	}
+
 	for (FUser User : Computer.Users)
 	{
 		if (User.ID == UserID)

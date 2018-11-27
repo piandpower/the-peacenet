@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "UVulnerability.h"
 #include "USystemContext.h"
 #include "UHackableHandler.generated.h"
 
@@ -19,5 +20,5 @@ public:
 	virtual bool CanHandle(USystemContext* InCaller);
 
 	UFUNCTION()
-	virtual void Handle(USystemContext* InCaller, USystemContext* InTarget);
+	virtual void Handle(UVulnerability* InVulnerability, USystemContext* InCaller, USystemContext* InTarget, int InUid);
 };

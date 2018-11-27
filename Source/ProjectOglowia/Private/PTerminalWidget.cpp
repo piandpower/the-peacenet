@@ -2,6 +2,7 @@
 
 #include "PTerminalWidget.h"
 #include "FConsoleReadLineLatentAction.h"
+#include "CommonUtils.h"
 #include "Rendering/DrawElements.h"
 #include "FTerminalSlowTypeLatentAction.h"
 
@@ -129,17 +130,7 @@ FReply UPTerminalWidget::NativeOnFocusReceived(const FGeometry & InGeometry, con
 
 void UPTerminalWidget::NativeConstruct()
 {
-	const UFont* RegularUnrealFont = Cast<UFont>(RegularTextFont.FontObject);
-	
-	if(RegularUnrealFont)
-	{
-		//This is where we set the initial character size if we have a regular text font.
-		//If we don't have a regular text font at this point then fuck the frontend devs.
-		RegularUnrealFont->GetCharSize(TEXT('#'), CharacterWidth, CharacterHeight);
-		
-	}
-	else {
-	}
+	UCommonUtils::MeasureChar('#', this->RegularTextFont, CharacterWidth, CharacterHeight);
 
 	SetVisibility(ESlateVisibility::Visible);
 
@@ -284,7 +275,7 @@ int32 UPTerminalWidget::NativePaint(const FPaintArgs& Args, const FGeometry& All
 		if (c == TEXT('\v'))
 			continue;
 
-		FontPtr->GetCharSize(c, char_w, char_h);
+		UCommonUtils::MeasureChar(c, font, char_w, char_h);
 		char_w = char_w * ZoomFactor;
 		char_h = char_h * ZoomFactor;
 
@@ -666,7 +657,7 @@ float UPTerminalWidget::GetLineHeight()
 		if (c == TEXT('\v'))
 			continue;
 
-		FontPtr->GetCharSize(c, char_w, char_h);
+		UCommonUtils::MeasureChar(c, font, char_w, char_h);
 		char_w = char_w * ZoomFactor;
 		char_h = char_h * ZoomFactor;
 

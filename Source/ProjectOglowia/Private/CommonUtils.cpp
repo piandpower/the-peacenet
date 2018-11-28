@@ -33,6 +33,46 @@ UPeacegateFileSystem * UCommonUtils::CreateFilesystem(USystemContext* InSystemCo
 	return FS;
 }
 
+FLinearColor UCommonUtils::GetTerminalColor(ETerminalColor InColor)
+{
+	switch (InColor)
+	{
+	case ETerminalColor::Black:
+	default:
+		return FLinearColor::Black;
+	case ETerminalColor::Blue:
+		return FLinearColor(0.f, 0.f, 0.5f, 1.f);
+	case ETerminalColor::Red:
+		return FLinearColor(0.5f, 0.f, 0.f, 1.f);
+	case ETerminalColor::Green:
+		return FLinearColor(0.f, 0.5f, 0.f, 1.f);
+	case ETerminalColor::Aqua:
+		return FLinearColor(0.f, 0.5f, 0.5f, 1.f);
+	case ETerminalColor::Purple:
+		return FLinearColor(0.5f, 0.f, 0.5f, 1.f);
+	case ETerminalColor::Yellow:
+		return FLinearColor(0.5f, 0.5f, 0.f, 1.f);
+	case ETerminalColor::Gray:
+		return FLinearColor(0.5f, 0.5f, 0.5f, 1.f);
+	case ETerminalColor::White:
+		return FLinearColor(0.75F, 0.75f, 0.75f, 1.f);
+	case ETerminalColor::LightBlue:
+		return FLinearColor(0.f, 0.f, 1.f, 1.f);
+	case ETerminalColor::LightGreen:
+		return FLinearColor(0.f, 1.f, 0.f, 1.f);
+	case ETerminalColor::LightRed:
+		return FLinearColor(1.f, 0.f, 0.f, 1.f);
+	case ETerminalColor::LightAqua:
+		return FLinearColor(0.f, 1.f, 1.f, 1.f);
+	case ETerminalColor::LightPurple:
+		return FLinearColor(1.f, 0.f, 1.f, 1.f);
+	case ETerminalColor::LightYellow:
+		return FLinearColor(1.f, 1.f, 0.f, 1.f);
+	case ETerminalColor::BrightWhite:
+		return FLinearColor(1.f, 1.f, 1.f, 1.f);
+	}
+}
+
 void UCommonUtils::MeasureChar(const TCHAR InChar, const FSlateFontInfo & InSlateFont, float & OutWidth, float & OutHeight)
 {
 	float x, y = 0;

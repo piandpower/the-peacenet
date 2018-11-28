@@ -2,6 +2,7 @@
 
 #include "CommonUtils.h"
 #include "Engine/Font.h"
+#include "Parse.h"
 #include "USystemContext.h"
 
 FText UCommonUtils::GetFriendlyFilesystemStatusCode(const EFilesystemStatusCode InStatusCode)
@@ -71,6 +72,66 @@ FLinearColor UCommonUtils::GetTerminalColor(ETerminalColor InColor)
 	case ETerminalColor::BrightWhite:
 		return FLinearColor(1.f, 1.f, 1.f, 1.f);
 	}
+}
+
+FString UCommonUtils::GetTerminalColorCode(ETerminalColor InColor)
+{
+	switch (InColor)
+	{
+	case ETerminalColor::Black:
+	default:
+		return "&0";
+	case ETerminalColor::Blue:
+		return "&1";
+	case ETerminalColor::Red:
+		return "&4";
+	case ETerminalColor::Green:
+		return "&2";
+	case ETerminalColor::Aqua:
+		return "&3";
+	case ETerminalColor::Purple:
+		return "&5";
+	case ETerminalColor::Yellow:
+		return "&6";
+	case ETerminalColor::Gray:
+		return "&8";
+	case ETerminalColor::White:
+		return "&7";
+	case ETerminalColor::LightBlue:
+		return "&9";
+	case ETerminalColor::LightGreen:
+		return "&A";
+	case ETerminalColor::LightRed:
+		return "&C";
+	case ETerminalColor::LightAqua:
+		return "&B";
+	case ETerminalColor::LightPurple:
+		return "&D";
+	case ETerminalColor::LightYellow:
+		return "&E";
+	case ETerminalColor::BrightWhite:
+		return "&F";
+	}
+}
+
+bool UCommonUtils::IsColorCode(FString InControlCode, ETerminalColor OutColor)
+{
+	if (!InControlCode.StartsWith("&"))
+		return false;
+
+	if (InControlCode.GetCharArray().Num() != 2)
+		return false;
+
+	// Get rid of the "&" at the start so we can parse as hex
+	InControlCode.RemoveAt(0, 1);
+
+	int Code = FParse::HexNumber(InControlCode.GetCharArray().GetData());
+	if (Code == 0 && InControlCode != "0")
+		return false; //HexNumber returns 0 if the code is invalid.
+
+	// Enums are awesome because we can do this.
+	OutColor = (ETerminalColor)Code;
+	return true;
 }
 
 void UCommonUtils::MeasureChar(const TCHAR InChar, const FSlateFontInfo & InSlateFont, float & OutWidth, float & OutHeight)

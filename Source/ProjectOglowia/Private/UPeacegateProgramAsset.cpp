@@ -14,6 +14,11 @@ void UProgram::PushNotification(const FText & InNotificationMessage)
 	this->Window->SystemContext->Desktop->EnqueueNotification(this->Window->WindowTitle, InNotificationMessage, this->Window->Icon);
 }
 
+void UProgram::RequestPlayerAttention(bool PlaySound)
+{
+	this->PlayerAttentionNeeded.Broadcast(PlaySound);
+}
+
 void UProgram::ExecuteCommand(FString InCommand)
 {
 	this->Window->SystemContext->ExecuteCommand(InCommand);

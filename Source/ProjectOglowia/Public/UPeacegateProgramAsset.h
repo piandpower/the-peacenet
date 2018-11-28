@@ -9,6 +9,8 @@
 #include "FNetMapScanEventArgs.h"
 #include "UPeacegateProgramAsset.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPlayerAttentionNeededEvent, bool, PlaySound);
+
 class UConsoleContext;
 class UPTerminalWidget;
 class UMissionAsset;
@@ -35,11 +37,16 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Desktop")
 		void PushNotification(const FText& InNotificationMessage);
 
-protected:
 	UFUNCTION(BlueprintImplementableEvent, Category = "NetMap")
 	void NetMapScan(int InEntityID, FNetMapScanEventArgs EventArgs);
 
+	UFUNCTION(BlueprintCallable, Category = "Program")
+	void RequestPlayerAttention(bool PlaySound);
+
 public:
+	UPROPERTY(BlueprintAssignable, Category = "Program")
+	FPlayerAttentionNeededEvent PlayerAttentionNeeded;
+
 	UFUNCTION(BlueprintCallable, Category = "System")
 	void ExecuteCommand(FString InCommand);
 

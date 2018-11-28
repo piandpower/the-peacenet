@@ -390,15 +390,7 @@ void UPTerminalWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime
 	//Plus this will kinda make things faster.
 	//
 	//Just use a fucking monospace font, god.
-	const UFont* RegularUnrealFont = Cast<UFont>(RegularTextFont.FontObject);
-
-	if (RegularUnrealFont)
-	{
-		//This is where we set the initial character size if we have a regular text font.
-		//If we don't have a regular text font at this point then fuck the frontend devs.
-		RegularUnrealFont->GetCharSize(TEXT('#'), CharacterWidth, CharacterHeight);
-
-	}
+	UCommonUtils::MeasureChar('#', this->RegularTextFont, CharacterWidth, CharacterHeight);
 
 	FVector2D gSize = MyGeometry.GetLocalSize();
 

@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-
+#include "ETerminalColor.h"
 #include "Engine/Font.h"
 #include "ThreadSafeBool.h"
 #include "Fonts/SlateFontInfo.h"
@@ -41,6 +41,11 @@ private:
 
 	UFUNCTION()
 	FSlateFontInfo ZoomText(FSlateFontInfo InFont) const;
+
+private:
+	void SkipControlCode(FString& InBuffer, int& InIndex);
+	void ParseControlCode(FString& InBuffer, int& InIndex, ETerminalColor& OutColor, FSlateFontInfo& OutFont, bool& OutInvert, bool& OutAttention);
+
 
 public:
 

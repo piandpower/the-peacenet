@@ -39,6 +39,76 @@ FSlateFontInfo UPTerminalWidget::ZoomText(FSlateFontInfo InFont) const
 	return Zoomed;
 }
 
+void UPTerminalWidget::SkipControlCode(FString & InBuffer, int & InIndex)
+{
+	TCHAR c = InBuffer[InIndex];
+
+	if (c != '&')
+		return;
+
+	if (InIndex < InBuffer.GetCharArray().Num() - 1)
+	{
+		if (InBuffer[InIndex + 1] == '&')
+		{
+			// && means literal & so we skip the control char.
+			InIndex++;
+			return;
+		}
+	}
+
+	InIndex += 2;
+}
+
+void UPTerminalWidget::ParseControlCode(FString & InBuffer, int & InIndex, ETerminalColor & OutColor, FSlateFontInfo & OutFont, bool & OutInvert, bool & OutAttention)
+{
+	char ctrl = InBuffer[InIndex];
+
+	if (ctrl != '&')
+		return;
+
+	if (InIndex < InBuffer.GetCharArray().Num() - 1)
+	{
+		InIndex++;
+		ctrl = InBuffer[InIndex];
+
+		if (ctrl == '&')
+			return;
+
+		if (!UCommonUtils::IsColorCode("&" + FString::Chr(ctrl), OutColor))
+		{
+			if (ctrl == 'r') // Reset
+			{
+				OutInvert = false;
+				OutAttention = false;
+				OutFont = this->RegularTextFont;
+			}
+			else if (ctrl == '!') // invert
+			{
+				OutInvert = true;
+			}
+			else if (ctrl == '~') // attention
+			{
+				OutAttention = true;
+			}
+			else if (ctrl == '*') // bold
+			{
+				OutFont = this->BoldTextFont;
+			}
+			else if (ctrl == '_') // italic
+			{
+				OutFont = this->ItalicTextFont;
+			}
+			else if (ctrl == '-') // both
+			{
+				OutFont = this->BoldItalicTextFont;
+			}
+		}
+	}
+
+	// Skips the second control code after parsing.
+	InIndex++;
+}
+
 void UPTerminalWidget::Exit()
 {
 	OnExit.Broadcast();

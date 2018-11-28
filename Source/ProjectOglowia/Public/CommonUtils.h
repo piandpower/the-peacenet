@@ -26,13 +26,13 @@ public:
 	static UPeacegateFileSystem* CreateFilesystem(USystemContext* InSystemContext, int InUserID);
 
 	UFUNCTION(BlueprintCallable, Category = "Terminal")
-	FLinearColor GetTerminalColor(ETerminalColor InColor);
+	static FLinearColor GetTerminalColor(ETerminalColor InColor);
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Terminal")
-	FString GetTerminalColorCode(ETerminalColor InColor);
+	static FString GetTerminalColorCode(ETerminalColor InColor);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Terminal")
-	bool IsColorCode(FString InControlCode, ETerminalColor OutColor);
+	static bool IsColorCode(FString InControlCode, ETerminalColor OutColor);
 
 	static void MeasureChar(const TCHAR InChar, const FSlateFontInfo& InSlateFont, float& OutWidth, float& OutHeight);
 };

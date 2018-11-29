@@ -13,7 +13,7 @@ FSlateFontInfo UPTerminalWidget::ZoomText(FSlateFontInfo InFont) const
 	return Zoomed;
 }
 
-bool UPTerminalWidget::SkipControlCode(FString & InBuffer, int & InIndex, bool& OutLiteral)
+bool UPTerminalWidget::SkipControlCode(const FString & InBuffer, int & InIndex, bool& OutLiteral) const
 {
 	OutLiteral = false;
 
@@ -22,7 +22,7 @@ bool UPTerminalWidget::SkipControlCode(FString & InBuffer, int & InIndex, bool& 
 	if (c != '&')
 		return false;
 
-	if (InIndex < InBuffer.GetCharArray().Num() - 1)
+	if (InIndex < InBuffer.GetCharArray().Num() - 2)
 	{
 		if (InBuffer[InIndex + 1] == '&')
 		{
@@ -35,7 +35,7 @@ bool UPTerminalWidget::SkipControlCode(FString & InBuffer, int & InIndex, bool& 
 	return true;
 }
 
-bool UPTerminalWidget::ParseControlCode(FString & InBuffer, int & InIndex, ETerminalColor & OutColor, FSlateFontInfo & OutFont, bool & OutInvert, bool & OutAttention, bool& OutLiteral)
+bool UPTerminalWidget::ParseControlCode(const FString & InBuffer, int & InIndex, ETerminalColor & OutColor, FSlateFontInfo & OutFont, bool & OutInvert, bool & OutAttention, bool& OutLiteral) const
 {
 	OutLiteral = false;
 
@@ -44,9 +44,9 @@ bool UPTerminalWidget::ParseControlCode(FString & InBuffer, int & InIndex, ETerm
 	if (ctrl != '&')
 		return false;
 
-	if (InIndex < InBuffer.GetCharArray().Num() - 1)
+	if (InIndex < InBuffer.GetCharArray().Num() - 2)
 	{
-		ctrl = InBuffer[InIndex];
+		ctrl = InBuffer[InIndex+1];
 
 		if (ctrl == '&')
 		{
@@ -202,10 +202,13 @@ int32 UPTerminalWidget::NativePaint(const FPaintArgs& Args, const FGeometry& All
 	TArray<TCHAR> arr = TextBuffer.GetCharArray();
 	TCHAR Last = TEXT('\0');
 	//How many elements are in the text array?
-	int arrNum = arr.Num();
+	int arrNum = arr.Num() - 1; //there's a \0 at the end
 
 	ETerminalColor CurrentColor = ETerminalColor::White;
 	ETerminalColor CurrentBackgroundColor = ETerminalColor::Black;
+
+	bool invert = false;
+	bool attention = false;
 
 	if (bRenderBackground)
 	{
@@ -226,6 +229,15 @@ int32 UPTerminalWidget::NativePaint(const FPaintArgs& Args, const FGeometry& All
 
 	for (int i = 0; i < arrNum; i++)
 	{
+		bool wasLiteral = false;
+		if (this->ParseControlCode(this->TextBuffer, i, CurrentColor, font, invert, attention, wasLiteral))
+		{
+			if (!wasLiteral)
+			{
+				continue;
+			}
+		}
+
 		//Get the character.
 		TCHAR c = arr[i];
 
@@ -529,10 +541,18 @@ float UPTerminalWidget::GetLineHeight()
 	TArray<TCHAR> arr = TextBuffer.GetCharArray();
 	TCHAR Last = TEXT('\0');
 	//How many elements are in the text array?
-	int arrNum = arr.Num();
+	int arrNum = arr.Num() - 1;
 
 	for (int i = 0; i < arrNum; i++)
 	{
+		bool wasLiteral = false;
+		if (this->SkipControlCode(TextBuffer, i, wasLiteral))
+		{
+			if (!wasLiteral)
+			{
+				continue;
+			}
+		}
 
 		//Get the character.
 		TCHAR c = arr[i];

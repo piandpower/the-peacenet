@@ -82,8 +82,8 @@ private: //variables
 public:
 
 private: //functions
-	bool SkipControlCode(FString& InBuffer, int& InIndex, bool& OutLiteral);
-	bool ParseControlCode(FString& InBuffer, int& InIndex, ETerminalColor& OutColor, FSlateFontInfo& OutFont, bool& OutInvert, bool& OutAttention, bool& OutLiteral);
+	bool SkipControlCode(const FString& InBuffer, int& InIndex, bool& OutLiteral) const;
+	bool ParseControlCode(const FString& InBuffer, int& InIndex, ETerminalColor& OutColor, FSlateFontInfo& OutFont, bool& OutInvert, bool& OutAttention, bool& OutLiteral) const;
 	float GetLineHeight();
 
 	UFUNCTION()

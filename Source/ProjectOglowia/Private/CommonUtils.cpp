@@ -114,12 +114,12 @@ FString UCommonUtils::GetTerminalColorCode(ETerminalColor InColor)
 	}
 }
 
-bool UCommonUtils::IsColorCode(FString InControlCode, ETerminalColor OutColor)
+bool UCommonUtils::IsColorCode(FString InControlCode, ETerminalColor& OutColor)
 {
 	if (!InControlCode.StartsWith("&"))
 		return false;
 
-	if (InControlCode.GetCharArray().Num() != 2)
+	if (InControlCode.Len() != 2)
 		return false;
 
 	// Get rid of the "&" at the start so we can parse as hex

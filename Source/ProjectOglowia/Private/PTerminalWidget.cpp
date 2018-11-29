@@ -43,17 +43,17 @@ bool UPTerminalWidget::ParseControlCode(const FString & InBuffer, int & InIndex,
 
 	if (ctrl != '&')
 		return false;
-
-	if (InIndex < InBuffer.GetCharArray().Num() - 2)
+	
+	InIndex++;
+	if (InIndex < InBuffer.GetCharArray().Num() - 1)
 	{
-		ctrl = InBuffer[InIndex+1];
+		ctrl = InBuffer[InIndex];
 
 		if (ctrl == '&')
 		{
 			OutLiteral = true;
 			return true;
 		}
-		InIndex++;
 
 		if (!UCommonUtils::IsColorCode("&" + FString::Chr(ctrl), OutColor))
 		{
@@ -442,10 +442,18 @@ FReply UPTerminalWidget::NativeOnKeyChar(const FGeometry & InGeometry, const FCh
 	{
 		if (!TextInputBuffer.IsEmpty())
 		{
+			TCHAR taken = TextInputBuffer[TextInputBuffer.Len() - 1];
 			TextInputBuffer.RemoveAt(TextInputBuffer.Len() - 1, 1, true);
 			if (EchoInputText)
 			{
-				TextBuffer.RemoveAt(TextBuffer.Len() - 1, 1, true);
+				if (taken == '&')
+				{
+					TextBuffer.RemoveAt(TextBuffer.Len() - 2, 2, true);
+				}
+				else
+				{
+					TextBuffer.RemoveAt(TextBuffer.Len() - 1, 1, true);
+				}
 				NewTextAdded = true;
 			}
 		}
@@ -457,11 +465,19 @@ FReply UPTerminalWidget::NativeOnKeyChar(const FGeometry & InGeometry, const FCh
 		NewTextAdded = true;
 		this->IsInputLineAvailable = true;
 	}
-	else {
+	else 
+	{
 		TextInputBuffer = TextInputBuffer.AppendChar(c);
 		if (EchoInputText)
 		{
-			TextBuffer = TextBuffer.AppendChar(c);
+			if (c == '&')
+			{
+				TextBuffer.Append("&&");
+			}
+			else
+			{
+				TextBuffer = TextBuffer.AppendChar(c);
+			}
 			NewTextAdded = true;
 		}
 	}

@@ -32,7 +32,7 @@ public:
 	static FString GetTerminalColorCode(ETerminalColor InColor);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Terminal")
-	static bool IsColorCode(FString InControlCode, ETerminalColor OutColor);
+	static bool IsColorCode(FString InControlCode, ETerminalColor& OutColor);
 
 	static void MeasureChar(const TCHAR InChar, const FSlateFontInfo& InSlateFont, float& OutWidth, float& OutHeight);
 };

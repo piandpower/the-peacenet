@@ -22,35 +22,15 @@ class PROJECTOGLOWIA_API UPTerminalWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnExitEvent);
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FTerminalZoomedEvent, float, InNewCharWidth, float, InNewCharHeight);
 
-public:
-	void InjectInput(const FString& Input);
-
+	
+public: //variables
 	FThreadSafeBool IsInputLineAvailable = false;
 
-	UPTerminalWidget(const FObjectInitializer& ObjectInitializer);
-
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnExitEvent);
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStdInCharWrittenEvent, const FText&, Character);
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStdInLineWrittenEvent, const FText&, Text);
-	DECLARE_DYNAMIC_DELEGATE_RetVal(UFont*, FGetFont);
-	
-private:
-	UPROPERTY()
-	float ZoomFactor = 1.f;
-
-	UFUNCTION()
-	FSlateFontInfo ZoomText(FSlateFontInfo InFont) const;
-
-private:
-	void SkipControlCode(FString& InBuffer, int& InIndex);
-	void ParseControlCode(FString& InBuffer, int& InIndex, ETerminalColor& OutColor, FSlateFontInfo& OutFont, bool& OutInvert, bool& OutAttention);
-
-
-public:
-
-	UFUNCTION(BlueprintCallable)
-		void Exit();
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Appearance")
+		bool bRenderBackground = true;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fonts and Colors")
 		FSlateFontInfo RegularTextFont;
@@ -68,18 +48,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cursor")
 		float CursorBlinkTimeMS;
 
-	UPROPERTY()
-		FGetFont RegularTextFontDelegate;
-
-	UPROPERTY()
-		FGetFont BoldTextFontDelegate;
-
-	UPROPERTY()
-		FGetFont ItalicTextFontDelegate;
-
-	UPROPERTY()
-		FGetFont BoldItalicTextFontDelegate;
-
 	//The width and height in pixels of a character.
 	UPROPERTY(BlueprintReadOnly)
 		float CharacterWidth;
@@ -87,33 +55,64 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 		float CharacterHeight;
 
-public:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Appearance")
-	bool bRenderBackground = true;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		int CommandLayer = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Appearance")
+	USlateBrushAsset * TerminalBrush;
 
 	/** Called when a command or user requests to "exit" this Terminal. */
 	UPROPERTY(BlueprintAssignable, Category = "Widget Event", meta = (DisplayName = "On Exit"))
 		FOnExitEvent OnExit;
 
-
-	/** Called when a character is written to the standard input stream. */
-	UPROPERTY(BlueprintAssignable, Category = "Widget Event", meta = (DisplayName = "On Standard Input Character Written"))
-		FOnStdInCharWrittenEvent OnStdInCharWritten;
-
-	/** Called when a line of text is written to the standard input stream. */
-	UPROPERTY(BlueprintAssignable, Category = "Widget Event", meta = (DisplayName = "On Standard Input Line Written"))
-		FOnStdInLineWrittenEvent OnStdInLineWritten;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Console IO|Input")
 		bool EchoInputText = true;
+
+	UPROPERTY(BlueprintAssignable)
+		FTerminalZoomedEvent TerminalZoomedEvent;
+
+private: //variables
+	float ZoomFactor = 1.f;
+	FVector2D GeometrySize;
+	bool bCursorActive = true;
+	float cursorTime = 0;
+	FString TextBuffer;
+	FString TextInputBuffer;
+	bool NewTextAdded = false;
+	float ScrollOffsetY;
+	float MaxScrollOffset;
+
+public:
+
+private: //functions
+	void SkipControlCode(FString& InBuffer, int& InIndex);
+	void ParseControlCode(FString& InBuffer, int& InIndex, ETerminalColor& OutColor, FSlateFontInfo& OutFont, bool& OutInvert, bool& OutAttention);
+	float GetLineHeight();
+
+	UFUNCTION()
+	FSlateFontInfo ZoomText(FSlateFontInfo InFont) const;
+
+
+public: //functions
+	void InjectInput(const FString& Input);
+	virtual FReply NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent) override;
+	virtual void NativeConstruct() override;
+	virtual int32 NativePaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const override;
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+	virtual FReply NativeOnMouseWheel(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+	virtual FReply NativeOnKeyChar(const FGeometry& InGeometry, const FCharacterEvent& InCharEvent) override;
+	virtual bool NativeIsInteractable() const override { return true; }
+	virtual bool NativeSupportsKeyboardFocus() const override { return true; }
+	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
+	void ClearInput() { TextInputBuffer = TEXT(""); }
+
+#if WITH_EDITOR
+	virtual const FText GetPaletteCategory() override;
+#endif
+
+	UFUNCTION(BlueprintCallable)
+		void Exit();
 
 	UFUNCTION(BlueprintCallable, Category = "Console IO|Input",
 		meta = (Latent, LatentInfo = "LatentInfo", HidePin = "WorldContextObject", DefaultToSelf = "WorldContextObject"))
 		virtual void ReadLine(UObject* WorldContextObject, struct FLatentActionInfo LatentInfo, FString& OutText);
-
 
 	UFUNCTION(BlueprintCallable, Category = "Console IO|Fancy Output",
 		meta = (Latent, LatentInfo = "LatentInfo", HidePin = "WorldContextObject", DefaultToSelf = "WorldContextObject"))
@@ -127,7 +126,6 @@ public:
 		meta = (Latent, LatentInfo = "LatentInfo", HidePin = "WorldContextObject", DefaultToSelf = "WorldContextObject"))
 		virtual UPTerminalWidget* SlowlyOverwriteLine(UObject* WorldContextObject, struct FLatentActionInfo LatentInfo, const FString& InText, float InDelayTime = 0.05);
 
-
 	UFUNCTION(BlueprintCallable, Category = "Console IO|Output")
 		UPTerminalWidget* Write(FString InText);
 
@@ -140,71 +138,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Console IO|Output")
 		UPTerminalWidget* Clear();
 
-	UPROPERTY(BlueprintReadOnly)
-		FVector2D GeometrySize;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Appearance")
-		USlateBrushAsset * TerminalBrush;
-
-
-
-	virtual FReply NativeOnFocusReceived(const FGeometry& InGeometry, const FFocusEvent& InFocusEvent) override;
-	virtual void NativeConstruct() override;
-	virtual int32 NativePaint(const FPaintArgs& Args, const FGeometry& AllottedGeometry, const FSlateRect& MyCullingRect, FSlateWindowElementList& OutDrawElements, int32 LayerId, const FWidgetStyle& InWidgetStyle, bool bParentEnabled) const override;
-	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
-	virtual FReply NativeOnMouseWheel(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
-	virtual FReply NativeOnKeyChar(const FGeometry& InGeometry, const FCharacterEvent& InCharEvent) override;
-	virtual bool NativeIsInteractable() const override { return true; }
-	virtual bool NativeSupportsKeyboardFocus() const override { return true; }
-	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
-
-
-#if WITH_EDITOR
-	virtual const FText GetPaletteCategory() override;
-#endif
 	UFUNCTION(BlueprintCallable)
 		FString& GetInputText() { return TextInputBuffer; }
-	void ClearInput() { TextInputBuffer = TEXT(""); }
-
-protected:
-	PROPERTY_BINDING_IMPLEMENTATION(FSlateFontInfo, RegularTextFont);
-	PROPERTY_BINDING_IMPLEMENTATION(FSlateFontInfo, BoldTextFont);
-	PROPERTY_BINDING_IMPLEMENTATION(FSlateFontInfo, ItalicTextFont);
-	PROPERTY_BINDING_IMPLEMENTATION(FSlateFontInfo, BoldItalicTextFont);
-
-public:
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FTerminalZoomedEvent, float, InNewCharWidth, float, InNewCharHeight);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Terminal")
 	void TerminalZoomed(float NewCharWidth, float NewCharHeight);
 
-	UPROPERTY(BlueprintAssignable)
-	FTerminalZoomedEvent TerminalZoomedEvent;
-private:
-	bool bCursorActive = true;
-	float cursorTime = 0;
-
-	FSlateFontInfo GetUnrealFont(uint8 fontType) const;
-
-	FString TextBuffer;
-	FString TextInputBuffer;
-
-	bool NewTextAdded = false;
-
-	// The scroll offset used when rendering text.
-	float ScrollOffsetY;
-
-	// The maximum value that ScrollOffsetY can be. Minimum is always 0.
-	float MaxScrollOffset;
-
-	float GetLineHeight();
-public:
-	bool ParseEscape(TCHAR character, uint8& termFont, uint8& termForegroundColorCode) const;
-
-private:
-	TArray<FLinearColor> ColorPalette;
-
-public:
+public: //static functions
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Common Utils|Terminal")
 		static FString NewLine();
 

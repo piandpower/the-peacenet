@@ -6,32 +6,6 @@
 #include "Rendering/DrawElements.h"
 #include "FTerminalSlowTypeLatentAction.h"
 
-
-UPTerminalWidget::UPTerminalWidget(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
-{ 
-	//Initialize color palette
-	ColorPalette = TArray<FLinearColor>();
-	ColorPalette.Add(FLinearColor::Black);
-	ColorPalette.Add(FLinearColor::White);
-	ColorPalette.Add(FLinearColor::Gray);
-	ColorPalette.Add(FLinearColor::Red);
-	ColorPalette.Add(FLinearColor::Green);
-	ColorPalette.Add(FLinearColor::Blue);
-	ColorPalette.Add(FLinearColor(FColor(0xFFFFA500)));
-	ColorPalette.Add(FLinearColor::Yellow);
-	ColorPalette.Add(FLinearColor(FColor(0xFFADD8E6)));
-	ColorPalette.Add(FLinearColor(FColor(0xFF98FB98)));
-	ColorPalette.Add(FLinearColor(FColor(0xFFFF69B4)));
-	ColorPalette.Add(FLinearColor(FColor(0xFFA020F0)));
-	ColorPalette.Add(FLinearColor(FColor(0xFFFFB6C1)));
-	ColorPalette.Add(FLinearColor(FColor(0xFFCF0000)));
-	ColorPalette.Add(FLinearColor(FColor(0xFF0000CF)));
-	ColorPalette.Add(FLinearColor(FColor(0xFF00CF00)));
-
-
-}
-
 FSlateFontInfo UPTerminalWidget::ZoomText(FSlateFontInfo InFont) const
 {
 	FSlateFontInfo Zoomed = FSlateFontInfo(InFont);
@@ -211,15 +185,21 @@ int32 UPTerminalWidget::NativePaint(const FPaintArgs& Args, const FGeometry& All
 {
 	// Get the size in pixels of the geometry so we know how big our widget is.
 	FVector2D size = AllottedGeometry.GetLocalSize();
-
-	uint8 term_font = 0; // What kind of font are we using?
-	uint8 term_bg_color = 0; //What entry in the color palette are we using for the background?
-	uint8 term_fg_color = 1; //What entry in the color palette are we using for the foreground?
-
+	FSlateFontInfo font = this->RegularTextFont;
+	const UFont* FontPtr = Cast<UFont>(font.FontObject);
 	float char_x = 0.f; //Where will the character be rendered on the X coordinate?
 	float char_y = 0.f - ScrollOffsetY; //The current text position on the Y axis, accounting for the scroll offset.
+	//The width of a character.
+	float char_w = CharacterWidth * ZoomFactor;
+	//The height of a character.
+	float char_h = CharacterHeight * ZoomFactor;
+	TArray<TCHAR> arr = TextBuffer.GetCharArray();
+	TCHAR Last = TEXT('\0');
+	//How many elements are in the text array?
+	int arrNum = arr.Num();
 
-	bool bSkipEscape = false; //Should we skip reading an escape sequence when we come across a char '`'?
+	ETerminalColor CurrentColor = ETerminalColor::White;
+	ETerminalColor CurrentBackgroundColor = ETerminalColor::Black;
 
 	if (bRenderBackground)
 	{
@@ -238,63 +218,10 @@ int32 UPTerminalWidget::NativePaint(const FPaintArgs& Args, const FGeometry& All
 		}
 	}
 
-	FSlateFontInfo font = this->GetUnrealFont(term_font); //Grab the regular font.
-	const UFont* FontPtr = Cast<UFont>(font.FontObject);
-
-	//The width of a character.
-	float char_w = CharacterWidth * ZoomFactor;
-	//The height of a character.
-	float char_h = CharacterHeight * ZoomFactor;
-
-	TArray<TCHAR> arr = TextBuffer.GetCharArray();
-
-	TCHAR Last = TEXT('\0');
-
-	//How many elements are in the text array?
-	int arrNum = arr.Num();
-
 	for (int i = 0; i < arrNum; i++)
 	{
-
 		//Get the character.
 		TCHAR c = arr[i];
-
-		// Handle reading an escape sequence if the current char is a backtick (`).
-		if (c == TEXT('`')) {
-			if (bSkipEscape)
-			{
-				//Skip this escape, but set bSkipEscape to false for the next value.
-				bSkipEscape = false;
-			}
-			else {
-				//If we're not the last char in the array:
-				if (i < arrNum - 1)
-				{
-					//Seek ahead to the next char.
-					TCHAR nextChar = arr[i + 1];
-
-					//Skip if it's a backtick. Double-backticks mean "render a literal backtick."
-					if (nextChar == TEXT('`'))
-					{
-						bSkipEscape = true;
-						continue;
-					}
-
-					//Attempt to parse the escape sequence. If it succeeds, i += 1 and continue.
-					if (ParseEscape(nextChar, term_font, term_fg_color))
-					{
-						//update font from font code
-						font = this->GetUnrealFont(term_font);
-
-						// update the ufont ptr
-						FontPtr = Cast<UFont>(font.FontObject);
-
-						i++;
-						continue;
-					}
-				}
-			}
-		}
 
 		float kerning = 0.f;
 
@@ -380,7 +307,7 @@ int32 UPTerminalWidget::NativePaint(const FPaintArgs& Args, const FGeometry& All
 			FText::FromString(FString::Chr(c)),
 			this->ZoomText(font),
 			ESlateDrawEffect::None,
-			ColorPalette[term_fg_color]);
+			UCommonUtils::GetTerminalColor(CurrentColor));
 
 
 		Last = c;
@@ -407,7 +334,7 @@ int32 UPTerminalWidget::NativePaint(const FPaintArgs& Args, const FGeometry& All
 			AllottedGeometry.ToPaintGeometry(FVector2D(char_x, char_y), FVector2D(char_w, char_h)),
 			&TerminalBrush->Brush,
 			ESlateDrawEffect::None,
-			ColorPalette[term_fg_color]);
+			UCommonUtils::GetTerminalColor(CurrentColor));
 
 		if (!HasAnyUserFocus())
 		{
@@ -419,7 +346,7 @@ int32 UPTerminalWidget::NativePaint(const FPaintArgs& Args, const FGeometry& All
 				AllottedGeometry.ToPaintGeometry(FVector2D(char_x+2, char_y+2), FVector2D(char_w-4, char_h-4)),
 				&TerminalBrush->Brush,
 				ESlateDrawEffect::None,
-				ColorPalette[term_bg_color]);
+				UCommonUtils::GetTerminalColor(CurrentBackgroundColor));
 
 		}
 	}
@@ -581,49 +508,20 @@ const FText UPTerminalWidget::GetPaletteCategory()
 }
 #endif
 
-FSlateFontInfo UPTerminalWidget::GetUnrealFont(uint8 fontType) const
-{
-	switch (fontType)
-	{
-	case 0:
-		return RegularTextFont;
-	case 1:
-		return BoldTextFont;
-	case 2:
-		return ItalicTextFont;
-	case 3:
-		return BoldItalicTextFont;
-	}
-
-	return RegularTextFont;
-}
-
 float UPTerminalWidget::GetLineHeight()
 {
 	// Get the size in pixels of the geometry so we know how big our widget is.
 	FVector2D size = this->GetCachedGeometry().GetLocalSize();
-
-	uint8 term_font = 0; // What kind of font are we using?
-	uint8 term_bg_color = 0; //What entry in the color palette are we using for the background?
-	uint8 term_fg_color = 1; //What entry in the color palette are we using for the foreground?
-
 	float char_x = 0.f; //Where will the character be rendered on the X coordinate?
 	float char_y = 0.f; //The current text position on the Y axis, accounting for the scroll offset.
-
-	bool bSkipEscape = false; //Should we skip reading an escape sequence when we come across a char '`'?
-
-	FSlateFontInfo font = this->GetUnrealFont(term_font); //Grab the regular font.
+	FSlateFontInfo font = this->RegularTextFont;
 	const UFont* FontPtr = Cast<UFont>(font.FontObject);
-
 	//The width of a character.
 	float char_w = CharacterWidth * ZoomFactor;
 	//The height of a character.
 	float char_h = CharacterHeight * ZoomFactor;
-
 	TArray<TCHAR> arr = TextBuffer.GetCharArray();
-
 	TCHAR Last = TEXT('\0');
-
 	//How many elements are in the text array?
 	int arrNum = arr.Num();
 
@@ -632,43 +530,6 @@ float UPTerminalWidget::GetLineHeight()
 
 		//Get the character.
 		TCHAR c = arr[i];
-
-		// Handle reading an escape sequence if the current char is a backtick (`).
-		if (c == TEXT('`')) {
-			if (bSkipEscape)
-			{
-				//Skip this escape, but set bSkipEscape to false for the next value.
-				bSkipEscape = false;
-			}
-			else {
-				//If we're not the last char in the array:
-				if (i < arrNum - 1)
-				{
-					//Seek ahead to the next char.
-					TCHAR nextChar = arr[i + 1];
-
-					//Skip if it's a backtick. Double-backticks mean "render a literal backtick."
-					if (nextChar == TEXT('`'))
-					{
-						bSkipEscape = true;
-						continue;
-					}
-
-					//Attempt to parse the escape sequence. If it succeeds, i += 1 and continue.
-					if (ParseEscape(nextChar, term_font, term_fg_color))
-					{
-						//update font from font code
-						font = this->GetUnrealFont(term_font);
-
-						// update the ufont ptr
-						FontPtr = Cast<UFont>(font.FontObject);
-
-						i++;
-						continue;
-					}
-				}
-			}
-		}
 
 		float kerning = 0.f;
 
@@ -748,44 +609,6 @@ float UPTerminalWidget::GetLineHeight()
 	}
 
 	return char_y + char_h;
-}
-
-bool UPTerminalWidget::ParseEscape(TCHAR character, uint8 & termFont, uint8 & termForegroundColorCode) const
-{
-	switch (character)
-	{
-	case TEXT('*'):
-		termFont = 1;
-		return true;
-	case TEXT('-'):
-		termFont = 3;
-		return true;
-	case TEXT('_'):
-		termFont = 2;
-		return true;
-	case TEXT('r'):
-		termFont = 0;
-		return true;
-	default:
-		int32 hex = FParse::HexDigit(character);
-		if (hex == 0)
-		{
-			//Special case: FParse returns 0 if it fails at parsing.
-			//So if we get 0 we need to check our input char and make sure it was 0.
-			//If it is then the foreground color becomes black. If not then we return false.
-			if (character == TEXT('0'))
-			{
-				termForegroundColorCode = 0;
-				return true;
-			}
-			else {
-				return false;
-			}
-		}
-		//If we get this far then we're a valid color code.
-		termForegroundColorCode = (uint8)hex;
-		return true;
-	}
 }
 
 FString UPTerminalWidget::NewLine()

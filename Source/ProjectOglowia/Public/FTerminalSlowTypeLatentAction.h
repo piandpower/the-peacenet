@@ -3,6 +3,7 @@
 #pragma once
 
 #include "LatentActions.h"
+#include "PTerminalWidget.h"
 #include "CoreMinimal.h"
 
 /**

@@ -1,6 +1,7 @@
 // Copyright (c) 2018 The Peacenet & Alkaline Thunder.
 
 #include "UConsoleContext.h"
+#include "CommonUtils.h"
 #include "USystemContext.h"
 
 void UConsoleContext::InjectInput(const FString & Input)
@@ -82,3 +83,39 @@ FString UConsoleContext::GetDisplayWorkingDirectory()
 	}
 	return WorkingDirectory;
 }
+
+void UConsoleContext::MakeBold()
+{
+	Write("&*");
+}
+
+void UConsoleContext::MakeBoldItalic()
+{
+	Write("&-");
+}
+
+void UConsoleContext::MakeItalic()
+{
+	Write("&_");
+}
+
+void UConsoleContext::ResetFormatting()
+{
+	Write("&r");
+}
+
+void UConsoleContext::SetAttention()
+{
+	Write("&!");
+}
+
+void UConsoleContext::InvertColors()
+{
+	Write("&~");
+}
+
+void UConsoleContext::SetColor(ETerminalColor InColor)
+{
+	Write(UCommonUtils::GetTerminalColorCode(InColor));
+}
+

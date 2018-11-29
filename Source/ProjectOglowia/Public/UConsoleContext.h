@@ -6,6 +6,7 @@
 #include "PTerminalWidget.h"
 #include "PeacenetWorldStateActor.h"
 #include "UPeacegateFileSystem.h"
+#include "ETerminalColor.h"
 #include "UConsoleContext.generated.h"
 
 class USystemContext;
@@ -19,6 +20,27 @@ class PROJECTOGLOWIA_API UConsoleContext : public UObject
 	GENERATED_BODY()
 
 public:
+	UFUNCTION(BlueprintCallable, Category = "Console|Formatting")
+	virtual void MakeBold();
+
+	UFUNCTION(BlueprintCallable, Category = "Console|Formatting")
+	virtual void MakeBoldItalic();
+
+	UFUNCTION(BlueprintCallable, Category = "Console|Formatting")
+	virtual void MakeItalic();
+
+	UFUNCTION(BlueprintCallable, Category = "Console|Formatting")
+	virtual void ResetFormatting();
+
+	UFUNCTION(BlueprintCallable, Category = "Console|Formatting")
+	virtual void SetColor(ETerminalColor InColor);
+
+	UFUNCTION(BlueprintCallable, Category = "Console|Formatting")
+	virtual void InvertColors();
+
+	UFUNCTION(BlueprintCallable, Category = "Console|Formatting")
+	virtual void SetAttention();
+
 	UPROPERTY(BlueprintReadOnly)
 	int UserID;
 

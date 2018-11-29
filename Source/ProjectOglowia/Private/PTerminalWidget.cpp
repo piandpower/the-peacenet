@@ -13,40 +13,47 @@ FSlateFontInfo UPTerminalWidget::ZoomText(FSlateFontInfo InFont) const
 	return Zoomed;
 }
 
-void UPTerminalWidget::SkipControlCode(FString & InBuffer, int & InIndex)
+bool UPTerminalWidget::SkipControlCode(FString & InBuffer, int & InIndex, bool& OutLiteral)
 {
+	OutLiteral = false;
+
 	TCHAR c = InBuffer[InIndex];
 
 	if (c != '&')
-		return;
+		return false;
 
 	if (InIndex < InBuffer.GetCharArray().Num() - 1)
 	{
 		if (InBuffer[InIndex + 1] == '&')
 		{
-			// && means literal & so we skip the control char.
-			InIndex++;
-			return;
+			OutLiteral = true;
+			return true;
 		}
 	}
 
-	InIndex += 2;
+	InIndex ++;
+	return true;
 }
 
-void UPTerminalWidget::ParseControlCode(FString & InBuffer, int & InIndex, ETerminalColor & OutColor, FSlateFontInfo & OutFont, bool & OutInvert, bool & OutAttention)
+bool UPTerminalWidget::ParseControlCode(FString & InBuffer, int & InIndex, ETerminalColor & OutColor, FSlateFontInfo & OutFont, bool & OutInvert, bool & OutAttention, bool& OutLiteral)
 {
+	OutLiteral = false;
+
 	char ctrl = InBuffer[InIndex];
 
 	if (ctrl != '&')
-		return;
+		return false;
 
 	if (InIndex < InBuffer.GetCharArray().Num() - 1)
 	{
-		InIndex++;
 		ctrl = InBuffer[InIndex];
 
 		if (ctrl == '&')
-			return;
+		{
+			OutLiteral = true;
+			return true;
+		}
+		InIndex++;
 
 		if (!UCommonUtils::IsColorCode("&" + FString::Chr(ctrl), OutColor))
 		{
@@ -79,8 +86,7 @@ void UPTerminalWidget::ParseControlCode(FString & InBuffer, int & InIndex, ETerm
 		}
 	}
 
-	// Skips the second control code after parsing.
-	InIndex++;
+	return true;
 }
 
 void UPTerminalWidget::Exit()

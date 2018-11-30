@@ -74,3 +74,40 @@ bool UPeacenetSaveGame::CountryHasEmailService(ECountry InCountry)
 	// TODO: What is an email service?
 	return true;
 }
+
+bool UPeacenetSaveGame::GetCharacterByID(int InEntityID, FPeacenetIdentity & OutCharacter)
+{
+	for (auto& Character : this->Characters)
+	{
+		if (Character.ID == InEntityID)
+		{
+			OutCharacter = Character;
+			return true;
+		}
+	}
+	return false;
+}
+
+bool UPeacenetSaveGame::GetBusinessByID(int InEntityID, FEnterpriseNetwork& OutCompany)
+{
+	for (auto& Company : this->Businesses)
+	{
+		if (Company.ID == InEntityID)
+		{
+			OutCompany = Company;
+			return true;
+		}
+	}
+	return false;
+}
+
+bool UPeacenetSaveGame::IsEntityKnown(int InEntityID, EPinnedContactType InContactType)
+{
+	for (auto& Contact : this->PinnedContacts)
+	{
+		if (Contact.EntityID == InEntityID && Contact.ContactType == InContactType)
+			return true;
+	}
+
+	return false;
+}

@@ -12,17 +12,10 @@
 #include "Slate/SlateBrushAsset.h"
 #include "Engine/Font.h"
 #include "SlateFontInfo.h"
+#include "FPinnedContact.h"
 #include "UNetMapWidget.generated.h"
 
 class UDesktopWidget;
-
-UENUM(BlueprintType)
-enum class ENetMapEmblemType : uint8
-{
-	Character,
-	Business,
-	Computer
-};
 
 USTRUCT(BlueprintType)
 struct PROJECTOGLOWIA_API FNetMapNode
@@ -31,16 +24,10 @@ struct PROJECTOGLOWIA_API FNetMapNode
 
 public:
 	UPROPERTY(BlueprintReadOnly)
-	ENetMapEmblemType EmblemType = ENetMapEmblemType::Character;
-
-	UPROPERTY(BlueprintReadOnly)
-	FVector2D Location;
-
-	UPROPERTY(BlueprintReadOnly)
 	float ColorValue = 0.f;
 
 	UPROPERTY(BlueprintReadOnly)
-	int EntityID = 0;
+	FPinnedContact Contact;
 };
 
 UENUM(BlueprintType)

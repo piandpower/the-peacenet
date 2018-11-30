@@ -15,37 +15,41 @@ void UNetMapWidget::CollectDiscoveredNodes()
 	// What we do depends on the display type.
 	if (this->DisplayType == ENetMapDisplayType::CountryMap)
 	{
-		for (auto& Character : this->Desktop->SystemContext->Peacenet->SaveGame->Characters)
+		for (auto& Contact : this->Desktop->SystemContext->Peacenet->SaveGame->PinnedContacts)
 		{
-			if (Character.Country != this->Desktop->SystemContext->Character.Country)
-				continue;
-
-			for (auto& Computer : this->Desktop->SystemContext->Peacenet->SaveGame->Computers)
+			if (Contact.ContactType == EPinnedContactType::Person)
 			{
-				if (Computer.ID == Character.ComputerID)
+				// personal
+				FPeacenetIdentity Character;
+				if (this->Desktop->SystemContext->Peacenet->SaveGame->GetCharacterByID(Contact.EntityID, Character))
 				{
-					FNetMapNode Node;
-					Node.EntityID = Character.ID;
-					Node.EmblemType = ENetMapEmblemType::Character;
-					Node.ColorValue = Character.Reputation;
-					Node.Location = this->CalculateLocation(Character, Computer);
-					Nodes.Add(Node);
-					NodeAdded(Node);
+					if (Character.Country == this->Desktop->SystemContext->Character.Country)
+					{
+						FNetMapNode CharNode;
+						CharNode.ColorValue = Character.Reputation;
+						CharNode.Contact = Contact;
+
+						Nodes.Add(CharNode);
+						NodeAdded(CharNode);
+					}
 				}
 			}
-		}
-
-		for (auto& Business : this->Desktop->SystemContext->Peacenet->SaveGame->Businesses)
-		{
-			if (Business.Country != this->Desktop->SystemContext->Character.Country)
+			else
 			{
-				FNetMapNode BusinessNode;
-				BusinessNode.Location = Business.NodePosition;
-				BusinessNode.EntityID = Business.ID;
-				BusinessNode.ColorValue = 0.f;
-				BusinessNode.EmblemType = ENetMapEmblemType::Business;
-				NodeAdded(BusinessNode);
-				Nodes.Add(BusinessNode);
+				// business
+				FEnterpriseNetwork Company;
+				if (this->Desktop->SystemContext->Peacenet->SaveGame->GetBusinessByID(Contact.EntityID, Company))
+				{
+					if (Company.Country == this->Desktop->SystemContext->Character.Country)
+					{
+						FNetMapNode BusinessNode;
+						BusinessNode.ColorValue = 0.f;
+						BusinessNode.Contact = Contact;
+
+						Nodes.Add(BusinessNode);
+						NodeAdded(BusinessNode);
+					}
+				}
 			}
 		}
 	}
@@ -53,10 +57,10 @@ void UNetMapWidget::CollectDiscoveredNodes()
 
 void UNetMapWidget::SelectNode(const FNetMapNode& InNode)
 {
-	switch (InNode.EmblemType)
+	switch (InNode.Contact.ContactType)
 	{
-	case ENetMapEmblemType::Character:
-		this->Desktop->SelectCharacterNode(InNode.EntityID);
+	case EPinnedContactType::Person:
+		this->Desktop->SelectCharacterNode(InNode.Contact.EntityID);
 		break;
 	}
 }

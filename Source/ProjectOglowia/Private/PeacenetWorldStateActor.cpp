@@ -504,6 +504,15 @@ void APeacenetWorldStateActor::StartGame()
 
 			USystemContext* PlayerContext = NewObject<USystemContext>();
 			
+			if (!SaveGame->IsEntityKnown(SaveGame->PlayerCharacterID, EPinnedContactType::Person))
+			{
+				FPinnedContact PlayerContact;
+				PlayerContact.ContactType = EPinnedContactType::Person;
+				PlayerContact.EntityID = SaveGame->PlayerCharacterID;
+				PlayerContact.IsStoryIntegral = true;
+				SaveGame->PinnedContacts.Add(PlayerContact);
+			}
+
 			PlayerContext->Computer = PlayerPC;
 			PlayerContext->Peacenet = this;
 			PlayerContext->Character = SaveGame->Characters[SaveGame->PlayerCharacterID];

@@ -5,10 +5,12 @@
 #include "CoreMinimal.h"
 #include "GameFramework/SaveGame.h"
 #include "FComputer.h"
+#include "FEmailMessage.h"
 #include "FPeacenetIdentity.h"
 #include "UDesktopWidget.h"
 #include "FEnterpriseNetwork.h"
 #include "UWindow.h"
+#include "FPinnedContact.h"
 #include "UPeacenetSaveGame.generated.h"
 
 class UDesktopWidget;
@@ -59,7 +61,10 @@ public:
 	TArray<FName> Missions;
 
 	UPROPERTY(VisibleAnywhere, Category = "NetMap")
-	TArray<int> DiscoveredCharacterIds;
+	TArray<FPinnedContact> PinnedContacts;
+
+	UPROPERTY(VisibleAnywhere, Category = "Email")
+	TArray<FEmailMessage> Emails;
 
 	const float SECONDS_DAY_LENGTH = 86400.f;
 
@@ -80,4 +85,13 @@ public:
 
 	UFUNCTION()
 	bool CountryHasEmailService(ECountry InCountry);
+
+	UFUNCTION()
+		bool GetCharacterByID(int InEntityID, FPeacenetIdentity& OutCharacter);
+
+	UFUNCTION()
+		bool GetBusinessByID(int InEntityID, FEnterpriseNetwork& OutCompany);
+
+	UFUNCTION()
+		bool IsEntityKnown(int InEntityID, EPinnedContactType InContactType);
 };

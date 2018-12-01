@@ -37,6 +37,15 @@ enum class ENetMapDisplayType : uint8
 	EnterpriseMap
 };
 
+UENUM(BlueprintType)
+enum class ENetMapAttentionType : uint8
+{
+	Generic,
+	NewMission
+};
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FContactWantsAttentionEvent, FNetMapNode, InNode, bool, PlaySound, ENetMapAttentionType, AttentionType);
+
 /**
  * A base widget for the Network Map.
  */
@@ -54,6 +63,9 @@ public:
 
 	UPROPERTY()
 	TArray<FNetMapNode> Nodes;
+
+	UPROPERTY(BlueprintAssignable, Category = "NetMap")
+	FContactWantsAttentionEvent ContactWantsAttention;
 
 protected:
 	UFUNCTION(BlueprintImplementableEvent, Category = "NetMap")
@@ -74,6 +86,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "NetMap")
 	bool GetCharacterData(const FNetMapNode& InNode, FPeacenetIdentity& OutCharacter);
-
+	
 	virtual void NativeConstruct() override;
 };

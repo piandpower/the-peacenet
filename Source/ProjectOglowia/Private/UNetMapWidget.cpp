@@ -70,6 +70,15 @@ FVector2D UNetMapWidget::CalculateLocation(const FPeacenetIdentity & InCharacter
 	return InCharacter.NodePosition;
 }
 
+bool UNetMapWidget::GetCharacterData(const FNetMapNode & InNode, FPeacenetIdentity & OutCharacter)
+{
+	if (InNode.Contact.ContactType == EPinnedContactType::Person)
+	{
+		return this->Desktop->SystemContext->Peacenet->SaveGame->GetCharacterByID(InNode.Contact.EntityID, OutCharacter);
+	}
+	return false;
+}
+
 void UNetMapWidget::NativeConstruct()
 {
 	// First time we collect our nodes from the save file.

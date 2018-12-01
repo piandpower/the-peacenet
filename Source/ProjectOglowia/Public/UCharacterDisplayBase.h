@@ -17,9 +17,20 @@ class PROJECTOGLOWIA_API UCharacterDisplayBase : public UProgram
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Character Display", meta = (ExposeOnSpawn))
+	UPROPERTY(BlueprintReadOnly, Category = "Character Display")
 	FPeacenetIdentity Character;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Character Display")
+	FComputer Computer;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Character Display")
+	bool IsPinned = false;
 
 	UFUNCTION(BlueprintCallable, Category = "Character Display")
 	void SetCharacterIdChecked(int InEntityID);
+
+
+
+public: //overrides
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 };

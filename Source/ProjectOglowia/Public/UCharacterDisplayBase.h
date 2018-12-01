@@ -33,4 +33,9 @@ public:
 
 public: //overrides
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+
+protected: // functions that only we have access to.
+
+	UFUNCTION(BlueprintCallable, Category = "Character Display")
+	void PinContactChecked();
 };

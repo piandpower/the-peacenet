@@ -24,3 +24,15 @@ void UCharacterDisplayBase::NativeTick(const FGeometry & MyGeometry, float InDel
 
 	Super::NativeTick(MyGeometry, InDeltaTime);
 }
+
+void UCharacterDisplayBase::PinContactChecked()
+{
+	check(!this->Window->SystemContext->Peacenet->SaveGame->IsEntityKnown(this->Character.ID, EPinnedContactType::Person));
+
+	FPinnedContact NewContact;
+	NewContact.EntityID = this->Character.ID;
+	NewContact.ContactType = EPinnedContactType::Person;
+	NewContact.IsStoryIntegral = false;
+
+	this->Window->SystemContext->Peacenet->SaveGame->PinnedContacts.Add(NewContact);
+}

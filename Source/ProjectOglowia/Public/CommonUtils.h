@@ -6,8 +6,11 @@
 #include "UPeacegateFileSystem.h"
 #include "SlateFontInfo.h"
 #include "ETerminalColor.h"
+#include "FEmailMessage.h"
+#include "FEmailAttachment.h"
 #include "CommonUtils.generated.h"
 
+class UPeacenetSaveGame;
 class USystemContext;
 
 /**
@@ -35,4 +38,7 @@ public:
 	static bool IsColorCode(FString InControlCode, ETerminalColor& OutColor);
 
 	static void MeasureChar(const TCHAR InChar, const FSlateFontInfo& InSlateFont, float& OutWidth, float& OutHeight);
+
+	UFUNCTION()
+	void SendEmailChecked(UPeacenetSaveGame* InSaveGame, int FromEntity, int ToEntity, const FText& Subject, const FText& Message, TArray<FEmailAttachment> InAttachments = TArray<FEmailAttachment>(), TArray<FEmailMission> InMissions = TArray<FEmailMission>());
 };

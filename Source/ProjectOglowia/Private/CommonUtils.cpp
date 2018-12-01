@@ -2,6 +2,7 @@
 
 #include "CommonUtils.h"
 #include "Engine/Font.h"
+#include "UPeacenetSaveGame.h"
 #include "Parse.h"
 #include "USystemContext.h"
 
@@ -148,5 +149,25 @@ void UCommonUtils::MeasureChar(const TCHAR InChar, const FSlateFontInfo & InSlat
 
 	OutWidth = x * Scale;
 	OutHeight = y * Scale;
+}
+
+void UCommonUtils::SendEmailChecked(UPeacenetSaveGame * InSaveGame, int FromEntity, int ToEntity, const FText & Subject, const FText & Message, TArray<FEmailAttachment> InAttachments, TArray<FEmailMission> InMissions)
+{
+	FPeacenetIdentity FromCharacter;
+	FPeacenetIdentity ToCharacter;
+
+	// Do these character entities exist?
+	check(InSaveGame->GetCharacterByID(FromEntity, FromCharacter));
+	check(InSaveGame->GetCharacterByID(ToEntity, ToCharacter));
+
+	FEmailMessage NewMessage;
+	NewMessage.EntityID = InSaveGame->Emails.Num();
+	NewMessage.Subject = Subject;
+	NewMessage.Message = Message;
+	NewMessage.Attachments = InAttachments;
+	NewMessage.Missions = InMissions;
+	NewMessage.IsUnread = true;
+	
+	InSaveGame->Emails.Add(NewMessage);
 }
 

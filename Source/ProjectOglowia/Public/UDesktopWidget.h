@@ -45,6 +45,8 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "System")
 	void ExecuteCommand(const FString& InCommand);
 
+	void ResetNetMap();
+
 protected:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Missions")
 	bool IsInMission();

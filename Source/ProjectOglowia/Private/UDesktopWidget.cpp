@@ -38,6 +38,13 @@ UNetMapWidget* UDesktopWidget::CreateNetMap(TSubclassOf<UNetMapWidget> InSubclas
 	return Result;
 }
 
+void UDesktopWidget::ResetNetMap()
+{
+	check(this->NetMap);
+
+	this->NetMap->CollectDiscoveredNodes();
+}
+
 void UDesktopWidget::SelectCharacterNode(int InEntityID)
 {
 	for (auto& Character : this->SystemContext->Peacenet->SaveGame->Characters)

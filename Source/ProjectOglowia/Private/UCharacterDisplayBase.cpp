@@ -35,4 +35,5 @@ void UCharacterDisplayBase::PinContactChecked()
 	NewContact.IsStoryIntegral = false;
 
 	this->Window->SystemContext->Peacenet->SaveGame->PinnedContacts.Add(NewContact);
+	this->Window->SystemContext->Desktop->ResetNetMap();
 }

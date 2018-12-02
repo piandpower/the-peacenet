@@ -38,6 +38,10 @@ class PROJECTOGLOWIA_API UDesktopWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
+protected:
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "System")
+	USystemContext* GetSystemContext();
+
 public:
 	UFUNCTION()
 	void SelectCharacterNode(int InEntityID);

@@ -17,6 +17,11 @@ bool UDesktopWidget::IsInMission()
 	return this->SystemContext->Peacenet->IsMissionActive();
 }
 
+USystemContext* UDesktopWidget::GetSystemContext()
+{
+	return this->SystemContext;
+}
+
 UProgram * UDesktopWidget::SpawnProgramFromClass(TSubclassOf<UProgram> InClass, const FText& InTitle, UTexture2D* InIcon)
 {
 	UWindow* OutputWindow = nullptr;

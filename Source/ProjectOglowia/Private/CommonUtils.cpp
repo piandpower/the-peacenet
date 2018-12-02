@@ -151,6 +151,13 @@ void UCommonUtils::MeasureChar(const TCHAR InChar, const FSlateFontInfo & InSlat
 	OutHeight = y * Scale;
 }
 
+void UCommonUtils::SetEnableBloom(UCameraComponent * InCamera, bool InEnableBloom)
+{
+	auto PostProcessSettings = InCamera->PostProcessSettings;
+	PostProcessSettings.bOverride_BloomIntensity = InEnableBloom;
+	InCamera->PostProcessSettings = PostProcessSettings;
+}
+
 void UCommonUtils::SendEmailChecked(UPeacenetSaveGame * InSaveGame, int FromEntity, int ToEntity, const FText & Subject, const FText & Message, TArray<FEmailAttachment> InAttachments, TArray<FEmailMission> InMissions)
 {
 	FPeacenetIdentity FromCharacter;

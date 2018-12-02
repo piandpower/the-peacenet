@@ -6,6 +6,7 @@
 #include "UPeacegateFileSystem.h"
 #include "SlateFontInfo.h"
 #include "ETerminalColor.h"
+#include "Camera/CameraComponent.h"
 #include "FEmailMessage.h"
 #include "FEmailAttachment.h"
 #include "CommonUtils.generated.h"
@@ -38,6 +39,9 @@ public:
 	static bool IsColorCode(FString InControlCode, ETerminalColor& OutColor);
 
 	static void MeasureChar(const TCHAR InChar, const FSlateFontInfo& InSlateFont, float& OutWidth, float& OutHeight);
+
+	UFUNCTION(BlueprintCallable, Category = "Settings")
+	static void SetEnableBloom(UCameraComponent* InCamera, bool InEnableBloom);
 
 	UFUNCTION()
 	void SendEmailChecked(UPeacenetSaveGame* InSaveGame, int FromEntity, int ToEntity, const FText& Subject, const FText& Message, TArray<FEmailAttachment> InAttachments = TArray<FEmailAttachment>(), TArray<FEmailMission> InMissions = TArray<FEmailMission>());

@@ -25,4 +25,7 @@ class PROJECTOGLOWIA_API UPeacenetSettings : public USaveGame
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Settings|UI")
 	EGUIScale GUIScale = EGUIScale::Normal;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Settings|Visual Effects")
+	bool EnableBloom = true;
 };

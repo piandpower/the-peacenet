@@ -2,7 +2,7 @@
 // Only difference is this version loads from Peacegate OS and not from the host PC.
 
 #include "ImageLoader.h"
-
+#include "Async.h"
 #include "ImageLoader.h"
 #include "IImageWrapper.h"
 #include "IImageWrapperModule.h"
@@ -138,11 +138,11 @@ UTexture2D* UImageLoader::CreateTexture(UObject* Outer, const TArray<uint8>& Pix
 
 TArray<uint8> UImageLoader::GetBitmapData(UTexture2D * InTexture)
 {
+#if WITH_EDITOR
 	// Retrieve the texture's current compression and mipmap settings, we need to nuke 'em temporarily.
-	TextureCompressionSettings prevCompression = InTexture->CompressionSettings;
-	TextureMipGenSettings prevMipSettings = InTexture->MipGenSettings;
 	InTexture->CompressionSettings = TextureCompressionSettings::TC_VectorDisplacementmap;
 	InTexture->MipGenSettings = TextureMipGenSettings::TMGS_NoMipmaps;
+#endif
 
 
 	// Update texture resources.
@@ -182,10 +182,6 @@ TArray<uint8> UImageLoader::GetBitmapData(UTexture2D * InTexture)
 	TArray<uint8> Ret;
 	if (UImageLoader::SaveImage(Pixels, DestSize, Ret))
 		return Ret;
-
-	// Revert the texture settings
-	InTexture->CompressionSettings = prevCompression;
-	InTexture->MipGenSettings = prevMipSettings;
 
 	return TArray<uint8>();
 }

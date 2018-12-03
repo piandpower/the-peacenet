@@ -25,5 +25,7 @@ public class ProjectOglowia : ModuleRules
 
 		// Add the Docopt module
 		PrivateDependencyModuleNames.Add("DocoptForUnreal");
+
+        bEnableExceptions = true;
     }
 }

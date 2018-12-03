@@ -49,5 +49,7 @@ public class DocoptForUnreal : ModuleRules
 				// ... add any modules that your module loads dynamically here ...
 			}
 			);
+
+        bEnableExceptions = true;
 	}
 }

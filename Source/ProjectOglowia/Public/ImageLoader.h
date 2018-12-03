@@ -5,6 +5,7 @@
 
 #include "CoreMinimal.h"
 #include "PixelFormat.h"
+#include "Async.h"
 #include "ThreadSafeBool.h"
 #include "ImageLoader.generated.h"
 

@@ -80,8 +80,7 @@ void UProgram::NativeConstruct()
 
 void UProgram::NativePreConstruct()
 {
-	if (this->JustOpened)
-		Super::NativePreConstruct();
+	Super::NativePreConstruct();
 }
 
 void UProgram::ShowInfoWithCallbacks(const FText & InTitle, const FText & InMessage, const EInfoboxIcon InIcon, const EInfoboxButtonLayout ButtonLayout, const bool ShowTextInput, const FInfoboxDismissedEvent & OnDismissed, const FInfoboxInputValidator & ValidatorFunction)

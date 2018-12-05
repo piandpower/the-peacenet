@@ -30,6 +30,12 @@ class PROJECTOGLOWIA_API UProgram : public UUserWidget
 {
 	GENERATED_BODY()
 
+public:
+	virtual void NativeConstruct() override;
+
+	UFUNCTION()
+		void ActiveProgramCloseEvent();
+
 protected:
 	UFUNCTION(BlueprintCallable, Category = "Missions")
 	void StartMission(UMissionAsset* InMissionAsset);

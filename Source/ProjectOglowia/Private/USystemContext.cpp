@@ -180,7 +180,7 @@ FUserInfo USystemContext::GetUserInfo(const int InUserID)
 	return FUserInfo();
 }
 
-void USystemContext::ShowWindowOnWorkspace(const UProgram * InProgram)
+void USystemContext::ShowWindowOnWorkspace(UProgram * InProgram)
 {
 	if (Desktop && InProgram)
 	{

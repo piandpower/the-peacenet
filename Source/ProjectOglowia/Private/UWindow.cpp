@@ -14,7 +14,7 @@ void UWindow::ShowInfo(const FText& InTitle, const FText& InMessage, const EInfo
 void UWindow::Close()
 {
 	OnWindowClosed();
-	NativeWindowClosed.Broadcast();
+	NativeWindowClosed.Broadcast(this);
 }
 
 void UWindow::Minimize()
@@ -40,4 +40,16 @@ void UWindow::AddWindowToClientSlot(const UUserWidget* InClientWidget)
 void UWindow::SetClientMinimumSize(const FVector2D& InSize)
 {
 	OnSetClientMinimumSize(InSize);
+}
+
+void UWindow::NativeOnAddedToFocusPath(const FFocusEvent & InFocusEvent)
+{
+	this->WindowFocusEvent.Broadcast(true, this);
+	Super::NativeOnAddedToFocusPath(InFocusEvent);
+}
+
+void UWindow::NativeOnRemovedFromFocusPath(const FFocusEvent & InFocusEvent)
+{
+	this->WindowFocusEvent.Broadcast(false, this);
+	Super::NativeOnRemovedFromFocusPath(InFocusEvent);
 }

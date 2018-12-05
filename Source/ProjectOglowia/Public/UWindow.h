@@ -7,6 +7,8 @@
 #include "USystemContext.h"
 #include "UWindow.generated.h"
 
+class UWindow;
+
 UENUM(BlueprintType)
 enum class EDialogResult : uint8
 {
@@ -41,10 +43,11 @@ enum class EFileDialogType : uint8
 	Save
 };
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FWindowFocusEvent, bool, IsFocused, UWindow*, Window);
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FInfoboxDismissedEvent, EDialogResult, DialogResult, FText, UserTextInput);
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FInfoboxInputValidator, FText, UserTextInput, FText&, OutError);
 DECLARE_DYNAMIC_DELEGATE_TwoParams(FFileDialogDismissedEvent, bool, FileSelected, FString, FilePath);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FWindowClosedEvent);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FWindowClosedEvent, UWindow*, InWindow);
 
 /**
  * Contains useful functionality for a Peacegate OS window.
@@ -100,6 +103,12 @@ public:
 	void AddWindowToClientSlot(const UUserWidget* InClientWidget);
 
 	void SetClientMinimumSize(const FVector2D& InSize);
+	
+public:
+	FWindowFocusEvent WindowFocusEvent;
+
+	virtual void NativeOnAddedToFocusPath(const FFocusEvent& InFocusEvent) override;
+	virtual void NativeOnRemovedFromFocusPath(const FFocusEvent& InFocusEvent) override;
 
 protected:
 	UFUNCTION(BlueprintImplementableEvent)

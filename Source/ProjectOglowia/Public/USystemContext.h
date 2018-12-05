@@ -92,7 +92,7 @@ public:
 		FUserInfo GetUserInfo(const int InUserID);
 
 	UFUNCTION(BlueprintCallable, Category = "System Context")
-		void ShowWindowOnWorkspace(const UProgram* InProgram);
+		void ShowWindowOnWorkspace(UProgram* InProgram);
 
 	UFUNCTION(BlueprintCallable, Category = "System Context")
 		EUserDomain GetUserDomain(int InUserID);

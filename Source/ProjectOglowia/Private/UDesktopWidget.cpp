@@ -5,12 +5,25 @@
 #include "USystemContext.h"
 #include "FComputer.h"
 #include "ImageLoader.h"
+#include "UWorkspace.h"
 #include "PTerminalWidget.h"
 #include "FPeacenetIdentity.h"
 #include "WallpaperAsset.h"
 #include "UPeacegateProgramAsset.h"
 #include "UNetMapWidget.h"
 #include "UConsoleContext.h"
+
+void UDesktopWidget::ShowProgramOnWorkspace(UProgram* InProgram)
+{
+	UWorkspace* Workspace = this->GetCurrentWorkspace();
+	if (Workspace)
+		Workspace->ShowProgramOnWorkspace(InProgram);
+}
+
+void UDesktopWidget::CloseActiveProgram()
+{
+	this->EventActiveProgramClose.Broadcast();
+}
 
 bool UDesktopWidget::IsInMission()
 {

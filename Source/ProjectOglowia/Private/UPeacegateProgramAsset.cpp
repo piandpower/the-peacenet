@@ -56,6 +56,23 @@ UProgram* UProgram::CreateProgram(const TSubclassOf<UWindow> InWindow, const TSu
 	return ProgramInstance;
 }
 
+void UProgram::ActiveProgramCloseEvent()
+{
+	if (this->Window->HasAnyUserFocus() || this->Window->HasFocusedDescendants() || this->Window->HasKeyboardFocus())
+	{
+		this->Window->Close();
+	}
+}
+
+void UProgram::NativeConstruct()
+{
+	TScriptDelegate<> OnActiveProgramClose;
+	OnActiveProgramClose.BindUFunction(this, "ActiveProgramCloseEvent");
+	this->Window->SystemContext->Desktop->EventActiveProgramClose.Add(OnActiveProgramClose);
+
+	Super::NativeConstruct();
+}
+
 void UProgram::ShowInfoWithCallbacks(const FText & InTitle, const FText & InMessage, const EInfoboxIcon InIcon, const EInfoboxButtonLayout ButtonLayout, const bool ShowTextInput, const FInfoboxDismissedEvent & OnDismissed, const FInfoboxInputValidator & ValidatorFunction)
 {
 	Window->ShowInfoWithCallbacks(InTitle, InMessage, InIcon, ButtonLayout, ShowTextInput, OnDismissed, ValidatorFunction);

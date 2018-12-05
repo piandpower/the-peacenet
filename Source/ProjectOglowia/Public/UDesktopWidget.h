@@ -8,11 +8,14 @@
 #include "UPeacegateFileSystem.h"
 #include "UDesktopWidget.generated.h"
 
+class UWorkspace;
 class USystemContext;
 class UConsoleContext;
 class UPTerminalWidget;
 class UNetMapWidget;
 class UImageLoader;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FActiveProgramCloseEvent);
 
 USTRUCT()
 struct PROJECTOGLOWIA_API FDesktopNotification
@@ -50,6 +53,17 @@ public:
 	void ExecuteCommand(const FString& InCommand);
 
 	void ResetNetMap();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "System")
+	void SwitchWorkspace(int InWorkspaceNumber);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "System")
+	void MoveActiveProgramToWorkspace(int InWorkspaceNumber);
+
+	UFUNCTION(BlueprintCallable, Category = "System")
+	void CloseActiveProgram();
+
+	FActiveProgramCloseEvent EventActiveProgramClose;
 
 protected:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Missions")
@@ -139,8 +153,11 @@ public:
 	UTexture2D* WallpaperTexture;
 
 public:
-	UFUNCTION(BlueprintImplementableEvent, Category = "Desktop")
-	void ShowProgramOnWorkspace(const UProgram* InProgram);
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "System")
+	UWorkspace* GetCurrentWorkspace();
+
+	UFUNCTION()
+	void ShowProgramOnWorkspace(UProgram* InProgram);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Desktop")
 	void ClearAppLauncherMainMenu();

@@ -30,8 +30,13 @@ class PROJECTOGLOWIA_API UProgram : public UUserWidget
 {
 	GENERATED_BODY()
 
+private:
+	// Learned this hack from the ShiftOS Visual Basic days.
+	bool JustOpened = true;
+
 public:
 	virtual void NativeConstruct() override;
+	virtual void NativePreConstruct() override;
 
 	UFUNCTION()
 		void ActiveProgramCloseEvent();

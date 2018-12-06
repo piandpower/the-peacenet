@@ -352,6 +352,32 @@ void USystemContext::HandleFileSystemEvent(EFilesystemEventType InType, FString 
 		}
 		break;
 	}
+
+	// If the path is within /var we might want to check to make sure the log still exists.
+	if (InPath.StartsWith("/var"))
+	{
+		auto RootFS = GetFilesystem(0);
+
+		EFilesystemStatusCode Anus;
+
+		// Does /var/log not exist?
+		if (!RootFS->DirectoryExists("/var/log"))
+		{
+			if (!RootFS->DirectoryExists("/var"))
+			{
+				RootFS->CreateDirectory("/var", Anus);
+			}
+			RootFS->CreateDirectory("/var/log", Anus);
+		}
+
+		// Does peacegate.log not exist?
+		if (!RootFS->FileExists("/var/log/peacegate.log"))
+		{
+			// write blank log.
+			RootFS->WriteText("/var/log/peacegate.log", "");
+		}
+
+	}
 }
 
 void USystemContext::UpdateSystemFiles()
@@ -375,5 +401,24 @@ void USystemContext::UpdateSystemFiles()
 			// Now we just need to write it to disk.
 			RootFS->WriteBinary(TEXT("/usr/share/wallpapers/") + Wallpaper->FriendlyName.ToString() + TEXT(".png"), UETextureData);
 		}
+	}
+
+	EFilesystemStatusCode Anus;
+
+	// Does /var/log not exist?
+	if (!RootFS->DirectoryExists("/var/log"))
+	{
+		if (!RootFS->DirectoryExists("/var"))
+		{
+			RootFS->CreateDirectory("/var", Anus);
+		}
+		RootFS->CreateDirectory("/var/log", Anus);
+	}
+
+	// Does peacegate.log not exist?
+	if (!RootFS->FileExists("/var/log/peacegate.log"))
+	{
+		// write blank log.
+		RootFS->WriteText("/var/log/peacegate.log", "");
 	}
 }

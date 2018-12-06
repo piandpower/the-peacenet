@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UPeacegateFileSystem.h"
+#include "FEventLogEntry.h"
 #include "SlateFontInfo.h"
 #include "ETerminalColor.h"
 #include "Camera/CameraComponent.h"
@@ -23,6 +24,9 @@ class PROJECTOGLOWIA_API UCommonUtils : public UObject
 	GENERATED_BODY()
 
 public:
+	UFUNCTION(BlueprintCallable, Category = "Event Log Entry", BlueprintPure)
+	static FString ParseEventLogEntryToString(const FEventLogEntry& InEventLogEntry);
+
 	UFUNCTION(BlueprintCallable, Category = "Peacegate", BlueprintPure)
 	static FText GetFriendlyFilesystemStatusCode(const EFilesystemStatusCode InStatusCode);
 

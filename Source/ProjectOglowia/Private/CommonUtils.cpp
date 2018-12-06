@@ -178,3 +178,9 @@ void UCommonUtils::SendEmailChecked(UPeacenetSaveGame * InSaveGame, int FromEnti
 	InSaveGame->Emails.Add(NewMessage);
 }
 
+FString UCommonUtils::ParseEventLogEntryToString(const FEventLogEntry& InEventLogEntry)
+{
+	FString TimeOfDay = FString::SanitizeFloat(InEventLogEntry.TimeOfDay);
+	
+	return "[" + TimeOfDay + "]\t<" + InEventLogEntry.Username + ">\t" + InEventLogEntry.Message;
+}

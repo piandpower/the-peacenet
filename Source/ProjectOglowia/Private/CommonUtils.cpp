@@ -6,6 +6,53 @@
 #include "Parse.h"
 #include "USystemContext.h"
 
+FEventLogEntry UCommonUtils::ReadEventLogEntry(FString InString)
+{
+	check(!InString.IsEmpty());
+	check(InString.Contains("\t"));
+
+	TArray<FString> Tokens;
+	InString.ParseIntoArray(Tokens, TEXT("\t"), true);
+
+	check(Tokens.Num() == 3);
+
+	FString TimeOfDay = Tokens[0];
+	FString Username = Tokens[1];
+	FString Message = Tokens[2];
+
+	TimeOfDay.RemoveFromStart("[");
+	TimeOfDay.RemoveFromEnd("]");
+
+	Username.RemoveFromStart("<");
+	Username.RemoveFromEnd(">");
+
+	FEventLogEntry ReturnValue;
+	ReturnValue.TimeOfDay = FCString::Atof(TimeOfDay.GetCharArray().GetData());
+	ReturnValue.Username = Username;
+	ReturnValue.Message = Message;
+
+	return ReturnValue;
+}
+
+TArray<FEventLogEntry> UCommonUtils::ReadEventLogFile(FString InString)
+{
+	TArray<FEventLogEntry> Ret;
+
+	TArray<FString> Lines;
+	InString.ParseIntoArray(Lines, TEXT("\n"), true);
+
+	for (auto Line : Lines)
+	{
+		if (Line.Trim().IsEmpty())
+			continue;
+
+		FEventLogEntry Log = UCommonUtils::ReadEventLogEntry(Line.Trim());
+		Ret.Add(Log);
+	}
+
+	return Ret;
+}
+
 FText UCommonUtils::GetFriendlyFilesystemStatusCode(const EFilesystemStatusCode InStatusCode)
 {
 	switch (InStatusCode)

@@ -27,6 +27,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Event Log Entry", BlueprintPure)
 	static FString ParseEventLogEntryToString(const FEventLogEntry& InEventLogEntry);
 
+	UFUNCTION()
+	static FEventLogEntry ReadEventLogEntry(FString InString);
+
+	UFUNCTION()
+	static TArray<FEventLogEntry> ReadEventLogFile(FString InString);
+
 	UFUNCTION(BlueprintCallable, Category = "Peacegate", BlueprintPure)
 	static FText GetFriendlyFilesystemStatusCode(const EFilesystemStatusCode InStatusCode);
 

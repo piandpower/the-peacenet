@@ -91,6 +91,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "System Context")
 		FUserInfo GetUserInfo(const int InUserID);
 
+	UFUNCTION()
+	void LogEvent(int UserID, FString Message);
+
 	UFUNCTION(BlueprintCallable, Category = "System Context")
 		void ShowWindowOnWorkspace(UProgram* InProgram);
 

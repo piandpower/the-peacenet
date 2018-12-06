@@ -180,6 +180,32 @@ FUserInfo USystemContext::GetUserInfo(const int InUserID)
 	return FUserInfo();
 }
 
+void USystemContext::LogEvent(int UserID, FString Message)
+{
+	auto UserInfo = this->GetUserInfo(UserID);
+
+	check(!UserInfo.Username.IsEmpty());
+
+	float CurrentTimeOfDay = this->Peacenet->SaveGame->EpochTime;
+
+	FEventLogEntry NewEntry;
+	NewEntry.TimeOfDay = CurrentTimeOfDay;
+	NewEntry.Username = UserInfo.Username;
+	NewEntry.Message = Message;
+
+	FString Serialized = UCommonUtils::ParseEventLogEntryToString(NewEntry);
+
+	auto RootFS = this->GetFilesystem(0);
+
+	FString LogText;
+	EFilesystemStatusCode Anus;
+	check(RootFS->ReadText("/var/log/peacegate.log", LogText, Anus));
+
+	LogText.Append(Serialized + "\n");
+
+	RootFS->WriteText("/var/log/peacegate.log", LogText);
+}
+
 void USystemContext::ShowWindowOnWorkspace(UProgram * InProgram)
 {
 	if (Desktop && InProgram)

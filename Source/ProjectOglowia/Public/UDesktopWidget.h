@@ -6,6 +6,7 @@
 #include "UserWidget.h"
 #include "UPeacegateProgramAsset.h" 
 #include "UPeacegateFileSystem.h"
+#include "FEventLogEntry.h"
 #include "UDesktopWidget.generated.h"
 
 class UWorkspace;
@@ -126,6 +127,12 @@ protected:
 
 	UPROPERTY()
 	UPeacegateFileSystem* Filesystem;
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Event Log")
+		void OnClearEventLog();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Event Log")
+	void OnAddEventToLog(FEventLogEntry InEvent);
 
 public:
 	UPROPERTY(BlueprintReadOnly, Category = "Desktop")

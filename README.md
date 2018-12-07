@@ -1,4 +1,6 @@
-# The Peacenet
+![Peacenet logo](https://community.watercolorgames.net/uploads/default/optimized/1X/b4c03663a0556c7287217e485cc0b380784713a3_1_689x153.png)
+
+[![Chat on Gitter](https://badges.gitter.im/bitphoenix/peacenet.png)](https://gitter.im/bitphoenix/peacenet)
 
 The Peacenet is a hacking game that uses the Unreal Engine. 
 The game features a procedurally generated world, a unique storyline, 

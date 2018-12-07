@@ -9,6 +9,8 @@
 #include "USystemContext.h"
 #include "TerminalCommand.generated.h"
 
+class UCommandInfo;
+
 /**
  * A simple Unreal object containing functions needed to run a Peacegate OS Terminal command.
  */
@@ -22,17 +24,26 @@ public:
 	UTerminalCommand();
 	~UTerminalCommand();
 
+	UPROPERTY(BlueprintReadOnly, Category = "Terminal Command")
+	UCommandInfo* CommandInfo;
+
 	UPROPERTY(BlueprintAssignable, BlueprintCallable)
 	FCommandCompletedEvent Completed;
 
 	UFUNCTION(BlueprintCallable, Category = "Terminal Command")
-	virtual void RunCommand(UPARAM(Ref) UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments);
+	void RunCommand(UPARAM(Ref) UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments);
+
 protected:
+	UPROPERTY(BlueprintReadOnly, Category = "Console")
+	UConsoleContext* Console;
+
+	virtual void NativeRunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments);
+
 	UFUNCTION(BlueprintImplementableEvent, Category = "Terminal Command")
 	void OnRunCommand(const UConsoleContext* InConsole, const TMap<FString, UDocoptValue*>& InArguments);
 
-	UFUNCTION(BlueprintCallable, Category="Terminal Command")
-	void Complete() { Completed.Broadcast(); }
+	UFUNCTION(BlueprintCallable, Category = "Terminal Command")
+	void Complete();
 };
 
 UCLASS(Blueprintable)
@@ -40,8 +51,8 @@ class PROJECTOGLOWIA_API UAdminTerminalCommand : public UTerminalCommand
 {
 	GENERATED_BODY()
 
-public:
-	virtual void RunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments) override;
+protected:
+	virtual void NativeRunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments) override;
 };
 
 UCLASS()
@@ -49,6 +60,6 @@ class PROJECTOGLOWIA_API UHelpCommand : public UTerminalCommand
 {
 	GENERATED_BODY()
 
-public:
-	virtual void RunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments) override;
+protected:
+	virtual void NativeRunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments) override;
 };

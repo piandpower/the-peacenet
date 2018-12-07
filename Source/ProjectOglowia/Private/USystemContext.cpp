@@ -135,6 +135,7 @@ bool USystemContext::TryGetTerminalCommand(FName CommandName, UTerminalCommand *
 	{
 		UGraphicalTerminalCommand* GraphicalCommand = NewObject<UGraphicalTerminalCommand>(this);
 		GraphicalCommand->ProgramAsset = Program;
+		GraphicalCommand->CommandInfo = Peacenet->CommandInfo[CommandName];
 		OutCommand = GraphicalCommand;
 		return true;
 	}
@@ -146,6 +147,8 @@ bool USystemContext::TryGetTerminalCommand(FName CommandName, UTerminalCommand *
 
 	UCommandInfo* Info = Peacenet->CommandInfo[CommandName];
 	OutCommand = NewObject<UTerminalCommand>(this, Info->Info.CommandClass);
+
+	OutCommand->CommandInfo = Info;
 
 	if (Info->IsA<UVulnerabilityCommandInfo>())
 	{

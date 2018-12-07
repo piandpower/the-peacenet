@@ -34,7 +34,7 @@ void UBashCommand::ProcessNextCommand()
 	}
 }
 
-void UBashCommand::RunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments)
+void UBashCommand::NativeRunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments)
 {
 	auto User = InConsole->SystemContext->GetUserInfo(InConsole->UserID);
 

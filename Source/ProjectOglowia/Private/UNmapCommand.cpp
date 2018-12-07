@@ -39,7 +39,7 @@ void UNmapCommand::ListNextService()
 	}
 }
 
-void UNmapCommand::RunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments)
+void UNmapCommand::NativeRunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments)
 {
     InConsole->WriteLine("Starting Nmap...");
     

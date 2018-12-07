@@ -30,5 +30,6 @@ public:
 
 	void ListNextService();
 
-	virtual void RunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments) override;
+protected:
+	virtual void NativeRunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments) override;
 };

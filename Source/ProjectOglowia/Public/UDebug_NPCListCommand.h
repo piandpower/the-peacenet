@@ -17,6 +17,6 @@ class PROJECTOGLOWIA_API UDebug_NPCListCommand : public UTerminalCommand
 {
 	GENERATED_BODY()
 
-public:
-	virtual void RunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments) override;
+protected:
+	virtual void NativeRunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments) override;
 };

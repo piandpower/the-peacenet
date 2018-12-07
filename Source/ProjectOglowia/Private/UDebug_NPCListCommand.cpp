@@ -4,7 +4,7 @@
 #include "UnrealMathUtility.h"
 #include "CommonUtils.h"
 
-void UDebug_NPCListCommand::RunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments)
+void UDebug_NPCListCommand::NativeRunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments)
 {
 	FString UserCommand = InArguments["<command>"]->AsString();
 

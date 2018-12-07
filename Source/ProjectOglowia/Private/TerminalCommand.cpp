@@ -1,6 +1,7 @@
 // Copyright (c) 2018 The Peacenet & Alkaline Thunder.
 
 #include "TerminalCommand.h"
+#include "CommandInfo.h"
 #include "PeacenetWorldStateActor.h"
 
 UTerminalCommand::UTerminalCommand()
@@ -11,12 +12,27 @@ UTerminalCommand::~UTerminalCommand()
 {
 }void UTerminalCommand::RunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments)
 {
-	OnRunCommand(InConsole, InArguments);
+	this->Console = InConsole;
+
+	this->Console->SystemContext->LogEvent(this->Console->UserID, "ran " + this->CommandInfo->Info.CommandName.ToString());
+
+	NativeRunCommand(InConsole, InArguments);
 }
 
-void UHelpCommand::RunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments)
+void UTerminalCommand::NativeRunCommand(UConsoleContext * InConsole, const TMap<FString, UDocoptValue*> InArguments)
 {
-	InConsole->WriteLine(TEXT("`*`1Command help`r"));
+	// Call into BP to do the rest.
+	this->OnRunCommand(InConsole, InArguments);
+}
+
+void UTerminalCommand::Complete()
+{
+	this->Completed.Broadcast();
+}
+
+void UHelpCommand::NativeRunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments)
+{
+	InConsole->WriteLine(TEXT("&*&ACommand help&r&1"));
 	InConsole->WriteLine(TEXT("------------------- \n"));
 
 	TMap<FName, FString> CommandList;
@@ -61,7 +77,7 @@ void UHelpCommand::RunCommand(UConsoleContext* InConsole, const TMap<FString, UD
 	this->Complete();
 }
 
-void UAdminTerminalCommand::RunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments)
+void UAdminTerminalCommand::NativeRunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments)
 {
 	if (InConsole->SystemContext->GetUserDomain(InConsole->UserID) != EUserDomain::Administrator)
 	{
@@ -70,5 +86,5 @@ void UAdminTerminalCommand::RunCommand(UConsoleContext* InConsole, const TMap<FS
 		return;
 	}
 
-	Super::RunCommand(InConsole, InArguments);
+	Super::NativeRunCommand(InConsole, InArguments);
 }

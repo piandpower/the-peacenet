@@ -42,6 +42,9 @@ class PROJECTOGLOWIA_API UDesktopWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
+private:
+	void ResetEventLog();
+
 protected:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "System")
 	USystemContext* GetSystemContext();

@@ -27,6 +27,6 @@ private:
 	UPROPERTY()
 	UConsoleContext* CurrentContext;
 
-public:
-	virtual void RunCommand(UConsoleContext* InConsole, TMap<FString, UDocoptValue*> InArguments) override;
+protected:
+	virtual void NativeRunCommand(UConsoleContext* InConsole, TMap<FString, UDocoptValue*> InArguments) override;
 };

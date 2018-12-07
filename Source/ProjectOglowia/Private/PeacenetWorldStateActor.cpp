@@ -182,6 +182,13 @@ void APeacenetWorldStateActor::LoadTerminalCommands()
 		ManPage.FriendlyUsage = FriendlyUsage;
 
 		ManPages.Add(Info.CommandName, ManPage);
+
+		UCommandInfo* CoffeeIsCode = NewObject<UCommandInfo>();
+
+		CoffeeIsCode->Info = Info;
+		CoffeeIsCode->UnlockedByDefault = Program->IsUnlockedByDefault;
+		
+		this->CommandInfo.Add(Program->ExecutableName, CoffeeIsCode);
 	}
 
 	// Now we load in vulnerabilities.

@@ -11,7 +11,7 @@ UGraphicalTerminalCommand::~UGraphicalTerminalCommand()
 {
 }
 
-void UGraphicalTerminalCommand::RunCommand(UConsoleContext * InConsole, const TMap<FString, UDocoptValue*> InArguments)
+void UGraphicalTerminalCommand::NativeRunCommand(UConsoleContext * InConsole, const TMap<FString, UDocoptValue*> InArguments)
 {
 	if (!InConsole->SystemContext->Desktop)
 	{

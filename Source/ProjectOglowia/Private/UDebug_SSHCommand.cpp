@@ -3,7 +3,7 @@
 #include "UDebug_SSHCommand.h"
 #include "PeacenetWorldStateActor.h"
 
-void UDebug_SSHCommand::RunCommand(UConsoleContext* InConsole, TMap<FString, UDocoptValue*> InArguments)
+void UDebug_SSHCommand::NativeRunCommand(UConsoleContext* InConsole, TMap<FString, UDocoptValue*> InArguments)
 {
 	InConsole->WriteLine("[debug] skipping ssh authentication and going straight to connection as non-root...");
 

@@ -8,6 +8,7 @@
 #include "UWorkspace.h"
 #include "PTerminalWidget.h"
 #include "FPeacenetIdentity.h"
+#include "CommonUtils.h"
 #include "WallpaperAsset.h"
 #include "UPeacegateProgramAsset.h"
 #include "UNetMapWidget.h"
@@ -28,6 +29,28 @@ void UDesktopWidget::CloseActiveProgram()
 bool UDesktopWidget::IsInMission()
 {
 	return this->SystemContext->Peacenet->IsMissionActive();
+}
+
+void UDesktopWidget::ResetEventLog()
+{
+	this->OnClearEventLog();
+
+	auto RootFS = this->SystemContext->GetFilesystem(0);
+
+	if (RootFS->FileExists("/var/log/peacegate.log"))
+	{
+		FString LogText;
+		EFilesystemStatusCode Anus;
+		
+		check(RootFS->ReadText("/var/log/peacegate.log", LogText, Anus));
+
+		TArray<FEventLogEntry> LogEntries = UCommonUtils::ReadEventLogFile(LogText);
+
+		for (auto Log : LogEntries)
+		{
+			this->OnAddEventToLog(Log);
+		}
+	}
 }
 
 USystemContext* UDesktopWidget::GetSystemContext()
@@ -86,6 +109,9 @@ void UDesktopWidget::NativeConstruct()
 	// Reset the app launcher.
 	this->ResetAppLauncher();
 
+	// reset event log.
+	this->ResetEventLog();
+
 	// Grab the user's home directory.
 	this->UserHomeDirectory = this->SystemContext->GetUserHomeDirectory(this->UserID);
 
@@ -97,6 +123,7 @@ void UDesktopWidget::NativeConstruct()
 	FSOperation.BindUFunction(this, "OnFilesystemOperation");
 
 	this->Filesystem->FilesystemOperation.Add(FSOperation);
+	this->SystemContext->GetFilesystem(0)->FilesystemOperation.Add(FSOperation);
 
 	// Create an image loader to use for wallpaper loading.
 	this->ImageLoader = NewObject<UImageLoader>(this);
@@ -162,6 +189,10 @@ void UDesktopWidget::OnFilesystemOperation(EFilesystemEventType InType, FString 
 				this->EnqueueNotification(FText::FromString("New wallpaper"), FText::FromString("A new wallpaper has been set by a program."), this->WallpaperTexture);
 
 				this->SystemContext->Peacenet->SaveWorld();
+			}
+			else if (InPath == "/var/log/peacegate.log")
+			{
+				this->ResetEventLog();
 			}
 			break;
 	}

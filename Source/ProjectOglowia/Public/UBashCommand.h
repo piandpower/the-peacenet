@@ -40,5 +40,5 @@ protected:
 	void ProcessNextCommand();
 
 public:
-	virtual void RunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments) override;
+	virtual void NativeRunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments) override;
 };

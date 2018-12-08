@@ -25,6 +25,9 @@ public:
 	FString Name;
 
 	UPROPERTY()
+	TArray<FString> Columns;
+
+	UPROPERTY()
 	TArray<FDatabaseRow> Rows;
 };
 
@@ -41,4 +44,7 @@ class PROJECTOGLOWIA_API UDatabaseParser : public UObject
 public:
 	UFUNCTION()
 	static TArray<FDatabaseTable> ParseTables(FString InTableString);
+
+	UFUNCTION()
+	static FString SerializeDatabase(TArray<FDatabaseTable> InDatabase);
 };

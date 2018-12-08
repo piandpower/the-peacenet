@@ -52,6 +52,7 @@ TArray<FDatabaseTable> UDatabaseParser::ParseTables(FString InTableString)
 				FDatabaseRow NewRow;
 				NewRow.Columns = ColumnMap;
 				Rows.Add(NewRow);
+
 			}
 		}
 		else
@@ -74,4 +75,30 @@ TArray<FDatabaseTable> UDatabaseParser::ParseTables(FString InTableString)
 	}
 
 	return Tables;
+}
+
+FString UDatabaseParser::SerializeDatabase(TArray<FDatabaseTable> InDatabase)
+{
+	FString Serialized;
+
+	for (auto& Table : InDatabase)
+	{
+		Serialized.Append(Table.Name + "\n");
+		for (auto Column : Table.Columns)
+		{
+			Serialized.Append("\t" + Column);
+		}
+		Serialized.Append("\n");
+		for (auto& Row : Table.Rows)
+		{
+			for (auto Column : Table.Columns)
+			{
+				Serialized.Append("\t" + Row.Columns[Column]);
+			}
+			Serialized.Append("\n");
+		}
+		Serialized.Append("\n");
+	}
+
+	return Serialized;
 }

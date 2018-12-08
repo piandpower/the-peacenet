@@ -46,5 +46,11 @@ public:
 	static TArray<FDatabaseTable> ParseTables(FString InTableString);
 
 	UFUNCTION()
+	static FString SanitizeString(FString InString);
+
+	UFUNCTION()
+	static FString PutrifyString(FString InString);
+
+	UFUNCTION()
 	static FString SerializeDatabase(TArray<FDatabaseTable> InDatabase);
 };

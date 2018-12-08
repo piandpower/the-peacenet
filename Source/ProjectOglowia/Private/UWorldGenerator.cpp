@@ -760,9 +760,11 @@ void FWorldGenTask::DoWork()
 		NonRoot.Password = Password;
 		NonRoot.Domain = EUserDomain::PowerUser;
 
-		FString MPT_B64_UserPassword;
-		FString MPT_B64_RootPassword;
+		FString MPT_B64_UserPassword = FBase64::Encode(Password);
+		FString MPT_B64_RootPassword = FBase64::Encode(RootPassword);
 
+		SaveGame->MPT.AddUnique(MPT_B64_UserPassword);
+		SaveGame->MPT.AddUnique(MPT_B64_RootPassword);
 
 
 		// Set their uids.

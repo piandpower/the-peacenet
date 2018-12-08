@@ -66,6 +66,9 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Email")
 	TArray<FEmailMessage> Emails;
 
+	UPROPERTY(VisibleAnywhere, Category = "Master Password Table")
+	TArray<FString> MPT;
+
 	const float SECONDS_DAY_LENGTH = 86400.f;
 
 	UFUNCTION()

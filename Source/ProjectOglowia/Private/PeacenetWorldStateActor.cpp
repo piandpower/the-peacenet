@@ -657,7 +657,7 @@ APeacenetWorldStateActor* APeacenetWorldStateActor::GenerateAndCreateWorld(const
 	NewPeacenet->WindowClass = InWindowDecorator;
 
 	// Now we can create a world seed. The world seed will be generated from the combined string of the player's full name, username and hostname. This creates a unique world for each player.
-	FString CombinedPlayerName = InWorldInfo.PlayerName.ToString() + TEXT("_") + InWorldInfo.PlayerUsername.ToString() + TEXT("_") + InWorldInfo.PlayerHostname.ToString();
+	FString CombinedPlayerName = InWorldInfo.PlayerName + TEXT("_") + InWorldInfo.PlayerUsername + TEXT("_") + InWorldInfo.PlayerHostname;
 
 	// We can use a CRC memory hash function to create the seed.
 	TArray<TCHAR> SeedChars = CombinedPlayerName.GetCharArray();
@@ -677,8 +677,8 @@ APeacenetWorldStateActor* APeacenetWorldStateActor::GenerateAndCreateWorld(const
 	// Create a unix root user.
 	FUser RootUser;
 	RootUser.ID = 0;
-	RootUser.Username = FText::FromString(TEXT("root"));
-	RootUser.Password = FText::FromString(TEXT(""));
+	RootUser.Username = "root";
+	RootUser.Password = "";
 	RootUser.Domain = EUserDomain::Administrator;
 
 	// Create a non-root user.
@@ -704,7 +704,7 @@ APeacenetWorldStateActor* APeacenetWorldStateActor::GenerateAndCreateWorld(const
 	PlayerIdentity.ComputerID = PlayerComputer.ID;
 
 	// World generator can generate the computer's filesystem.
-	UWorldGenerator::CreateFilesystem(PlayerIdentity, PlayerComputer, WorldGenerator, InWorldInfo.PlayerHostname.ToString());
+	UWorldGenerator::CreateFilesystem(PlayerIdentity, PlayerComputer, WorldGenerator, InWorldInfo.PlayerHostname);
 
 
 	// Note: The save file would have been loaded as soon as the actor spawned - BeginPlay gets called during UWorld::SpawnActor.

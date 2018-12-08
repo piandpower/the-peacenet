@@ -235,7 +235,7 @@ void UDesktopWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	this->CurrentUsername = this->SystemContext->GetUsername(this->UserID);
 
 	// update hostname
-	this->CurrentHostname = FText::FromString(this->SystemContext->GetHostname());
+	this->CurrentHostname = this->SystemContext->GetHostname();
 
 	// And now the Peacenet name.
 	this->CurrentPeacenetName = this->SystemContext->Character.CharacterName;

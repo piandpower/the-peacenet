@@ -101,7 +101,7 @@ public:
 		EUserDomain GetUserDomain(int InUserID);
 
 	UFUNCTION(BlueprintCallable, Category = "System Context")
-		FText GetUsername(int InUserID);
+	FString GetUsername(int InUserID);
 
 	UFUNCTION(BlueprintCallable, Category = "System Context")
 		FString GetUserHomeDirectory(int UserID);

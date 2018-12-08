@@ -2,11 +2,11 @@
 
 #include "UPeacenetSaveGame.h"
 
-bool UPeacenetSaveGame::CharacterNameExists(FText CharacterName)
+bool UPeacenetSaveGame::CharacterNameExists(FString CharacterName)
 {
 	for (auto& Character : Characters)
 	{
-		if (Character.CharacterName.EqualTo(CharacterName))
+		if (Character.CharacterName == CharacterName)
 		{
 			return true;
 		}
@@ -14,11 +14,11 @@ bool UPeacenetSaveGame::CharacterNameExists(FText CharacterName)
 	return false;
 }
 
-bool UPeacenetSaveGame::CompanyNameExists(FText CompanyName)
+bool UPeacenetSaveGame::CompanyNameExists(FString CompanyName)
 {
 	for (auto& Company : Businesses)
 	{
-		if (Company.Name.EqualTo(CompanyName))
+		if (Company.Name == CompanyName)
 			return true;
 	}
 	return false;

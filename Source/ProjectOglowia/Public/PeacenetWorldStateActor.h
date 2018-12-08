@@ -33,16 +33,16 @@ struct PROJECTOGLOWIA_API FPeacenetWorldInfo
 
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FText PlayerName;
+	FString PlayerName;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FText PlayerUsername;
+	FString PlayerUsername;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FText PlayerHostname;
+	FString PlayerHostname;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FText PlayerPassword;
+	FString PlayerPassword;
 };
 
 USTRUCT()

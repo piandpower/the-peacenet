@@ -30,7 +30,7 @@ public:
 	int ID;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FText CharacterName;
+	FString CharacterName;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FVector2D NodePosition;

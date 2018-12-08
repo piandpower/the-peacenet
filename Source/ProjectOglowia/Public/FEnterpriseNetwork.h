@@ -32,7 +32,7 @@ public:
 
 	// This is the name of the company, displayed in the UI. No two companies should have the same name unless in different countries. If it does have the same name in a different country, both companies inherit similar stats.
 	UPROPERTY(BlueprintReadOnly, Category = "Peacenet|Company")
-	FText Name;
+	FString Name;
 
 	// A list of all computers the company owns. Each element is an entity ID (see FComputer.h).
 	UPROPERTY(BlueprintReadOnly, Category = "Peacenet|Company")

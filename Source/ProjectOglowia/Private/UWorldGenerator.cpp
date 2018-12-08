@@ -6,6 +6,7 @@
 #include "USystemContext.h"
 #include "UPeacenetSaveGame.h"
 #include "FEnterpriseNetwork.h"
+#include "Base64.h"
 #include "UComputerTypeAsset.h"
 #include "UComputerService.h"
 #include "Async.h"
@@ -489,7 +490,7 @@ void UWorldGenerator::CreateFilesystem(FPeacenetIdentity& InCharacter, FComputer
 	{
 		// Parse the character's name to give us a hostname to use.
 		FString Username;
-		USystemContext::ParseCharacterName(InCharacter.CharacterName.ToString(), Username, InHostname);
+		USystemContext::ParseCharacterName(InCharacter.CharacterName, Username, InHostname);
 	}
 	// Get the root FS context.
 	UPeacegateFileSystem* RootFilesystem = SysCtx->GetFilesystem(0);
@@ -602,7 +603,7 @@ void FWorldGenTask::DoWork()
 			{
 				FString CompanyName;
 				CompanyType->GenerateName(this->RandomStream, BusinessNames, CompanyName, DomainName);
-				Business.Name = FText::FromString(CompanyName);
+				Business.Name = CompanyName;
 			} while (this->SaveGame->CompanyNameExists(Business.Name));
 			
 			do
@@ -664,7 +665,7 @@ void FWorldGenTask::DoWork()
 				FString LastName = UWorldGenerator::MakeName(LastNameGenerator->GetMarkovString(0));
 
 				// Combine it into a single Text variable as the NPC's full name.
-				NPC.CharacterName = FText::FromString(FirstName + TEXT(" ") + LastName);
+				NPC.CharacterName = FirstName + TEXT(" ") + LastName;
 			} while (SaveGame->CharacterNameExists(NPC.CharacterName));
 
 			// The NPC is not a player or story character.
@@ -734,7 +735,7 @@ void FWorldGenTask::DoWork()
 		int PasswordLength = RandomStream.RandRange(3, 5) * FMath::Pow(2, NPC.Skill);
 
 		// Hostname and user generation is really easy, since this is a personal computer.
-		USystemContext::ParseCharacterName(NPC.CharacterName.ToString(), Username, Hostname);
+		USystemContext::ParseCharacterName(NPC.CharacterName, Username, Hostname);
 
 		// For the password, I probably have a function for that. But who knows?
 		Password = UWorldGenerator::GenerateRandomPassword(RandomStream, PasswordLength);
@@ -749,15 +750,20 @@ void FWorldGenTask::DoWork()
 
 		// Create the root user:
 		FUser Root;
-		Root.Username = FText::FromString(TEXT("root"));
-		Root.Password = FText::FromString(RootPassword);
+		Root.Username = TEXT("root");
+		Root.Password = RootPassword;
 		Root.Domain = EUserDomain::Administrator;
 
 		// Create the NPC user:
 		FUser NonRoot;
-		NonRoot.Username = FText::FromString(Username);
-		NonRoot.Password = FText::FromString(Password);
+		NonRoot.Username = Username;
+		NonRoot.Password = Password;
 		NonRoot.Domain = EUserDomain::PowerUser;
+
+		FString MPT_B64_UserPassword;
+		FString MPT_B64_RootPassword;
+
+
 
 		// Set their uids.
 		Root.ID = 0;

@@ -151,13 +151,13 @@ public:
 	UTexture2D* NotificationIcon;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Desktop")
-	FText CurrentUsername;
+	FString CurrentUsername;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Desktop")
-	FText CurrentHostname;
+	FString CurrentHostname;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Desktop")
-	FText CurrentPeacenetName;
+	FString CurrentPeacenetName;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Desktop")
 	UTexture2D* WallpaperTexture;

@@ -72,10 +72,10 @@ public:
 	const float SECONDS_DAY_LENGTH = 86400.f;
 
 	UFUNCTION()
-	bool CharacterNameExists(FText CharacterName);
+	bool CharacterNameExists(FString CharacterName);
 
 	UFUNCTION()
-	bool CompanyNameExists(FText CompanyName);
+	bool CompanyNameExists(FString CompanyName);
 
 	UFUNCTION()
 	bool DomainNameExists(FString InDomainName);

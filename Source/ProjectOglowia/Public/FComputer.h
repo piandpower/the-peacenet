@@ -51,10 +51,10 @@ public:
 	EUserDomain Domain;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FText Username;
+	FString Username;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FText Password;
+	FString Password;
 };
 
 /**

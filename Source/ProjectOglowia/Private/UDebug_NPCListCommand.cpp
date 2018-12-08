@@ -18,7 +18,7 @@ void UDebug_NPCListCommand::NativeRunCommand(UConsoleContext* InConsole, const T
 				continue;
 
 			InConsole->Write(FString::FromInt(Character.ID) + "\t\t");
-			InConsole->Write(Character.CharacterName.ToString() + "\t\t\t\t");
+			InConsole->Write(Character.CharacterName + "\t\t\t\t");
 			InConsole->Write(FString::FromInt(Character.ComputerID) + "\t\t");
 			if (FMath::IsNearlyEqual(Character.Reputation, 0, 0.1f))
 			{

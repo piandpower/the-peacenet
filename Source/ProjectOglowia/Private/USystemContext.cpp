@@ -174,7 +174,7 @@ FUserInfo USystemContext::GetUserInfo(const int InUserID)
 		if (User.ID == InUserID)
 		{
 			FUserInfo Info;
-			Info.Username = User.Username.ToString();
+			Info.Username = User.Username;
 			Info.IsAdminUser = (User.Domain == EUserDomain::Administrator);
 			return Info;
 		}
@@ -235,10 +235,10 @@ EUserDomain USystemContext::GetUserDomain(int InUserID)
 	return EUserDomain::User;
 }
 
-FText USystemContext::GetUsername(int InUserID)
+FString USystemContext::GetUsername(int InUserID)
 {
 	FUserInfo UserInfo = this->GetUserInfo(InUserID);
-	return FText::FromString(UserInfo.Username);
+	return UserInfo.Username;
 }
 
 FString USystemContext::GetUserHomeDirectory(int UserID)
@@ -254,7 +254,7 @@ FString USystemContext::GetUserHomeDirectory(int UserID)
 		{
 			if (User.Domain == EUserDomain::Administrator)
 				return TEXT("/root");
-			return TEXT("/home/") + User.Username.ToString();
+			return TEXT("/home/") + User.Username;
 		}
 	}
 
@@ -265,7 +265,7 @@ bool USystemContext::Authenticate(const FString & Username, const FString & Pass
 {
 	for (FUser User : Computer.Users)
 	{
-		if (User.Username.ToString() == Username && User.Password.ToString() == Password)
+		if (User.Username == Username && User.Password == Password)
 		{
 			UserID = User.ID;
 			return true;

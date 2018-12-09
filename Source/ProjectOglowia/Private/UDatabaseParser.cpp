@@ -13,7 +13,7 @@ TArray<FDatabaseTable> UDatabaseParser::ParseTables(FString InTableString)
 	TArray<FDatabaseTable> Tables;
 
 	TArray<FString> Lines;
-	InTableString.ParseIntoArray(Lines, TEXT("\n"), true);
+	InTableString.ParseIntoArrayLines(Lines, true);
 
 	for (auto Line : Lines)
 	{
@@ -76,6 +76,19 @@ TArray<FDatabaseTable> UDatabaseParser::ParseTables(FString InTableString)
 			Rows.Empty();
 		}
 	}
+
+	if (!CurrentTableName.IsEmpty())
+	{
+		check(ColumnNames.Num());
+
+		FDatabaseTable NewTable;
+		NewTable.Name = PutrifyString(CurrentTableName);
+		NewTable.Columns = ColumnNames;
+		NewTable.Rows = Rows;
+
+		Tables.Add(NewTable);
+	}
+
 
 	return Tables;
 }

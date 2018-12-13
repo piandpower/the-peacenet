@@ -57,5 +57,15 @@ void URainbowTable::ReloadTable()
 
 void URainbowTable::UpdateTableFormat()
 {
-	// TODO: Update the rainbow table schema.
+	// Make sure this is in fact a rainbow table.
+	if (!this->RainbowTable->TableExists("Rainbow Table"))
+	{
+		this->RainbowTable->AddTable("Rainbow Table");
+	}
+
+	// Add columns for the various hash functions. These don't actually modify the database unless the column doesn't exist.
+	this->RainbowTable->AddColumnToTable("Rainbow Table", "Password");
+	this->RainbowTable->AddColumnToTable("Rainbow Table", "MD5 Hash");
+	this->RainbowTable->AddColumnToTable("Rainbow Table", "SHA1 Hash");
+	this->RainbowTable->AddColumnToTable("Rainbow Table", "CRC Hash");
 }

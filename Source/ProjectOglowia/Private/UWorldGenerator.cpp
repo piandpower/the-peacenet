@@ -884,8 +884,17 @@ void FWorldGenTask::DoWork()
 	// Then we check their reputation value. If it's below 0 (a.k.a, malicious), then the spawn rate for a rainbow table is FAR greater.
 	// Then we choose a random number of passwords to add to the rainbow table, and we choose them randomly from the Master Password Table.
 	
-	for(FPeacenetIdentity& Character : this->SaveGame->Characters)
+	for(int i = 0; i < this->SaveGame->Characters.Num(); i++)
 	{
+		AsyncTask(ENamedThreads::GameThread, [this, i]()
+		{
+			Status->Status = FText::FromString("Generating rainbow tables... [" + FString::FromInt(i+1) + "/" + FString::FromInt(this->SaveGame->Characters.Num()) + "]...");
+			Status->Percentage = (float)i / (SaveGame->Characters.Num() - 1);
+		});
+
+
+		FPeacenetIdentity& Character = this->SaveGame->Characters[i];
+
 		float SpawnRate = 0.1f;
 		if(Character.Reputation < 0.f)
 		{
@@ -914,7 +923,7 @@ void FWorldGenTask::DoWork()
 					URainbowTable* RainbowTableContext = NewObject<URainbowTable>(ComputerContext);
 					RainbowTableContext->Setup(ComputerContext, "/etc/rainbow_table.db");
 
-					int Passwords = this->RandomStream.RandRange(10, this->SaveGame->MPT.Num());
+					int Passwords = this->RandomStream.RandRange(10, 50);
 
 					TArray<FString> UsedHashes;
 

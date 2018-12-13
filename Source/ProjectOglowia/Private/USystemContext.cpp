@@ -6,6 +6,7 @@
 #include "UPeacegateFileSystem.h"
 #include "CommonUtils.h"
 #include "UPeacegateProgramAsset.h"
+#include "URainbowTable.h"
 #include "UVulnerability.h"
 #include "UVulnerabilityTerminalCommand.h"
 #include "WallpaperAsset.h"
@@ -450,4 +451,8 @@ void USystemContext::UpdateSystemFiles()
 		// write blank log.
 		RootFS->WriteText("/var/log/peacegate.log", "");
 	}
+
+	// This is also where we init our rainbow table.
+	this->RainbowTable = NewObject<URainbowTable>(this);
+	this->RainbowTable->Setup(this, "/etc/rainbow_table.db");
 }

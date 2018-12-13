@@ -11,6 +11,7 @@
 
 
 class UDesktopWidget;
+class URainbowTable;
 class APeacenetWorldStateActor;
 class UPeacegateProgramAsset;
 
@@ -41,6 +42,9 @@ private:
 	FString CurrentHostname;
 
 public:
+	UPROPERTY()
+	URainbowTable* RainbowTable;
+
 	UPROPERTY()
 	FNetMapScanEvent NetMapScan;
 

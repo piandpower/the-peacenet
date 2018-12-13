@@ -41,6 +41,13 @@ protected:
 	UPROPERTY()
 	UDatabase* RainbowTable;
 
+protected:
+	UFUNCTION()
+	void UpdateTableFormat();
+
+	UFUNCTION()
+	void ReloadTable();
+
 public:
 	// Set up this rainbow table manager with the given system context and file path.
 	UFUNCTION()

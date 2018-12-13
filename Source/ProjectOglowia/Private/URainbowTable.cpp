@@ -68,4 +68,7 @@ void URainbowTable::UpdateTableFormat()
 	this->RainbowTable->AddColumnToTable("Rainbow Table", "MD5 Hash");
 	this->RainbowTable->AddColumnToTable("Rainbow Table", "SHA1 Hash");
 	this->RainbowTable->AddColumnToTable("Rainbow Table", "CRC Hash");
+
+	// Save the rainbow table.
+	this->Filesystem->WriteText(this->RainbowTablePath, UDatabaseParser::SerializeDatabase(this->RainbowTable->Tables));
 }

@@ -2,6 +2,7 @@
 
 #include "URainbowTable.h"
 #include "USystemContext.h"
+#include "UHashFunctions.h"
 #include "UPeacegateFileSystem.h"
 
 void URainbowTable::Setup(USystemContext* InSystem, FString InPath)
@@ -30,6 +31,22 @@ void URainbowTable::Setup(USystemContext* InSystem, FString InPath)
 
 	// Load/create the new Rainbow Table database.
 	this->ReloadTable();
+}
+
+void URainbowTable::AddPassword(FString InPassword)
+{
+	if (!this->RainbowTable->GetColumnValues("Rainbow Table", "Password").Contains(InPassword))
+	{
+		TMap<FString, FString> Row;
+		Row.Add("Password", InPassword);
+		Row.Add("MD5 Hash", UHashFunctions::MD5Hash(InPassword));
+		Row.Add("SHA256 Hash", UHashFunctions::SHA256Hash(InPassword));
+		Row.Add("CRC Hash", UHashFunctions::CrcHash(InPassword));
+
+		this->RainbowTable->AddRowToTableChecked("Rainbow Table", Row);
+
+		this->Filesystem->WriteText(this->RainbowTablePath, UDatabaseParser::SerializeDatabase(this->RainbowTable->Tables));
+	}
 }
 
 void URainbowTable::ReloadTable()
@@ -66,7 +83,7 @@ void URainbowTable::UpdateTableFormat()
 	// Add columns for the various hash functions. These don't actually modify the database unless the column doesn't exist.
 	this->RainbowTable->AddColumnToTable("Rainbow Table", "Password");
 	this->RainbowTable->AddColumnToTable("Rainbow Table", "MD5 Hash");
-	this->RainbowTable->AddColumnToTable("Rainbow Table", "SHA1 Hash");
+	this->RainbowTable->AddColumnToTable("Rainbow Table", "SHA256 Hash");
 	this->RainbowTable->AddColumnToTable("Rainbow Table", "CRC Hash");
 
 	// Save the rainbow table.

@@ -52,4 +52,8 @@ public:
 	// Set up this rainbow table manager with the given system context and file path.
 	UFUNCTION()
 	void Setup(USystemContext* InSystem, FString InPath);
+
+	// Adds a password to the rainbow table if it does not exist.
+	UFUNCTION()
+	void AddPassword(FString InPassword);
 };

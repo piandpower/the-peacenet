@@ -692,6 +692,7 @@ bool UPeacegateFileSystem::ReadText(const FString & InPath, FString& OutText, EF
 		return false;
 	}
 
+	OutStatusCode = EFilesystemStatusCode::OK;
 	// File contents are in base 64.
 	FBase64::Decode(FoundFile.FileContent, OutText);
 	return true;

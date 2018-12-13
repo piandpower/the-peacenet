@@ -454,5 +454,5 @@ void USystemContext::UpdateSystemFiles()
 
 	// This is also where we init our rainbow table.
 	this->RainbowTable = NewObject<URainbowTable>(this);
-	this->RainbowTable->Setup(this, "/etc/rainbow_table.db");
+	this->RainbowTable->Setup(this, "/etc/rainbow_table.db", true);
 }

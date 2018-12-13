@@ -5,13 +5,16 @@
 #include "UHashFunctions.h"
 #include "UPeacegateFileSystem.h"
 
-void URainbowTable::Setup(USystemContext* InSystem, FString InPath)
+void URainbowTable::Setup(USystemContext* InSystem, FString InPath, bool InShouldAutoFlush)
 {
 	// Some safeguards against drunk developers like Alkaline
 	check(InSystem);
 	check(!InPath.TrimStartAndEnd().IsEmpty());
 	check(InPath.StartsWith("/"));
 	check(!InPath.EndsWith("/"));
+
+	// Store whether we should auto-flush.
+	this->ShouldAutoFlush = InShouldAutoFlush;
 
 	// We get owned by the calling system context.
 	this->SystemContext = InSystem;
@@ -45,7 +48,10 @@ void URainbowTable::AddPassword(FString InPassword)
 
 		this->RainbowTable->AddRowToTableChecked("Rainbow Table", Row);
 
-		this->Filesystem->WriteText(this->RainbowTablePath, UDatabaseParser::SerializeDatabase(this->RainbowTable->Tables));
+		if(this->ShouldAutoFlush)
+		{
+			this->Flush();
+		}
 	}
 }
 
@@ -87,5 +93,13 @@ void URainbowTable::UpdateTableFormat()
 	this->RainbowTable->AddColumnToTable("Rainbow Table", "CRC Hash");
 
 	// Save the rainbow table.
+	if(this->ShouldAutoFlush)
+	{
+		this->Flush();
+	}
+}
+
+void URainbowTable::Flush()
+{
 	this->Filesystem->WriteText(this->RainbowTablePath, UDatabaseParser::SerializeDatabase(this->RainbowTable->Tables));
 }

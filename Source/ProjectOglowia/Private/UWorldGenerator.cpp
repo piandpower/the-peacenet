@@ -921,7 +921,9 @@ void FWorldGenTask::DoWork()
 					ComputerContext->Computer = Computer;
 					
 					URainbowTable* RainbowTableContext = NewObject<URainbowTable>(ComputerContext);
-					RainbowTableContext->Setup(ComputerContext, "/etc/rainbow_table.db");
+					
+					// Register the rainbow table with the system, also we set "ShouldAutoFlush" to false for a massive speed increase since the filesystem api isn't fucked with till we finish adding passwords.
+					RainbowTableContext->Setup(ComputerContext, "/etc/rainbow_table.db", false);
 
 					int Passwords = this->RandomStream.RandRange(10, 50);
 
@@ -940,6 +942,9 @@ void FWorldGenTask::DoWork()
 						UsedHashes.Add(Hash);
 						Passwords--;
 					}
+
+					// Flush the rainbow table to the computer.
+					RainbowTableContext->Flush();
 
 					// At this point, /etc/rainbow_table.db is written. We just need to pump the new filesystem into the save file.
 					Computer.Filesystem = ComputerContext->Computer.Filesystem;

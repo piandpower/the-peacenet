@@ -41,6 +41,10 @@ protected:
 	UPROPERTY()
 	UDatabase* RainbowTable;
 
+	// Should the game auto-flush this RainboW table?
+	UPROPERTY()
+	bool ShouldAutoFlush = true;
+
 protected:
 	UFUNCTION()
 	void UpdateTableFormat();
@@ -49,9 +53,13 @@ protected:
 	void ReloadTable();
 
 public:
+	// Flushes the contents of the Rainbow Table to the filesystem.
+	UFUNCTION()
+	void Flush();
+
 	// Set up this rainbow table manager with the given system context and file path.
 	UFUNCTION()
-	void Setup(USystemContext* InSystem, FString InPath);
+	void Setup(USystemContext* InSystem, FString InPath, bool InShouldAutoFlush);
 
 	// Adds a password to the rainbow table if it does not exist.
 	UFUNCTION()

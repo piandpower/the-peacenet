@@ -43,10 +43,10 @@ TArray<FEventLogEntry> UCommonUtils::ReadEventLogFile(FString InString)
 
 	for (auto Line : Lines)
 	{
-		if (Line.Trim().IsEmpty())
+		if (Line.TrimStartAndEnd().IsEmpty())
 			continue;
 
-		FEventLogEntry Log = UCommonUtils::ReadEventLogEntry(Line.Trim());
+		FEventLogEntry Log = UCommonUtils::ReadEventLogEntry(Line.TrimStartAndEnd());
 		Ret.Add(Log);
 	}
 

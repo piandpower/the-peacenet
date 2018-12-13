@@ -1,0 +1,10 @@
+{
+	"files.exclude": {
+		"C:/Users/Alkaline/Documents/peacenet-ue/.git": true,
+		"C:/Users/Alkaline/Documents/peacenet-ue/.vs": true,
+		"C:/Users/Alkaline/Documents/peacenet-ue/.vscode": true,
+		"C:/Users/Alkaline/Documents/peacenet-ue/Content": true,
+		"C:/Users/Alkaline/Documents/peacenet-ue/Intermediate": true,
+		"C:/Users/Alkaline/Documents/peacenet-ue/Saved": true
+	}
+}

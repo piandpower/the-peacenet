@@ -9,6 +9,7 @@
 #include "Base64.h"
 #include "UComputerTypeAsset.h"
 #include "UComputerService.h"
+#include "URainbowTable.h"
 #include "Async.h"
 #include "FEnterpriseNetwork.h"
 #include "UHackableAsset.h"
@@ -878,7 +879,67 @@ void FWorldGenTask::DoWork()
 		}
 	}
 
+	// Noiw we generate NPC rainbow tables.
+	// To do this we loop through each character in the save file.
+	// Then we check their reputation value. If it's below 0 (a.k.a, malicious), then the spawn rate for a rainbow table is FAR greater.
+	// Then we choose a random number of passwords to add to the rainbow table, and we choose them randomly from the Master Password Table.
 	
+	for(FPeacenetIdentity& Character : this->SaveGame->Characters)
+	{
+		float SpawnRate = 0.1f;
+		if(Character.Reputation < 0.f)
+		{
+			SpawnRate = FMath::Abs(Character.Reputation) / 2.f;
+		}
+		else
+		{
+			SpawnRate = FMath::Abs(Character.Reputation) * 0.1f;
+		}
+
+		// This is the value that actually determines if we're going to bother with a rainbow table.
+		float SpawnValue = this->RandomStream.GetFraction();
+
+		// Is it less than or equal to the spawn rate?
+		if(SpawnValue <= SpawnRate)
+		{
+			// We're going to spawn. Find the computer.
+			for(FComputer& Computer : this->SaveGame->Computers)
+			{
+				if(Computer.ID == Character.ComputerID)
+				{
+					USystemContext* ComputerContext = NewObject<USystemContext>();
+					ComputerContext->Character = Character;
+					ComputerContext->Computer = Computer;
+					
+					URainbowTable* RainbowTableContext = NewObject<URainbowTable>(ComputerContext);
+					RainbowTableContext->Setup(ComputerContext, "/etc/rainbow_table.db");
+
+					int Passwords = this->RandomStream.RandRange(10, this->SaveGame->MPT.Num());
+
+					TArray<FString> UsedHashes;
+
+					while(Passwords > 0)
+					{
+						FString Hash;
+						FString Password;
+						do
+						{
+							Hash = this->SaveGame->MPT[this->RandomStream.RandRange(0, this->SaveGame->MPT.Num() - 1)];
+						} while(UsedHashes.Contains(Hash));
+						FBase64::Decode(Hash, Password);
+						RainbowTableContext->AddPassword(Password);
+						UsedHashes.Add(Hash);
+						Passwords--;
+					}
+
+					// At this point, /etc/rainbow_table.db is written. We just need to pump the new filesystem into the save file.
+					Computer.Filesystem = ComputerContext->Computer.Filesystem;
+				}
+			}
+		}
+
+
+	}
 
 	// Setting this will tell the game thread that we're done without crashing the game or causing bugs.
 	AsyncTask(ENamedThreads::GameThread, [this]() 

@@ -20,6 +20,18 @@ public: // Properties.
 	TArray<FDatabaseTable> Tables;
 
 public: // Member functions.
+	UFUNCTION(BlueprintCallable, Category = "Database")
+	void AddTable(FString TableName);
+
+	UFUNCTION(BlueprintCallable, Category = "Database")
+	void AddColumnToTable(FString TableName, FString ColumnName);
+
+	UFUNCTION(BlueprintCallable, Category = "Database", BlueprintPure)
+	bool TableExists(FString InTable);
+
+	UFUNCTION(BlueprintCallable, Category = "Database", BlueprintPure)
+	bool ColumnExistsInTable(FString InTable, FString InColumn);
+
 	UFUNCTION(BlueprintCallable, Category = "Database", BlueprintPure)
 	TArray<FString> GetTables();
 

@@ -26,6 +26,9 @@ public: // Member functions.
 	UFUNCTION(BlueprintCallable, Category = "Database")
 	void AddColumnToTable(FString TableName, FString ColumnName);
 
+	UFUNCTION(BlueprintCallable, Category = "Database")
+		void AddRowToTableChecked(FString InTable, TMap<FString, FString> InRow);
+
 	UFUNCTION(BlueprintCallable, Category = "Database", BlueprintPure)
 	bool TableExists(FString InTable);
 

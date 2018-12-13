@@ -123,3 +123,32 @@ void UDatabase::AddColumnToTable(FString TableName, FString ColumnName)
 		}
 	}
 }
+
+void UDatabase::AddRowToTableChecked(FString InTable, TMap<FString, FString> InRow)
+{
+	check(TableExists(InTable));
+	check(!InRow.Contains("ID"));
+
+	for (auto& Table : this->Tables)
+	{
+		if (Table.Name == InTable)
+		{
+			InRow.Add("ID", FString::FromInt(Table.Rows.Num()));
+
+			FDatabaseRow Row;
+			
+			for (auto Column : Table.Columns)
+			{
+				if (!InRow.Contains(Column))
+				{
+					InRow.Add(Column, "");
+				}
+				Row.Columns.Add(Column, InRow[Column]);
+			}
+
+			// We skipped any data that doesn't match the schema.
+			Table.Rows.Add(Row);
+			
+		}
+	}
+}

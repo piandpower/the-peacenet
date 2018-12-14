@@ -86,6 +86,8 @@ public:
 
 	virtual FString SynchronouslyReadLine() override;
 
+	FString GetInputBuffer();
+
 	virtual void ReadLine(UObject* WorldContextObject, struct FLatentActionInfo LatentInfo, FString& OutText) override
 	{
 		if (Input)

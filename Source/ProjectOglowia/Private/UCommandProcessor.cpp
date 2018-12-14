@@ -6,6 +6,18 @@
 #include "TerminalCommand.h"
 #include "TerminalCommandParserLibrary.h"
 
+FString UPiperContext::GetInputBuffer()
+{
+	if(this->Input)
+	{
+		return this->Input->Log;
+	}
+	else
+	{
+		return FString();
+	}
+}
+
 TArray<FCommandRunInstruction> UCommandProcessor::ProcessCommand(UConsoleContext* InConsole, const FString& InCommand)
 {
 	check(InConsole);

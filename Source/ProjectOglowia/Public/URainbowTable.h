@@ -11,7 +11,7 @@ class USystemContext;
 class UPeacegateFileSystem;
 
 /**
- * Encapsulates functionality for reading from/writing to a Peacenet Rainbow Table file.
+ * Contains functionality for reading from/writing to a Peacenet Rainbow Table file.
  */
 UCLASS(BlueprintType)
 class PROJECTOGLOWIA_API URainbowTable : public UObject

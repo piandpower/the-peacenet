@@ -32,4 +32,33 @@ public:
 
 	UPROPERTY()
 	bool IsStoryIntegral = false;
+
+
+	// DISCOVERY SYSTEM VARIABLES
+	UPROPERTY()
+	bool IsEmailKnown = false;
+
+	UPROPERTY()
+	bool IsNameKnown = false;
+
+	UPROPERTY()
+	bool IsCountryKnown = false;
+	
+	UPROPERTY()
+	bool IsPersonalIPKnown = false;
+	
+	UPROPERTY()
+	bool IsPersonalHostnameKnown = false;
+	
+	UPROPERTY()
+	bool IsPersonalUsernameKnown = false;
+	
+	UPROPERTY()
+	TArray<int> KnownFriendIDs;
+	
+	UPROPERTY()
+	TArray<int> KnownEnemyIDs;
+	
+	UPROPERTY()
+	bool IsGroupMembershipKnown = false;
 };

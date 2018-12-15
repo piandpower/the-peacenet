@@ -56,4 +56,10 @@ public:
 
     UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Address Book")
     TArray<UContact*> GetContacts();
+
+    UFUNCTION()
+    bool FindComputerAndContact(FPeacenetIdentity InCharacter, FComputer& OutComputer, FPinnedContact& OutContact);
+
+    UFUNCTION()
+    bool FindCharacterByID(int InEntityID, FPeacenetIdentity& OutCharacter);
 };

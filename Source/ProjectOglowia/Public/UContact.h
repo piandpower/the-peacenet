@@ -3,6 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "FPinnedContact.h"
+#include "FComputer.h"
+#include "ECountry.h"
+#include "FPeacenetIdentity.h"
 #include "UContact.generated.h"
 
 class UAddressBookContext;
@@ -28,4 +32,27 @@ public:
 
     UFUNCTION()
     void Setup(UAddressBookContext* InOwnerAddressBook, int InEntityID);
+
+public: // Blueprint functions.
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Contact")
+    bool RetrieveName(FString& OutCharacterName);
+
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Contact")
+    bool RetrieveEmail(FString& OutEmail);
+
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Contact")
+    bool RetrieveCountry(ECountry& OutCountry);
+
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Contact")
+    bool RetrieveReputation(float& OutReputation);
+
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Contact")
+    bool RetrieveComputerIP(FString& OutIPAddress);
+
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Contact")
+    bool RetrieveComputerHostname(FString& OutHostname);
+
+private:
+    UFUNCTION()
+    bool FetchCharacter(FPeacenetIdentity& OutCharacter, FComputer& OutComputer, FPinnedContact& OutContact);
 };

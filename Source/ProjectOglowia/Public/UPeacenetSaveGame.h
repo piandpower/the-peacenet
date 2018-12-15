@@ -96,5 +96,8 @@ public:
 		bool GetBusinessByID(int InEntityID, FEnterpriseNetwork& OutCompany);
 
 	UFUNCTION()
+	bool GetComputerByID(int InEntityID, FComputer& OutComputer);
+
+	UFUNCTION()
 		bool IsEntityKnown(int InEntityID, EPinnedContactType InContactType);
 };

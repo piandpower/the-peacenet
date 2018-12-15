@@ -61,4 +61,7 @@ public:
 	
 	UPROPERTY()
 	bool IsGroupMembershipKnown = false;
+
+	UPROPERTY()
+	bool IsReputationKnown = false;
 };

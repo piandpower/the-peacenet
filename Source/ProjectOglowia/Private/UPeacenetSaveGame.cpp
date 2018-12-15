@@ -111,3 +111,16 @@ bool UPeacenetSaveGame::IsEntityKnown(int InEntityID, EPinnedContactType InConta
 
 	return false;
 }
+
+bool UPeacenetSaveGame::GetComputerByID(int InEntityID, FComputer& OutComputer)
+{
+	for(auto& Computer : this->Computers)
+	{
+		if(Computer.ID == InEntityID)
+		{
+			OutComputer = Computer;
+			return true;
+		}
+	}
+	return false;
+}

@@ -127,3 +127,26 @@ void UAddressBookContext::RemoveContact(UContact* InContact)
     // TODO: Allow the game to choose whether the player is allowed to remove story-integral contacts. Perhaps this should be a milestone 2 feature?
     this->RemoveContactBackend(InContact->GetEntityID(), false);
 }
+
+bool UAddressBookContext::FindCharacterByID(int InEntityID, FPeacenetIdentity& OutCharacter)
+{
+    return this->SystemContext->Peacenet->SaveGame->GetCharacterByID(InEntityID, OutCharacter);
+}
+
+bool UAddressBookContext::FindComputerAndContact(FPeacenetIdentity InCharacter, FComputer& OutComputer, FPinnedContact& OutContact)
+{
+    if(!this->SystemContext->Peacenet->SaveGame->GetComputerByID(InCharacter.ComputerID, OutComputer))
+        return false;
+
+    for(int i = 0; i < this->SystemContext->Peacenet->SaveGame->PinnedContacts.Num(); i++)
+    {
+        FPinnedContact Contact = this->SystemContext->Peacenet->SaveGame->PinnedContacts[i];
+
+        if(Contact.EntityID == InCharacter.ID && Contact.OwningEntityID == this->SystemContext->Character.ID)
+        {
+            OutContact = Contact;
+            return true;
+        }
+    }
+    return false;
+}

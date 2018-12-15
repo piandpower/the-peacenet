@@ -1,12 +1,18 @@
 #include "UContact.h"
 #include "UAddressBookContext.h"
 
-void UContact::Setup(UAddressBookContext* InOwnerAddressBook, int InEntityID)
+void UContact::Setup(UAddressBookContext* InOwnerAddressBook, int InEntityID, int InContactIndex)
 {
     check(InOwnerAddressBook);
 
     this->AddressBook = InOwnerAddressBook;
+    this->ContactIndex = InContactIndex;
     this->EntityID = InEntityID;
+}
+
+int UContact::GetContactIndex()
+{
+    return this->ContactIndex;
 }
 
 int UContact::GetEntityID()

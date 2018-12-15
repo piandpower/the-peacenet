@@ -57,7 +57,7 @@ bool UAddressBookContext::HasContact(int InEntityID)
 
 void UAddressBookContext::RemoveContactBackend(int InEntityID, bool InAllowStoryRemovals)
 {
-    if(this->HasContact(InEntityID))
+    if(!this->HasContact(InEntityID))
         return;
 
     int ContactIndex = -1;
@@ -95,8 +95,10 @@ void UAddressBookContext::RetrieveContacts()
     this->Contacts.Empty();
 
     // Go through every contact in the save file.
-    for(FPinnedContact& PinnedContact : this->SystemContext->Peacenet->SaveGame->PinnedContacts)
+    for(int i = 0; i < this->SystemContext->Peacenet->SaveGame->PinnedContacts.Num(); i++)
     {
+        FPinnedContact PinnedContact = this->SystemContext->Peacenet->SaveGame->PinnedContacts[i];
+
         // Is the contact not owned by us? If it isn't owned by us we skip it.
         if(PinnedContact.OwningEntityID != this->SystemContext->Character.ID)
             continue;
@@ -105,7 +107,7 @@ void UAddressBookContext::RetrieveContacts()
         UContact* Contact = NewObject<UContact>(this);
 
         // Initialize it so it's owned by us and represents this pinned contact entity.
-        Contact->Setup(this, PinnedContact.EntityID);
+        Contact->Setup(this, PinnedContact.EntityID, i);
 
         // Add to our Contacts list!
         this->Contacts.Add(Contact);
@@ -161,5 +163,33 @@ bool UAddressBookContext::GetContactByEntityID(int InEntityID, UContact* OutCont
             return true;
         }
     }
+
+    // We'll add a new contact if none was found and the entity exists.
+    FPeacenetIdentity Character;
+    if(this->SystemContext->Peacenet->SaveGame->GetCharacterByID(InEntityID, Character))
+    {
+        FPinnedContact NewContact;
+        NewContact.EntityID = InEntityID;
+        NewContact.OwningEntityID = this->SystemContext->Character.ID;
+        
+        NewContact.IsStoryIntegral = Character.CharacterType == EIdentityType::Story;
+
+        NewContact.ContactType = EPinnedContactType::Person;
+        this->SystemContext->Peacenet->SaveGame->PinnedContacts.Add(NewContact);
+
+        // MANUALLY create the UContact context.
+        UContact* ContactContext = NewObject<UContact>(this);
+        ContactContext->Setup(this, NewContact.EntityID, this->SystemContext->Peacenet->SaveGame->PinnedContacts.Num() - 1);
+
+        // Add it to our contact list.
+        this->Contacts.Add(ContactContext);
+
+        OutContact = ContactContext;
+
+        this->EventAddressBookUpdated.Broadcast();
+
+        return true;
+    }
+
     return false;
 }

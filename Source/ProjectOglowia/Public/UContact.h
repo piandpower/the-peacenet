@@ -24,6 +24,9 @@ protected:
     int EntityID = 0;
 
     UPROPERTY()
+    int ContactIndex = 0;
+
+    UPROPERTY()
     UAddressBookContext* AddressBook;
 
 public:
@@ -31,7 +34,10 @@ public:
     int GetEntityID();
 
     UFUNCTION()
-    void Setup(UAddressBookContext* InOwnerAddressBook, int InEntityID);
+    int GetContactIndex();
+
+    UFUNCTION()
+    void Setup(UAddressBookContext* InOwnerAddressBook, int InEntityID, int InContactIndex);
 
 public: // Blueprint functions.
     UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Contact")

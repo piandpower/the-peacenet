@@ -3,6 +3,12 @@
 #include "TerminalCommand.h"
 #include "CommandInfo.h"
 #include "PeacenetWorldStateActor.h"
+#include "UAddressBookContext.h"
+
+UAddressBookContext* UTerminalCommand::GetAddressBook()
+{
+	return this->Console->SystemContext->GetAddressBook();
+}
 
 UTerminalCommand::UTerminalCommand()
 {

@@ -21,12 +21,15 @@ struct PROJECTOGLOWIA_API FPinnedContact
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Pinned Contact")
+	UPROPERTY()
 	EPinnedContactType ContactType = EPinnedContactType::Person;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Pinned Contact")
+	UPROPERTY()
 	int EntityID = 0;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Pinned Contact")
+	UPROPERTY()
+	int OwningEntityID = 0;
+
+	UPROPERTY()
 	bool IsStoryIntegral = false;
 };

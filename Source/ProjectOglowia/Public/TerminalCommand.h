@@ -9,6 +9,7 @@
 #include "USystemContext.h"
 #include "TerminalCommand.generated.h"
 
+class UAddressBookContext;
 class UCommandInfo;
 
 /**
@@ -20,6 +21,11 @@ class PROJECTOGLOWIA_API UTerminalCommand : public UObject
 	GENERATED_BODY()
 
 	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FCommandCompletedEvent);
+
+protected:
+	UFUNCTION(BlueprintCallable, BlueprintCallable, Category = "Address Book")
+	UAddressBookContext* GetAddressBook();
+
 public:
 	UTerminalCommand();
 	~UTerminalCommand();

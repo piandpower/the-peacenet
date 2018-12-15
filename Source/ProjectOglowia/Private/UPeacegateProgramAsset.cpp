@@ -8,6 +8,13 @@
 #include "UPeacegateFileSystem.h"
 #include "PeacenetWorldStateActor.h"
 #include "Kismet/GameplayStatics.h"
+#include "UAddressBookContext.h"
+
+UAddressBookContext* UProgram::GetAddressBook()
+{
+	// This is all System Context stuff.
+	return this->Window->SystemContext->GetAddressBook();
+}
 
 void UProgram::PushNotification(const FText & InNotificationMessage)
 {

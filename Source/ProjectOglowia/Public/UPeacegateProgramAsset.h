@@ -11,6 +11,7 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPlayerAttentionNeededEvent, bool, PlaySound);
 
+class UAddressBookContext;
 class UConsoleContext;
 class UPTerminalWidget;
 class UMissionAsset;
@@ -42,6 +43,9 @@ public:
 		void ActiveProgramCloseEvent();
 
 protected:
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Address Book")
+	UAddressBookContext* GetAddressBook();
+
 	UFUNCTION(BlueprintCallable, Category = "Missions")
 	void StartMission(UMissionAsset* InMissionAsset);
 

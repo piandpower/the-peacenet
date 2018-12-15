@@ -5,6 +5,7 @@
 #include "UDesktopWidget.h"
 #include "UPeacegateFileSystem.h"
 #include "CommonUtils.h"
+#include "UAddressBookContext.h"
 #include "UPeacegateProgramAsset.h"
 #include "URainbowTable.h"
 #include "UVulnerability.h"
@@ -13,6 +14,21 @@
 #include "ImageLoader.h"
 #include "UGraphicalTerminalCommand.h"
 #include "CommandInfo.h"
+
+UAddressBookContext* USystemContext::GetAddressBook()
+{
+	check(this->Peacenet);
+
+	
+
+	if(!this->AddressBook)
+	{
+		this->AddressBook = NewObject<UAddressBookContext>(this);
+		this->AddressBook->Setup(this);
+	}
+
+	return this->AddressBook;
+}
 
 FString ReadFirstLine(FString InText)
 {

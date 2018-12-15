@@ -9,7 +9,7 @@
 #include "FNetMapScanEventArgs.h"
 #include "USystemContext.generated.h"
 
-
+class UAddressBookContext;
 class UDesktopWidget;
 class URainbowTable;
 class APeacenetWorldStateActor;
@@ -67,10 +67,16 @@ public:
 	UDesktopWidget* Desktop;
 
 protected:
+	UPROPERTY()
+	UAddressBookContext* AddressBook;
+
 	UFUNCTION()
 		void HandleFileSystemEvent(EFilesystemEventType InType, FString InPath);
 
 public:
+	UFUNCTION()
+	UAddressBookContext* GetAddressBook();
+
 	UFUNCTION()
 	void UpdateSystemFiles();
 

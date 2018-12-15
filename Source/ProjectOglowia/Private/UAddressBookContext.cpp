@@ -150,3 +150,16 @@ bool UAddressBookContext::FindComputerAndContact(FPeacenetIdentity InCharacter, 
     }
     return false;
 }
+
+bool UAddressBookContext::GetContactByEntityID(int InEntityID, UContact* OutContact)
+{
+    for(auto Contact : this->Contacts)
+    {
+        if(Contact->GetEntityID() == InEntityID)
+        {
+            OutContact = Contact;
+            return true;
+        }
+    }
+    return false;
+}

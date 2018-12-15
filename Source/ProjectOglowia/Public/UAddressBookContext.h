@@ -62,4 +62,7 @@ public:
 
     UFUNCTION()
     bool FindCharacterByID(int InEntityID, FPeacenetIdentity& OutCharacter);
+
+    UFUNCTION()
+    bool GetContactByEntityID(int InEntityID, UContact* OutContact);
 };

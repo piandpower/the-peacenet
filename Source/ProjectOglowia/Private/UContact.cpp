@@ -8,3 +8,8 @@ void UContact::Setup(UAddressBookContext* InOwnerAddressBook, int InEntityID)
     this->AddressBook = InOwnerAddressBook;
     this->EntityID = InEntityID;
 }
+
+int UContact::GetEntityID()
+{
+    return this->EntityID;
+}

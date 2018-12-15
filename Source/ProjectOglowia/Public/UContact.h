@@ -24,5 +24,8 @@ protected:
 
 public:
     UFUNCTION()
+    int GetEntityID();
+
+    UFUNCTION()
     void Setup(UAddressBookContext* InOwnerAddressBook, int InEntityID);
 };

@@ -14,6 +14,8 @@
 // Forward declarations for circular dependencies...
 class USystemContext;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FAddressBookUpdatedEvent);
+
 /**
  * Encapsulates a Peacenet address book.
  */
@@ -30,11 +32,27 @@ protected:
     TArray<UContact*> Contacts;
 
 public:
+    UPROPERTY(BlueprintAssignable, Category = "Address Book")
+    FAddressBookUpdatedEvent EventAddressBookUpdated;
+
+public:
     UFUNCTION()
     void Setup(USystemContext* InSystemContext);
 
     UFUNCTION()
     void RetrieveContacts();
+
+    UFUNCTION()
+    void RemoveContactBackend(int InEntityID, bool InAllowStoryRemoves = false);
+
+    UFUNCTION()
+    bool HasContact(int InEntityID);
+
+    UFUNCTION()
+    void AddContact(int InEntityID, bool InIsStoryIntegral = true);
+
+    UFUNCTION(BlueprintCallable, Category = "Address Book")
+    void RemoveContact(UContact* InContact);
 
     UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Address Book")
     TArray<UContact*> GetContacts();

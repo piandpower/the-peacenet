@@ -193,3 +193,23 @@ bool UAddressBookContext::GetContactByEntityID(int InEntityID, UContact* OutCont
 
     return false;
 }
+
+void UAddressBookContext::DiscoverName(UContact* InContact)
+{
+    this->SystemContext->Peacenet->SaveGame->PinnedContacts[InContact->GetContactIndex()].IsNameKnown = true;
+}
+
+void UAddressBookContext::DiscoverEmail(UContact* InContact)
+{
+    this->SystemContext->Peacenet->SaveGame->PinnedContacts[InContact->GetContactIndex()].IsEmailKnown = true;
+}
+
+void UAddressBookContext::DiscoverCountry(UContact* InContact)
+{
+    this->SystemContext->Peacenet->SaveGame->PinnedContacts[InContact->GetContactIndex()].IsCountryKnown = true;
+}
+
+void UAddressBookContext::DiscoverReputation(UContact* InContact)
+{
+    this->SystemContext->Peacenet->SaveGame->PinnedContacts[InContact->GetContactIndex()].IsReputationKnown = true;
+}

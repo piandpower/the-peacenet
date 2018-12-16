@@ -45,8 +45,17 @@ bool UContact::RetrieveName(FString& OutCharacterName)
 
 bool UContact::RetrieveEmail(FString& OutEmail)
 {
-    // Not yet implemented.
-    return false; 
+    FPeacenetIdentity Character;
+    FComputer Computer;
+    FPinnedContact Contact;
+    if(!FetchCharacter(Character, Computer, Contact))
+        return false;
+
+    if(!Contact.IsEmailKnown)
+        return false;
+
+    OutEmail = Character.Email;
+    return true;    // Not yet implemented.
 }
 
 bool UContact::RetrieveCountry(ECountry& OutCountry)

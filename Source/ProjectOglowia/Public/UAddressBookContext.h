@@ -65,4 +65,11 @@ public:
 
     UFUNCTION()
     bool GetContactByEntityID(int InEntityID, UContact* OutContact);
+
+    // The below functions are not to EVER be executed by Blueprint.
+    void DiscoverName(UContact* InContact);
+    void DiscoverEmail(UContact* InContact);
+    void DiscoverCountry(UContact* InContact);
+    void DiscoverReputation(UContact* InContact);
+    void DiscoverIPAddress(UContact* InContact);  
 };

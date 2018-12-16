@@ -776,6 +776,11 @@ void FWorldGenTask::DoWork()
 		Computer.Users.Add(Root);
 		Computer.Users.Add(NonRoot);
 
+		// The NPC gets an email now too.
+		NPC.Email = Username + "@peace.net";
+
+		this->SaveGame->Characters[i] = NPC;
+
 		// And add the computer to the world.
 		SaveGame->Computers.Add(Computer);
 	}

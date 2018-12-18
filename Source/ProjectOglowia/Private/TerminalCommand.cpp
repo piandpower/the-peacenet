@@ -10,6 +10,11 @@ UAddressBookContext* UTerminalCommand::GetAddressBook()
 	return this->Console->SystemContext->GetAddressBook();
 }
 
+UConsoleContext* UTerminalCommand::GetConsole()
+{
+	return this->Console;
+}
+
 UTerminalCommand::UTerminalCommand()
 {
 }

@@ -39,9 +39,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Terminal Command")
 	void RunCommand(UPARAM(Ref) UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments);
 
-protected:
-	UPROPERTY(BlueprintReadOnly, Category = "Console")
+private:
+	UPROPERTY()
 	UConsoleContext* Console;
+
+public:
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Terminal Command")
+	UConsoleContext* GetConsole();
+
+protected:
 
 	virtual void NativeRunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments);
 

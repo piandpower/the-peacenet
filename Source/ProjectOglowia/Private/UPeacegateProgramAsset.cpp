@@ -10,6 +10,11 @@
 #include "Kismet/GameplayStatics.h"
 #include "UAddressBookContext.h"
 
+bool UProgram::OpenProgram(FName InExecutableName, UProgram*& OutProgram)
+{
+	return this->Window->SystemContext->OpenProgram(InExecutableName, OutProgram);
+}
+
 UAddressBookContext* UProgram::GetAddressBook()
 {
 	// This is all System Context stuff.

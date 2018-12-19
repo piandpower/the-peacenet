@@ -26,7 +26,7 @@ enum class EProgramFileOpenStatus : uint8
 	NoSuitableProgram
 };
 
-UCLASS(Blueprintable)
+UCLASS(Blueprintable, BlueprintType)
 class PROJECTOGLOWIA_API UProgram : public UUserWidget
 {
 	GENERATED_BODY()
@@ -43,6 +43,9 @@ public:
 		void ActiveProgramCloseEvent();
 
 protected:
+	UFUNCTION(BlueprintCallable, Category = "Program")
+	bool OpenProgram(FName InExecutableName, UProgram*& OutProgram);
+
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Address Book")
 	UAddressBookContext* GetAddressBook();
 

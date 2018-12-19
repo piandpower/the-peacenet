@@ -89,7 +89,7 @@ TArray<UPeacegateProgramAsset*> USystemContext::GetInstalledPrograms()
 	return OutArray;
 }
 
-bool USystemContext::OpenProgram(FName InExecutableName)
+bool USystemContext::OpenProgram(FName InExecutableName, UProgram*& OutProgram)
 {
 	if (!Desktop)
 	{
@@ -109,6 +109,8 @@ bool USystemContext::OpenProgram(FName InExecutableName)
 				MyWindow->Icon = Program->AppLauncherItem.Icon;
 				MyWindow->WindowTitle = Program->AppLauncherItem.Name;
 			}
+
+			OutProgram = MyProgram;
 
 			return true;
 		}

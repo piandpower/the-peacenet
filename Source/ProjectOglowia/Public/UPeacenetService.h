@@ -8,6 +8,10 @@
 
 class USystemContext;
 class UPeacenetServiceAsset;
+class UContact;
+class UAddressBookContext;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPeacenetServiceContactOpenRequestedEvent, UContact*, InContact);
 
 /**
  * Encapsulates a Peacenet service and acts as a base for all service pages.
@@ -24,7 +28,17 @@ protected:
     UPROPERTY()
     USystemContext* SystemContext;
 
+protected:
+    UFUNCTION(BlueprintCallable, Category = "Address Book")
+    void OpenPeacenetIdentity(int InEntityID);
+
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Peacenet Service|Address Book")
+    UAddressBookContext* GetAddressBook();
+
 public:
+    UPROPERTY(BlueprintAssignable, Category = "Peacenet Service|Address Book")
+    FPeacenetServiceContactOpenRequestedEvent EventOnContactOpenRequested;
+
     UFUNCTION()
     USystemContext* GetSystemContext();
 

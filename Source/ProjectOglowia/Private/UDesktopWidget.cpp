@@ -307,9 +307,9 @@ void UDesktopWidget::ShowAppLauncherCategory(const FString& InCategoryName)
 	}
 }
 
-void UDesktopWidget::OpenProgram(const FName InExecutableName)
+bool UDesktopWidget::OpenProgram(const FName InExecutableName, UProgram*& OutProgram)
 {
-	this->SystemContext->OpenProgram(InExecutableName);
+	return this->SystemContext->OpenProgram(InExecutableName, OutProgram);
 }
 
 void UDesktopWidget::FinishShowingNotification()

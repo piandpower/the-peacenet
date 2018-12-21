@@ -10,9 +10,9 @@
 #include "Kismet/GameplayStatics.h"
 #include "UAddressBookContext.h"
 
-bool UProgram::OpenProgram(FName InExecutableName, UProgram*& OutProgram)
+bool UProgram::OpenProgram(FName InExecutableName, UProgram*& OutProgram, bool InCheckForExistingWindow)
 {
-	return this->Window->SystemContext->OpenProgram(InExecutableName, OutProgram);
+	return this->Window->SystemContext->OpenProgram(InExecutableName, OutProgram, InCheckForExistingWindow);
 }
 
 UAddressBookContext* UProgram::GetAddressBook()

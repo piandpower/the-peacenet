@@ -87,7 +87,7 @@ public:
 	TArray<UPeacegateProgramAsset*> GetInstalledPrograms();
 
 	UFUNCTION(BlueprintCallable, Category = "System Context")
-	bool OpenProgram(FName InExecutableName, UProgram*& OutProgram);
+	bool OpenProgram(FName InExecutableName, UProgram*& OutProgram, bool InCheckForExistingWindow = true);
 
 	UFUNCTION(BlueprintCallable, Category = "System Context")
 		UPeacegateFileSystem* GetFilesystem(const int UserID);

@@ -3,6 +3,7 @@
 #include "USystemContext.h"
 #include "PeacenetWorldStateActor.h"
 #include "UDesktopWidget.h"
+#include "Uworkspace.h"
 #include "UPeacegateFileSystem.h"
 #include "CommonUtils.h"
 #include "UAddressBookContext.h"
@@ -89,7 +90,7 @@ TArray<UPeacegateProgramAsset*> USystemContext::GetInstalledPrograms()
 	return OutArray;
 }
 
-bool USystemContext::OpenProgram(FName InExecutableName, UProgram*& OutProgram)
+bool USystemContext::OpenProgram(FName InExecutableName, UProgram*& OutProgram, bool InCheckForExistingWindow)
 {
 	if (!Desktop)
 	{
@@ -100,6 +101,16 @@ bool USystemContext::OpenProgram(FName InExecutableName, UProgram*& OutProgram)
 	{
 		if (Program->ExecutableName == InExecutableName)
 		{
+			if(InCheckForExistingWindow)
+			{
+				UWorkspace* CurrentWorkspace = Desktop->GetCurrentWorkspace();
+				
+				if(CurrentWorkspace->HasExistingWindow(Program->ProgramClass, OutProgram))
+				{
+					return true;
+				}
+			}
+
 			UWindow* MyWindow = nullptr;
 
 			UProgram* MyProgram = UProgram::CreateProgram(Peacenet->WindowClass, Program->ProgramClass, this, Desktop->UserID, MyWindow);

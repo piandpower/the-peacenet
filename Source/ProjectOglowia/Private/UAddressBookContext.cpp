@@ -153,7 +153,7 @@ bool UAddressBookContext::FindComputerAndContact(FPeacenetIdentity InCharacter, 
     return false;
 }
 
-bool UAddressBookContext::GetContactByEntityID(int InEntityID, UContact* OutContact)
+bool UAddressBookContext::GetContactByEntityID(int InEntityID, UContact*& OutContact)
 {
     for(auto Contact : this->Contacts)
     {
@@ -212,4 +212,9 @@ void UAddressBookContext::DiscoverCountry(UContact* InContact)
 void UAddressBookContext::DiscoverReputation(UContact* InContact)
 {
     this->SystemContext->Peacenet->SaveGame->PinnedContacts[InContact->GetContactIndex()].IsReputationKnown = true;
+}
+
+void UAddressBookContext::DiscoverIPAddress(UContact* InContact)
+{
+    this->SystemContext->Peacenet->SaveGame->PinnedContacts[InContact->GetContactIndex()].IsPersonalIPKnown = true;
 }

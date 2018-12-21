@@ -18,7 +18,7 @@ void UPeacenetService::Setup(USystemContext* InSystemContext, UPeacenetServiceAs
     this->ServiceAsset = InService;
 }
 
-void UPeacenetService::OpenPeacenetIdentity(int InEntityID)
+void UPeacenetService::OpenPeacenetIdentity(int InEntityID, UContact*& OutContact)
 {
     // Try to get the address book from our current system context.
     UAddressBookContext* AddressBook = this->GetSystemContext()->GetAddressBook();
@@ -32,8 +32,14 @@ void UPeacenetService::OpenPeacenetIdentity(int InEntityID)
     UContact* ContactInfo = nullptr;
     check(AddressBook->GetContactByEntityID(InEntityID, ContactInfo));
 
+    // Checks for a bug where the contact fetcher returns true but doesn't fetch a contact.
+    check(ContactInfo);
+
     // Tell Blueprint what the FUCK we just did.
     this->EventOnContactOpenRequested.Broadcast(ContactInfo);
+
+    // So that a Blueprint can access what we just opened.
+    OutContact = ContactInfo;
 }
 
 UAddressBookContext* UPeacenetService::GetAddressBook()

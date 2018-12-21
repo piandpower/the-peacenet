@@ -67,3 +67,12 @@ bool UWorldDebugUtils::GetNPCs(UObject* InContextObject, TArray<FPeacenetIdentit
     OutCharacters = SystemContext->Peacenet->SaveGame->Characters;
     return true;
 }
+
+bool UWorldDebugUtils::GetNPCComputer(UObject* InContextObject, const FPeacenetIdentity& InCharacter, FComputer& OutComputer)
+{
+    USystemContext* SystemContext = nullptr;
+    if(!RetrieveSystemContext(InContextObject, SystemContext))
+        return false;
+
+    return SystemContext->Peacenet->SaveGame->GetComputerByID(InCharacter.ComputerID, OutComputer);
+}

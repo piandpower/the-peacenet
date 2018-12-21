@@ -64,12 +64,20 @@ public:
     bool FindCharacterByID(int InEntityID, FPeacenetIdentity& OutCharacter);
 
     UFUNCTION()
-    bool GetContactByEntityID(int InEntityID, UContact* OutContact);
+    bool GetContactByEntityID(int InEntityID, UContact*& OutContact);
 
-    // The below functions are not to EVER be executed by Blueprint.
+    UFUNCTION(BlueprintCallable, Category = "Address Book|Discovery")
     void DiscoverName(UContact* InContact);
+
+    UFUNCTION(BlueprintCallable, Category = "Address Book|Discovery")
     void DiscoverEmail(UContact* InContact);
+
+    UFUNCTION(BlueprintCallable, Category = "Address Book|Discovery")
     void DiscoverCountry(UContact* InContact);
+
+    UFUNCTION(BlueprintCallable, Category = "Address Book|Discovery")
     void DiscoverReputation(UContact* InContact);
+
+    UFUNCTION(BlueprintCallable, Category = "Address Book|Discovery")
     void DiscoverIPAddress(UContact* InContact);  
 };

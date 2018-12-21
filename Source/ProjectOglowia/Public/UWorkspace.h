@@ -22,6 +22,9 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Workspace")
 	TArray<UWindow*> GetWindows();
 
+	UPROPERTY()
+	TArray<UProgram*> Programs;
+
 public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Workspace")
 	void OnWindowAdded(UWindow* InWindow);
@@ -34,6 +37,9 @@ public:
 
 	UPROPERTY()
 	UWindow* ActiveWindow = nullptr;
+
+	UFUNCTION()
+	bool HasExistingWindow(TSubclassOf<UProgram> InProgramClass, UProgram*& OutProgram);
 
 	UFUNCTION()
 	void WindowFocusEvent(bool IsFocused, UWindow* InWindow);

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "FComputer.h"
 #include "FPeacenetIdentity.h"
 #include "UWorldDebugUtils.generated.h"
 
@@ -22,4 +23,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Debug|World Utils", meta=(DefaultToSelf="InContextObject"))
 	static bool GetNPCs(UObject* InContextObject, TArray<FPeacenetIdentity>& OutCharacters);
+
+	UFUNCTION(BlueprintCallable, Category = "Debug|World Info")
+	static bool GetNPCComputer(UObject* InContextObject, const FPeacenetIdentity& InCharacter, FComputer& OutComputer);
 };

@@ -30,7 +30,7 @@ protected:
 
 protected:
     UFUNCTION(BlueprintCallable, Category = "Address Book")
-    void OpenPeacenetIdentity(int InEntityID);
+    void OpenPeacenetIdentity(int InEntityID, UContact*& OutContact);
 
     UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Peacenet Service|Address Book")
     UAddressBookContext* GetAddressBook();

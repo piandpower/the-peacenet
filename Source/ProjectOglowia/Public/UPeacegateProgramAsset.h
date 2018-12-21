@@ -44,7 +44,7 @@ public:
 
 protected:
 	UFUNCTION(BlueprintCallable, Category = "Program")
-	bool OpenProgram(FName InExecutableName, UProgram*& OutProgram);
+	bool OpenProgram(FName InExecutableName, UProgram*& OutProgram, bool InCheckForExistingWindow = false);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Address Book")
 	UAddressBookContext* GetAddressBook();

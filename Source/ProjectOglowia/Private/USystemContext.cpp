@@ -101,7 +101,7 @@ bool USystemContext::OpenProgram(FName InExecutableName, UProgram*& OutProgram, 
 	{
 		if (Program->ExecutableName == InExecutableName)
 		{
-			if(InCheckForExistingWindow)
+			if(InCheckForExistingWindow || Program->IsSingleInstance)
 			{
 				UWorkspace* CurrentWorkspace = Desktop->GetCurrentWorkspace();
 				

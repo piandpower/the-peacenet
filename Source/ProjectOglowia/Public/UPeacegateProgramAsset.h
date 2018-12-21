@@ -158,20 +158,23 @@ class PROJECTOGLOWIA_API UPeacegateProgramAsset : public UDataAsset
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Metadata")
 	FName ExecutableName;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Metadata")
 	FAppLauncherItemInformation AppLauncherItem;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Program")
 	TSubclassOf<UProgram> ProgramClass;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Metadata")
 	bool IsUnlockedByDefault = false;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Program")
 	TArray<FString> SupportedFileExtensions;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Program")
+	bool IsSingleInstance = false;
 };
 
 UCLASS(Blueprintable)

@@ -4,6 +4,11 @@
 #include "UContact.h"
 #include "USystemContext.h"
 
+void UPeacenetService::NavigateToURL(FString InURL)
+{
+    this->EventOnNavigationRequested.Broadcast(InURL);
+}
+
 USystemContext* UPeacenetService::GetSystemContext()
 {
     return this->SystemContext;

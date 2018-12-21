@@ -12,6 +12,7 @@ class UContact;
 class UAddressBookContext;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPeacenetServiceContactOpenRequestedEvent, UContact*, InContact);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPeacenetServiceNavigateRequestedEvent, FString, InURL);
 
 /**
  * Encapsulates a Peacenet service and acts as a base for all service pages.
@@ -35,7 +36,13 @@ protected:
     UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Peacenet Service|Address Book")
     UAddressBookContext* GetAddressBook();
 
+    UFUNCTION(BlueprintCallable, Category = "Peacenet Service|Navigation")
+    void NavigateToURL(FString InURL);
+
 public:
+    UPROPERTY(BlueprintAssignable, Category = "Peacenet Service|Navigation")
+    FPeacenetServiceNavigateRequestedEvent EventOnNavigationRequested;
+
     UPROPERTY(BlueprintAssignable, Category = "Peacenet Service|Address Book")
     FPeacenetServiceContactOpenRequestedEvent EventOnContactOpenRequested;
 

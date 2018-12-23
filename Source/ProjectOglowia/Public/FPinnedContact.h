@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "FContactNote.h"
 #include "FPinnedContact.generated.h"
 
 UENUM(BlueprintType)
@@ -64,4 +65,7 @@ public:
 
 	UPROPERTY()
 	bool IsReputationKnown = false;
+
+	UPROPERTY()
+	TArray<FContactNote> UserNotes;
 };

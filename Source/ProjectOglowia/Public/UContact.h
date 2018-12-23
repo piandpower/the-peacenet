@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "FPinnedContact.h"
 #include "FComputer.h"
+#include "FContactNote.h"
 #include "ECountry.h"
 #include "FPeacenetIdentity.h"
 #include "UContact.generated.h"
@@ -40,6 +41,9 @@ public:
     void Setup(UAddressBookContext* InOwnerAddressBook, int InEntityID, int InContactIndex);
 
 public: // Blueprint functions.
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Contact|User Note")
+    bool GetUserNotes(TArray<FContactNote>& OutNotes);
+
     UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Contact")
     bool RetrieveName(FString& OutCharacterName);
 

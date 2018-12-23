@@ -10,6 +10,18 @@ void UContact::Setup(UAddressBookContext* InOwnerAddressBook, int InEntityID, in
     this->EntityID = InEntityID;
 }
 
+bool UContact::GetUserNotes(TArray<FContactNote>& OutNotes)
+{
+    FPeacenetIdentity Character;
+    FComputer Computer;
+    FPinnedContact Contact;
+    if(!FetchCharacter(Character, Computer, Contact))
+        return false;
+
+    OutNotes = Contact.UserNotes;
+    return OutNotes.Num();
+}
+
 int UContact::GetContactIndex()
 {
     return this->ContactIndex;

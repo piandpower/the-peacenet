@@ -1,6 +1,7 @@
 #include "UPeacenetServiceUtils.h"
 #include "Blueprint/UserWidget.h"
-#include "UPeacegateProgramAsset.h"
+#include "UProgram.h"
+#include "UWindow.h"
 #include "USystemContext.h"
 #include "UPeacenetService.h"
 #include "AssetRegistryModule.h"

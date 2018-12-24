@@ -1,7 +1,7 @@
 // Copyright (c) 2018 The Peacenet & Alkaline Thunder.
 
 #include "UWorkspace.h"
-#include "UPeacegateProgramAsset.h"
+#include "UProgram.h"
 
 void UWorkspace::OnWindowClosed(UWindow * InWindow)
 {

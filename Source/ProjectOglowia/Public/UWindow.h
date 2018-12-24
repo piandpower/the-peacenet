@@ -4,49 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "UserWidget.h"
+#include "Dialog.h"
 #include "USystemContext.h"
 #include "UWindow.generated.h"
 
 class UWindow;
 
-UENUM(BlueprintType)
-enum class EDialogResult : uint8
-{
-	OK,
-	Cancel,
-	Yes,
-	No
-};
-
-UENUM(BlueprintType)
-enum class EInfoboxButtonLayout : uint8
-{
-	OK,
-	OKCancel,
-	YesNo,
-	YesNoCancel
-};
-
-UENUM(BlueprintType)
-enum class EInfoboxIcon : uint8
-{
-	Info,
-	Error,
-	Question,
-	Warning
-};
-
-UENUM(BlueprintType)
-enum class EFileDialogType : uint8
-{
-	Open,
-	Save
-};
-
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FWindowFocusEvent, bool, IsFocused, UWindow*, Window);
-DECLARE_DYNAMIC_DELEGATE_TwoParams(FInfoboxDismissedEvent, EDialogResult, DialogResult, FText, UserTextInput);
-DECLARE_DYNAMIC_DELEGATE_TwoParams(FInfoboxInputValidator, FText, UserTextInput, FText&, OutError);
-DECLARE_DYNAMIC_DELEGATE_TwoParams(FFileDialogDismissedEvent, bool, FileSelected, FString, FilePath);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FWindowClosedEvent, UWindow*, InWindow);
 
 /**

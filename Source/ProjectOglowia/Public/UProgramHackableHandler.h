@@ -10,6 +10,8 @@
 #include "UDesktopWidget.h"
 #include "UProgramHackableHandler.generated.h"
 
+class UProgram;
+
 /**
  * Runs a program as the hacked system if the program is installed/unlocked on the caller.
  */

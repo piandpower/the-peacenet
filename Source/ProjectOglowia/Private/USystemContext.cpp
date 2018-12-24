@@ -8,6 +8,7 @@
 #include "CommonUtils.h"
 #include "UAddressBookContext.h"
 #include "UPeacegateProgramAsset.h"
+#include "UProgram.h"
 #include "URainbowTable.h"
 #include "UVulnerability.h"
 #include "UVulnerabilityTerminalCommand.h"

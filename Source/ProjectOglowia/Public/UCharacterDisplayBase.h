@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "FComputer.h"
+#include "UProgram.h"
 #include "FPeacenetIdentity.h"
 #include "UPeacegateProgramAsset.h"
 #include "UCharacterDisplayBase.generated.h"

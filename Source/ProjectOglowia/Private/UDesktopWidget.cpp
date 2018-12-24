@@ -10,7 +10,7 @@
 #include "FPeacenetIdentity.h"
 #include "CommonUtils.h"
 #include "WallpaperAsset.h"
-#include "UPeacegateProgramAsset.h"
+#include "UProgram.h"
 #include "UNetMapWidget.h"
 #include "UConsoleContext.h"
 

@@ -1,6 +1,7 @@
 // Copyright (c) 2018 The Peacenet & Alkaline Thunder.
 
 #include "UGraphicalTerminalCommand.h"
+#include "UProgram.h"
 #include "PeacenetWorldStateActor.h"
 
 UGraphicalTerminalCommand::UGraphicalTerminalCommand()

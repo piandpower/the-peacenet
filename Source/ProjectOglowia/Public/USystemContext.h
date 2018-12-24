@@ -11,6 +11,7 @@
 
 class UAddressBookContext;
 class UDesktopWidget;
+class UProgram;
 class URainbowTable;
 class APeacenetWorldStateActor;
 class UPeacegateProgramAsset;

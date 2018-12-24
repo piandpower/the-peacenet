@@ -1,6 +1,7 @@
 // Copyright (c) 2018 The Peacenet & Alkaline Thunder.
 
 #include "UProgramHackableHandler.h"
+#include "UProgram.h"
 #include "PeacenetWorldStateActor.h"
 
 bool UProgramHackableHandler::CanHandle(USystemContext * InCaller)

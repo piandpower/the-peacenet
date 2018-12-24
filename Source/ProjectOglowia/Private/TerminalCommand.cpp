@@ -21,12 +21,17 @@ UTerminalCommand::UTerminalCommand()
 
 UTerminalCommand::~UTerminalCommand()
 {
-}void UTerminalCommand::RunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments)
+}
+
+void UTerminalCommand::RunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments)
 {
 	this->Console = InConsole;
 
-	this->Console->SystemContext->LogEvent(this->Console->UserID, "ran " + this->CommandInfo->Info.CommandName.ToString());
-
+	if(this->CommandInfo)
+	{
+		this->Console->SystemContext->LogEvent(this->Console->UserID, "ran " + this->CommandInfo->Info.CommandName.ToString());
+	}
+	
 	NativeRunCommand(InConsole, InArguments);
 }
 

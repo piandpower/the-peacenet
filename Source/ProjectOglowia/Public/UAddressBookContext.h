@@ -80,4 +80,7 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = "Address Book|Discovery")
     void DiscoverIPAddress(UContact* InContact);  
+
+    UFUNCTION(BlueprintCallable, Category = "Address Book|User Note")
+    void AddUserNote(UContact* InContact, const FText& InUserNote);
 };

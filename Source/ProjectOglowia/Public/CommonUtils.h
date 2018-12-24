@@ -127,6 +127,8 @@ inline bool UCommonUtils::BinarySearch(TArray<T> InArray, TFunction<int(const T&
 
 	while (max - min != 0)
 	{
+		int averagate = (min + max) / 2;
+
 		int guessResult = InComparer(InArray[average]);
 
 		if (guessResult == 0)

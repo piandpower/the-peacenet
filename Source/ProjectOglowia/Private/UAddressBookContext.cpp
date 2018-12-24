@@ -1,4 +1,5 @@
 #include "UAddressBookContext.h"
+#include "FContactNote.h"
 #include "USystemContext.h"
 
 void UAddressBookContext::Setup(USystemContext* InSystemContext)
@@ -217,4 +218,17 @@ void UAddressBookContext::DiscoverReputation(UContact* InContact)
 void UAddressBookContext::DiscoverIPAddress(UContact* InContact)
 {
     this->SystemContext->Peacenet->SaveGame->PinnedContacts[InContact->GetContactIndex()].IsPersonalIPKnown = true;
+}
+
+void UAddressBookContext::AddUserNote(UContact* InContact, const FText& InUserNote)
+{
+    FPinnedContact Contact = this->SystemContext->Peacenet->SaveGame->PinnedContacts[InContact->GetContactIndex()];
+
+    FContactNote NewNote;
+    NewNote.NoteMessage = InUserNote;
+    NewNote.Timestamp = this->SystemContext->Peacenet->SaveGame->EpochTime;
+
+    Contact.UserNotes.Add(NewNote);
+
+    this->SystemContext->Peacenet->SaveGame->PinnedContacts[InContact->GetContactIndex()] = Contact;
 }

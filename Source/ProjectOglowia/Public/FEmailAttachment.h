@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UEmailAttachmentAsset.h"
-#include "FemailAttachment.generated.h"
+#include "FEmailAttachment.generated.h"
 
 /**
  * Represents an email attachment.

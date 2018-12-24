@@ -2,7 +2,7 @@
 
 #include "UNetMapWidget.h"
 #include "UPeacenetSaveGame.h"
-#include "PeacenetworldStateActor.h"
+#include "PeacenetWorldStateActor.h"
 #include "UDesktopWidget.h"
 
 void UNetMapWidget::CollectDiscoveredNodes()

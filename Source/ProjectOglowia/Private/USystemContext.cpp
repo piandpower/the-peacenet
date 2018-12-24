@@ -3,7 +3,7 @@
 #include "USystemContext.h"
 #include "PeacenetWorldStateActor.h"
 #include "UDesktopWidget.h"
-#include "Uworkspace.h"
+#include "UWorkspace.h"
 #include "UPeacegateFileSystem.h"
 #include "CommonUtils.h"
 #include "UAddressBookContext.h"

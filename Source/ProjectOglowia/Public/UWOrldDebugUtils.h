@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "FComputer.h"
 #include "FPeacenetIdentity.h"
-#include "UWorldDebugUtils.generated.h"
+#include "UWOrldDebugUtils.generated.h"
 
 class USystemContext;
 

@@ -4,7 +4,6 @@
 #include "UNmapCommand.h"
 #include "UComputerTypeAsset.h"
 #include "TimerManager.h"
-#include "FNetMapScanEventArgs.h"
 #include "UHackableAsset.h"
 
 void UNmapCommand::ListNextService()
@@ -27,7 +26,7 @@ void UNmapCommand::ListNextService()
 			EventArgs.Hackable = NetMapService;
 			EventArgs.EventType = ENetMapScanEventType::ServiceFound;
 
-			this->Caller->SystemContext->BroadcastNetMapEvent(this->ResolvedContext->Computer.ID, EventArgs);
+			this->NetMapEvent.Broadcast(this->ResolvedContext->Computer.ID, EventArgs);
 		}
 		FTimerHandle UnusedHandle;
 		this->Caller->SystemContext->Peacenet->GetWorldTimerManager().SetTimer(
@@ -69,7 +68,7 @@ void UNmapCommand::NativeRunCommand(UConsoleContext* InConsole, const TMap<FStri
 				FNetMapScanEventArgs EventArgs;
 				EventArgs.EventType = ENetMapScanEventType::ScanStarted;
 
-				this->Caller->SystemContext->BroadcastNetMapEvent(this->ResolvedContext->Computer.ID, EventArgs);
+				this->NetMapEvent.Broadcast(this->ResolvedContext->Computer.ID, EventArgs);
 
 				this->ListNextService();
 			}

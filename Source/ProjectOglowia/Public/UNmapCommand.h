@@ -7,8 +7,11 @@
 #include "USystemContext.h"
 #include "UComputerService.h"
 #include "PeacenetWorldStateActor.h"
+#include "FNetMapScanEventArgs.h"
 #include "DocoptForUnrealBPLibrary.h"
 #include "UNmapCommand.generated.h"
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FNetMapEvent, int, InComputerID, FNetMapScanEventArgs, InEventArgs);
 
 /**
  * A Terminal Command that maps out the services running on a Peacenet computer/network.
@@ -21,6 +24,9 @@ class PROJECTOGLOWIA_API UNmapCommand : public UTerminalCommand
 public:
 	UPROPERTY()
 	USystemContext* ResolvedContext;
+
+	UPROPERTY(BlueprintAssignable, Category = "Nmap")
+	FNetMapEvent NetMapEvent;
 
 	UPROPERTY()
 	TArray<FServiceInfo> Hackables;

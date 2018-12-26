@@ -39,99 +39,112 @@ class PROJECTOGLOWIA_API USystemContext : public UObject
 {
 	GENERATED_BODY()
 
-private:
-	FString CurrentHostname;
-
-public:
-	UPROPERTY()
-	URainbowTable* RainbowTable;
-
-	UPROPERTY()
-	FNetMapScanEvent NetMapScan;
-
-	UFUNCTION()
-	void BroadcastNetMapEvent(int InEntityID, FNetMapScanEventArgs EventArgs);
-
-	UFUNCTION()
-	void ExecuteCommand(FString InCommand);
-
-	UPROPERTY()
-	APeacenetWorldStateActor * Peacenet;
-	
-	UPROPERTY(BlueprintReadOnly)
-	FComputer Computer;
-	
-	UPROPERTY(BlueprintReadOnly)
-	FPeacenetIdentity Character;
-
-	UPROPERTY(BlueprintReadOnly)
-	UDesktopWidget* Desktop;
-
 protected:
 	UPROPERTY()
-	UAddressBookContext* AddressBook;
-
-	UFUNCTION()
-		void HandleFileSystemEvent(EFilesystemEventType InType, FString InPath);
-
-public:
-	UFUNCTION()
-	UAddressBookContext* GetAddressBook();
-
-	UFUNCTION()
-	void UpdateSystemFiles();
-
-	UFUNCTION(BlueprintCallable, Category = "System Context")
-	FString GetHostname();
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "System Context")
-	TArray<UPeacegateProgramAsset*> GetInstalledPrograms();
-
-	UFUNCTION(BlueprintCallable, Category = "System Context")
-	bool OpenProgram(FName InExecutableName, UProgram*& OutProgram, bool InCheckForExistingWindow = true);
-
-	UFUNCTION(BlueprintCallable, Category = "System Context")
-		UPeacegateFileSystem* GetFilesystem(const int UserID);
-
-	UFUNCTION()
-		bool TryGetTerminalCommand(FName CommandName, UTerminalCommand*& OutCommand, FString& InternalUsage, FString& FriendlyUsage);
+	FString CurrentHostname;
 
 	UPROPERTY()
 	TMap<int, UPeacegateFileSystem*> RegisteredFilesystems;
 
+	UPROPERTY()
+	UAddressBookContext* AddressBook;
+
+	UPROPERTY()
+	URainbowTable* RainbowTable;
+
+	UPROPERTY()
+	APeacenetWorldStateActor * Peacenet;
+
+	UPROPERTY()
+	int ComputerID = 0;
+	
+	UPROPERTY()
+	int CharacterID = 0;
+
+	UPROPERTY()
+	UDesktopWidget* Desktop;
+
+protected:
+	UFUNCTION()
+	void HandleFileSystemEvent(EFilesystemEventType InType, FString InPath);
+
+public: // Property getters
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "System Context")
+	virtual APeacenetWorldStateActor* GetPeacenet();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "System Context")
+	virtual UDesktopWidget* GetDesktop();
+
+	UFUNCTION()
+	virtual FPeacenetIdentity& GetCharacter();
+
+	UFUNCTION()
+	virtual FComputer& GetComputer();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "System Context")
+	virtual UAddressBookContext* GetAddressBook();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "System Context")
+	virtual URainbowTable* GetRainbowTable();
+
 	UFUNCTION(BlueprintCallable, Category = "System Context")
-		FUserInfo GetUserInfo(const int InUserID);
+	virtual FString GetHostname();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "System Context")
+	virtual TArray<UPeacegateProgramAsset*> GetInstalledPrograms();
+
+public:
+	UFUNCTION()
+	void SetupDesktop(int InUserID);
+
+	UFUNCTION()
+	void Setup(int InComputerID, int InCharacterID, APeacenetWorldStateActor* InPeacenet);
+
+	UFUNCTION()
+	void ExecuteCommand(FString InCommand);
+
+	UFUNCTION()
+	void UpdateSystemFiles();
+
+	UFUNCTION()
+	bool OpenProgram(FName InExecutableName, UProgram*& OutProgram, bool InCheckForExistingWindow = true);
+
+	UFUNCTION()
+	UPeacegateFileSystem* GetFilesystem(const int UserID);
+
+	UFUNCTION()
+	bool TryGetTerminalCommand(FName CommandName, UTerminalCommand*& OutCommand, FString& InternalUsage, FString& FriendlyUsage);
+
+	UFUNCTION()
+	FUserInfo GetUserInfo(const int InUserID);
 
 	UFUNCTION()
 	void LogEvent(int UserID, FString Message);
 
-	UFUNCTION(BlueprintCallable, Category = "System Context")
-		void ShowWindowOnWorkspace(UProgram* InProgram);
+	UFUNCTION()
+	void ShowWindowOnWorkspace(UProgram* InProgram);
 
-	UFUNCTION(BlueprintCallable, Category = "System Context")
-		EUserDomain GetUserDomain(int InUserID);
+	UFUNCTION()
+	EUserDomain GetUserDomain(int InUserID);
 
-	UFUNCTION(BlueprintCallable, Category = "System Context")
+	UFUNCTION()
 	FString GetUsername(int InUserID);
 
-	UFUNCTION(BlueprintCallable, Category = "System Context")
-		FString GetUserHomeDirectory(int UserID);
-
-	UFUNCTION(BlueprintCallable, Category = "Hacking")
-		bool Authenticate(const FString& Username, const FString& Password, int& UserID);
-
-	UFUNCTION(Category = "Peacegate")
-		bool GetSuitableProgramForFileExtension(const FString& InExtension, class UPeacegateProgramAsset*& OutProgram);
+	UFUNCTION()
+	FString GetUserHomeDirectory(int UserID);
 
 	UFUNCTION()
-		void GetFolderTree(TArray<FFolder>& OutFolderTree);
+	bool Authenticate(const FString& Username, const FString& Password, int& UserID);
 
 	UFUNCTION()
-		void PushFolderTree(const TArray<FFolder>& InFolderTree);
+	bool GetSuitableProgramForFileExtension(const FString& InExtension, class UPeacegateProgramAsset*& OutProgram);
+
+	UFUNCTION()
+	void GetFolderTree(TArray<FFolder>& OutFolderTree);
+
+	UFUNCTION()
+	void PushFolderTree(const TArray<FFolder>& InFolderTree);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Peacegate")
 	FText GetTimeOfDay();
-
-	UFUNCTION(BlueprintCallable, Category = "Peacegate|Setup")
-	static void ParseCharacterName(const FString InCharacterName, FString& OutUsername, FString& OutHostname);
 };

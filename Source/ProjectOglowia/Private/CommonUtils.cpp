@@ -207,12 +207,15 @@ void UCommonUtils::SetEnableBloom(UCameraComponent * InCamera, bool InEnableBloo
 
 void UCommonUtils::SendEmailChecked(UPeacenetSaveGame * InSaveGame, int FromEntity, int ToEntity, const FText & Subject, const FText & Message, TArray<FEmailAttachment> InAttachments, TArray<FEmailMission> InMissions)
 {
+	int FromIndex;
+	int ToIndex;
+
 	FPeacenetIdentity FromCharacter;
 	FPeacenetIdentity ToCharacter;
 
 	// Do these character entities exist?
-	check(InSaveGame->GetCharacterByID(FromEntity, FromCharacter));
-	check(InSaveGame->GetCharacterByID(ToEntity, ToCharacter));
+	check(InSaveGame->GetCharacterByID(FromEntity, FromCharacter, FromIndex));
+	check(InSaveGame->GetCharacterByID(ToEntity, ToCharacter, ToIndex));
 
 	FEmailMessage NewMessage;
 	NewMessage.EntityID = InSaveGame->Emails.Num();
@@ -230,4 +233,49 @@ FString UCommonUtils::ParseEventLogEntryToString(const FEventLogEntry& InEventLo
 	FString TimeOfDay = FString::SanitizeFloat(InEventLogEntry.TimeOfDay);
 	
 	return "[" + TimeOfDay + "]\t<" + InEventLogEntry.Username + ">\t" + InEventLogEntry.Message;
+}
+
+void UCommonUtils::ParseCharacterName(const FString InCharacterName, FString & OutUsername, FString & OutHostname)
+{
+	// No sense doing this if there's only whitespace
+	if (InCharacterName.IsEmpty())
+		return;
+
+	// Unix usernames can only be lower-case.
+	FString NameString = InCharacterName.ToLower();
+
+	// this will be the username.
+	FString FirstName;
+	FString Rem;
+
+	// These characters are valid as name chars.
+	const FString ValidUnixUsernameChars = TEXT("abcdefghijklmnopqrstuvwxyz0123456789_-");
+
+	// the first char that isn't valid.
+	TCHAR InvalidChar = TEXT('\0');
+
+	// the chars in the name string
+	TArray<TCHAR> NameChars = NameString.GetCharArray();
+
+	for (auto Char : NameChars)
+	{
+		if (!ValidUnixUsernameChars.Contains(FString(1, &Char)))
+		{
+			InvalidChar = Char;
+			break;
+		}
+	}
+
+	// Did that for loop above change us?
+	if (InvalidChar != TEXT('\0'))
+	{
+		NameString.Split(FString(1, &InvalidChar), &FirstName, &Rem);
+	}
+	else
+	{
+		FirstName = NameString;
+	}
+
+	OutUsername = FirstName;
+	OutHostname = FirstName + TEXT("-pc");
 }

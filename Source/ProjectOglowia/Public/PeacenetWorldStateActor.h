@@ -6,7 +6,6 @@
 #include "GameFramework/Actor.h"
 #include "UDesktopWidget.h"
 #include "UPeacenetSaveGame.h"
-#include "UMissionAction.h"
 #include "UGameTypeAsset.h"
 #include "PeacenetWorldStateActor.generated.h"
 
@@ -82,46 +81,9 @@ private:
 	UPROPERTY()
 	TArray<UNativeLatentAction*> LatentActions;
 
-	UPROPERTY()
-	bool bIsMissionPaused = false;
-
-	UPROPERTY()
-	UPeacenetSaveGame* MissionStartSaveGame;
-
-	UPROPERTY()
-	UPeacenetSaveGame* CheckpointSaveGame;
-
-public:
-	UPROPERTY()
-	TArray<UMissionUnlock*> MissionUnlocks;
-
 private:
-	UPROPERTY()
-	TArray<UMissionUnlock*> CheckpointMissionUnlocks;
-
-	UPROPERTY()
-	UMissionAsset* CurrentMissionAsset;
-
 	UFUNCTION()
 	void LoadTerminalCommands();
-
-	UPROPERTY()
-	USystemContext* MissionContext;
-
-	UPROPERTY()
-	TArray<UMissionAction*> CurrentMissionActions;
-
-	UPROPERTY()
-	TArray<UMissionAction*> CheckpointMissionActions;
-
-	UPROPERTY()
-	ULatentMissionAction* CurrentLatentMissionAction;
-
-	UFUNCTION()
-	void CompleteMission();
-
-	UFUNCTION()
-	void ResynchronizeSystemContexts();
 
 public:	
 	UPROPERTY()
@@ -132,9 +94,6 @@ public:
 
 	UFUNCTION()
 	bool ResolveHost(FString InHost, FString& ResolvedIP, USystemContext*& ResolvedContext);
-
-	UPROPERTY()
-	TArray<UMissionAsset*> Missions;
 
 	UFUNCTION()
 	void SaveWorld();
@@ -181,10 +140,6 @@ public:
 	// Sets default values for this actor's properties
 	APeacenetWorldStateActor();
 
-public:
-	UFUNCTION()
-	bool StartMission(UMissionAsset* InMission, USystemContext* InMissionSystem);
-
 private:
 
 	UPROPERTY()
@@ -217,9 +172,6 @@ public:
 public:
 	UPROPERTY()
 	UWorldGeneratorStatus* WorldGeneratorStatus = nullptr;
-
-	UFUNCTION()
-	bool IsMissionActive();
 
 public:
 	// Used by the Ubiquity menu to see if the "Boot existing OS" screen should show.

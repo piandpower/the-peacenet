@@ -20,7 +20,7 @@ void ULogScraperCommand::NativeRunCommand(UConsoleContext* InConsole, const TMap
     FString InputBuffer = Cast<UPiperContext>(InConsole)->GetInputBuffer();
 
     // This is the current save game because this is a C++ command and we can do that.
-    UPeacenetSaveGame* SaveGame = InConsole->SystemContext->Peacenet->SaveGame;
+    UPeacenetSaveGame* SaveGame = InConsole->SystemContext->GetPeacenet()->SaveGame;
 
     // The list of scraped passwords.
     TArray<FString> FoundPasswords;
@@ -46,7 +46,7 @@ void ULogScraperCommand::NativeRunCommand(UConsoleContext* InConsole, const TMap
     for(auto& Password : FoundPasswords)
     {
         InConsole->WriteLine("Scraped password: " + Password);
-        InConsole->SystemContext->RainbowTable->AddPassword(Password);
+        InConsole->SystemContext->GetRainbowTable()->AddPassword(Password);
     }
 
     // If no passwords were found, the player is alerted.

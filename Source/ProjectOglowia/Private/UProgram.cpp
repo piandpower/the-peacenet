@@ -22,7 +22,7 @@ UAddressBookContext* UProgram::GetAddressBook()
 
 void UProgram::PushNotification(const FText & InNotificationMessage)
 {
-	this->Window->SystemContext->Desktop->EnqueueNotification(this->Window->WindowTitle, InNotificationMessage, this->Window->Icon);
+	this->Window->SystemContext->GetDesktop()->EnqueueNotification(this->Window->WindowTitle, InNotificationMessage, this->Window->Icon);
 }
 
 void UProgram::RequestPlayerAttention(bool PlaySound)
@@ -37,9 +37,9 @@ void UProgram::ExecuteCommand(FString InCommand)
 
 UProgram* UProgram::CreateProgram(const TSubclassOf<UWindow> InWindow, const TSubclassOf<UProgram> InProgramClass, USystemContext* InSystem, const int InUserID, UWindow*& OutWindow, bool DoContextSetup)
 {
-	check(InSystem->Peacenet);
+	check(InSystem->GetPeacenet());
 
-	APlayerController* MyPlayer = UGameplayStatics::GetPlayerController(InSystem->Peacenet->GetWorld(), 0);
+	APlayerController* MyPlayer = UGameplayStatics::GetPlayerController(InSystem->GetPeacenet()->GetWorld(), 0);
 
 	// The window is what contains the program's UI.
 	UWindow* Window = CreateWidget<UWindow, APlayerController>(MyPlayer, InWindow);
@@ -81,7 +81,7 @@ void UProgram::NativeConstruct()
 	{
 		TScriptDelegate<> OnActiveProgramClose;
 		OnActiveProgramClose.BindUFunction(this, "ActiveProgramCloseEvent");
-		this->Window->SystemContext->Desktop->EventActiveProgramClose.Add(OnActiveProgramClose);
+		this->Window->SystemContext->GetDesktop()->EventActiveProgramClose.Add(OnActiveProgramClose);
 
 		JustOpened = false;
 
@@ -97,63 +97,6 @@ void UProgram::NativePreConstruct()
 void UProgram::ShowInfoWithCallbacks(const FText & InTitle, const FText & InMessage, const EInfoboxIcon InIcon, const EInfoboxButtonLayout ButtonLayout, const bool ShowTextInput, const FInfoboxDismissedEvent & OnDismissed, const FInfoboxInputValidator & ValidatorFunction)
 {
 	Window->ShowInfoWithCallbacks(InTitle, InMessage, InIcon, ButtonLayout, ShowTextInput, OnDismissed, ValidatorFunction);
-}
-
-void UProgram::StartMission(UMissionAsset* InMissionAsset)
-{
-	if (!this->IsMissionActive() && this->MissionsEnabled())
-	{
-		if (this->Window->SystemContext->Peacenet->StartMission(InMissionAsset, this->Window->SystemContext))
-		{
-			this->Window->Close();
-		}
-	}
-}
-
-bool UProgram::GetAvailableMissions(TArray<UMissionAsset*>& OutMissions)
-{
-	if (this->IsMissionActive() || !this->MissionsEnabled())
-	{
-		return false;
-	}
-
-	for (auto Mission : this->Window->SystemContext->Peacenet->Missions)
-	{
-		if (this->Window->SystemContext->Peacenet->SaveGame->Missions.Contains(Mission->InternalID))
-			continue;
-
-		bool shouldAdd = true;
-
-		for (auto SubMission : Mission->Prerequisites)
-		{
-			if (!this->Window->SystemContext->Peacenet->SaveGame->Missions.Contains(SubMission->InternalID))
-			{
-				shouldAdd = false;
-				break;
-			}
-		}
-
-		if (shouldAdd)
-		{
-			OutMissions.Add(Mission);
-		}
-	}
-	
-	return OutMissions.Num() > 0;
-}
-
-bool UProgram::IsMissionActive()
-{
-	return this->Window->SystemContext->Peacenet->IsMissionActive();
-}
-
-bool UProgram::MissionsEnabled()
-{
-	if (this->Window->SystemContext->Computer.OwnerType != EComputerOwnerType::Player)
-	{
-		return false;
-	}
-	return this->Window->SystemContext->Peacenet->GameType->EnableMissions;
 }
 
 FText UProgram::GetUsername()
@@ -235,10 +178,6 @@ void UProgram::AskForFile(const FString InBaseDirectory, const FString InFilter,
 
 void UProgram::SetupContexts()
 {
-	TScriptDelegate<> NMS;
-	NMS.BindUFunction(this, "NetMapScan");
-	Window->SystemContext->NetMapScan.Add(NMS);
-
 	// Fetch a filesystem context from Peacegate, with the current User ID.
 	this->Filesystem = Window->SystemContext->GetFilesystem(Window->UserID);
 

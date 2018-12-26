@@ -13,7 +13,6 @@ class UWorkspace;
 class USystemContext;
 class UConsoleContext;
 class UPTerminalWidget;
-class UNetMapWidget;
 class UImageLoader;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FActiveProgramCloseEvent);
@@ -50,13 +49,8 @@ protected:
 	USystemContext* GetSystemContext();
 
 public:
-	UFUNCTION()
-	void SelectCharacterNode(int InEntityID);
-
 	UFUNCTION(BlueprintImplementableEvent, Category = "System")
 	void ExecuteCommand(const FString& InCommand);
-
-	void ResetNetMap();
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "System")
 	void SwitchWorkspace(int InWorkspaceNumber);
@@ -70,20 +64,8 @@ public:
 	FActiveProgramCloseEvent EventActiveProgramClose;
 
 protected:
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Missions")
-	bool IsInMission();
-
 	UFUNCTION(BlueprintCallable, Category = "Desktop")
 	UProgram* SpawnProgramFromClass(TSubclassOf<UProgram> InClass, const FText& InTitle, UTexture2D* InIcon);
-
-	UFUNCTION(BlueprintImplementableEvent, Category = "NetMap")
-	void CharacterNodeSelected(const FPeacenetIdentity& InIdentity, const FComputer& InComputer);
-
-	UFUNCTION(BlueprintCallable, Category = "NetMap")
-	UNetMapWidget* CreateNetMap(TSubclassOf<UNetMapWidget> InSubclass);
-
-	UPROPERTY(BlueprintReadOnly, Category = "NetMap")
-	UNetMapWidget* NetMap;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Desktop")
 	FPeacenetIdentity MyCharacter;
@@ -103,12 +85,6 @@ protected:
 	UImageLoader* ImageLoader;
 
 public:
-	UFUNCTION(BlueprintImplementableEvent, Category = "Missions")
-	void OnMissionCompleted(const UMissionAsset* InMission, const USystemContext* InMissionContext, const TArray<UMissionUnlock*>& InMissionUnlocks);
-
-	UFUNCTION(BlueprintImplementableEvent, Category = "Missions")
-	void OnMissionFailed(const UMissionAsset* InMission, const USystemContext* InMissionContext, const FString& InFailReason);
-
 	UPROPERTY()
 	USystemContext * SystemContext;
 

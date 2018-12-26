@@ -99,5 +99,5 @@ public:
 	virtual void Clear() { Terminal->Clear(); }
 
 	UFUNCTION(BlueprintCallable, Category="Console", meta=(Latent, LatentInfo="LatentInfo", HidePin="WorldContextObject", DefaultToSelf="WorldContextObject"))
-	virtual void ReadLine(UObject* WorldContextObject, struct FLatentActionInfo LatentInfo, FString& OutText) { Terminal->ReadLine(this->SystemContext->Peacenet, LatentInfo, OutText); }
+	virtual void ReadLine(UObject* WorldContextObject, struct FLatentActionInfo LatentInfo, FString& OutText);
 };

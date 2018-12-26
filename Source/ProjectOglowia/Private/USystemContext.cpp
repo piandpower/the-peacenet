@@ -1,6 +1,7 @@
 // Copyright (c) 2018 The Peacenet & Alkaline Thunder.
 
 #include "USystemContext.h"
+#include "Kismet/GameplayStatics.h"
 #include "PeacenetWorldStateActor.h"
 #include "UDesktopWidget.h"
 #include "UWorkspace.h"
@@ -19,7 +20,7 @@
 
 UAddressBookContext* USystemContext::GetAddressBook()
 {
-	check(this->Peacenet);
+	check(this->GetPeacenet());
 
 	
 
@@ -71,18 +72,18 @@ TArray<UPeacegateProgramAsset*> USystemContext::GetInstalledPrograms()
 {
 	check(Peacenet);
 
-	if (Peacenet->GameType->UnlockAllProgramsByDefault)
+	if (GetPeacenet()->GameType->UnlockAllProgramsByDefault)
 	{
 		// Return ALL loaded programs if we're in a sandbox environment with all programs unlocked.
-		return Peacenet->Programs;
+		return GetPeacenet()->Programs;
 	}
 
 	TArray<UPeacegateProgramAsset*> OutArray;
 
-	for (auto Executable : Computer.InstalledPrograms)
+	for (auto Executable : GetComputer().InstalledPrograms)
 	{
 		UPeacegateProgramAsset* FoundProgram;
-		if (Peacenet->FindProgramByName(Executable, FoundProgram))
+		if (GetPeacenet()->FindProgramByName(Executable, FoundProgram))
 		{
 			OutArray.Add(FoundProgram);
 		}
@@ -150,19 +151,19 @@ bool USystemContext::TryGetTerminalCommand(FName CommandName, UTerminalCommand *
 {
 	check(Peacenet);
 
-	if (!(Computer.InstalledCommands.Contains(CommandName) || Computer.InstalledPrograms.Contains(CommandName)) && !Peacenet->GameType->UnlockAllProgramsByDefault)
+	if (!(GetComputer().InstalledCommands.Contains(CommandName) || GetComputer().InstalledPrograms.Contains(CommandName)) && !Peacenet->GameType->UnlockAllProgramsByDefault)
 		return false;
 
-	if (!Peacenet->ManPages.Contains(CommandName))
+	if (!GetPeacenet()->ManPages.Contains(CommandName))
 		return false;
 
-	FManPage ManPage = Peacenet->ManPages[CommandName];
+	FManPage ManPage = GetPeacenet()->ManPages[CommandName];
 
 	InternalUsage = ManPage.InternalUsage;
 	FriendlyUsage = ManPage.FriendlyUsage;
 
 	UPeacegateProgramAsset* Program = nullptr;
-	if (Peacenet->FindProgramByName(CommandName, Program))
+	if (GetPeacenet()->FindProgramByName(CommandName, Program))
 	{
 		UGraphicalTerminalCommand* GraphicalCommand = NewObject<UGraphicalTerminalCommand>(this);
 		GraphicalCommand->ProgramAsset = Program;
@@ -171,12 +172,12 @@ bool USystemContext::TryGetTerminalCommand(FName CommandName, UTerminalCommand *
 		return true;
 	}
 
-	if (!Peacenet->CommandInfo.Contains(CommandName))
+	if (!GetPeacenet()->CommandInfo.Contains(CommandName))
 	{
 		return false;
 	}
 
-	UCommandInfo* Info = Peacenet->CommandInfo[CommandName];
+	UCommandInfo* Info = GetPeacenet()->CommandInfo[CommandName];
 	OutCommand = NewObject<UTerminalCommand>(this, Info->Info.CommandClass);
 
 	OutCommand->CommandInfo = Info;
@@ -200,7 +201,7 @@ FUserInfo USystemContext::GetUserInfo(const int InUserID)
 		return AnonInfo;
 	}
 
-	for (FUser User : Computer.Users)
+	for (FUser User : GetComputer().Users)
 	{
 		if (User.ID == InUserID)
 		{
@@ -255,7 +256,7 @@ EUserDomain USystemContext::GetUserDomain(int InUserID)
 		return EUserDomain::Anonymous;
 	}
 
-	for (FUser User : Computer.Users)
+	for (FUser User : GetComputer().Users)
 	{
 		if (User.ID == InUserID)
 		{
@@ -279,7 +280,7 @@ FString USystemContext::GetUserHomeDirectory(int UserID)
 		return "/";
 	}
 
-	for (FUser User : Computer.Users)
+	for (FUser User : GetComputer().Users)
 	{
 		if (User.ID == UserID)
 		{
@@ -294,7 +295,7 @@ FString USystemContext::GetUserHomeDirectory(int UserID)
 
 bool USystemContext::Authenticate(const FString & Username, const FString & Password, int & UserID)
 {
-	for (FUser User : Computer.Users)
+	for (FUser User : GetComputer().Users)
 	{
 		if (User.Username == Username && User.Password == Password)
 		{
@@ -308,10 +309,10 @@ bool USystemContext::Authenticate(const FString & Username, const FString & Pass
 
 bool USystemContext::GetSuitableProgramForFileExtension(const FString & InExtension, UPeacegateProgramAsset *& OutProgram)
 {
-	for (auto ProgramName : Computer.InstalledPrograms)
+	for (auto ProgramName : GetComputer().InstalledPrograms)
 	{
 		UPeacegateProgramAsset* Program;
-		if (!Peacenet->FindProgramByName(ProgramName, Program))
+		if (!GetPeacenet()->FindProgramByName(ProgramName, Program))
 		{
 			continue;
 		}
@@ -324,78 +325,83 @@ bool USystemContext::GetSuitableProgramForFileExtension(const FString & InExtens
 	return false;
 }
 
+UDesktopWidget* USystemContext::GetDesktop()
+{
+	return this->Desktop;
+}
+
+FPeacenetIdentity& USystemContext::GetCharacter()
+{
+	check(this->GetPeacenet());
+
+	auto MyPeacenet = this->GetPeacenet();
+
+	int CharacterIndex;
+	FPeacenetIdentity Character;
+
+	check(MyPeacenet->SaveGame->GetCharacterByID(this->CharacterID, Character, CharacterIndex));
+
+	return MyPeacenet->SaveGame->Characters[CharacterIndex];
+}
+
+FComputer& USystemContext::GetComputer()
+{
+	check(this->GetPeacenet());
+
+	auto MyPeacenet = this->GetPeacenet();
+
+	int ComputerIndex;
+	FComputer Computer;
+
+	check(MyPeacenet->SaveGame->GetComputerByID(this->ComputerID, Computer, ComputerIndex));
+
+	return MyPeacenet->SaveGame->Computers[ComputerIndex];
+}
+
+APeacenetWorldStateActor* USystemContext::GetPeacenet()
+{
+	return this->Peacenet;
+}
+
+URainbowTable* USystemContext::GetRainbowTable()
+{
+	return this->RainbowTable;
+}
+
+void USystemContext::SetupDesktop(int InUserID)
+{
+	check(!this->GetDesktop());
+
+	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetPeacenet()->GetWorld(), 0);
+
+	this->Desktop = CreateWidget<UDesktopWidget, APlayerController>(PlayerController, this->GetPeacenet()->DesktopClass);
+
+	check(GetDesktop());
+
+	this->Desktop->SystemContext = this;
+	this->Desktop->UserID = InUserID;
+}
+
 void USystemContext::GetFolderTree(TArray<FFolder>& OutFolderTree)
 {
-	OutFolderTree = Computer.Filesystem;
+	OutFolderTree = GetComputer().Filesystem;
 }
 
 void USystemContext::PushFolderTree(const TArray<FFolder>& InFolderTree)
 {
-	Computer.Filesystem = InFolderTree;
-	if(Peacenet)
-		Peacenet->UpdateComputer(Computer.ID, Computer, false);
+	GetComputer().Filesystem = InFolderTree;
 }
 
 FText USystemContext::GetTimeOfDay()
 {
-	return Peacenet->GetTimeOfDay();
-}
-
-void USystemContext::ParseCharacterName(const FString InCharacterName, FString & OutUsername, FString & OutHostname)
-{
-	// No sense doing this if there's only whitespace
-	if (InCharacterName.IsEmpty())
-		return;
-
-	// Unix usernames can only be lower-case.
-	FString NameString = InCharacterName.ToLower();
-
-	// this will be the username.
-	FString FirstName;
-	FString Rem;
-
-	// These characters are valid as name chars.
-	const FString ValidUnixUsernameChars = TEXT("abcdefghijklmnopqrstuvwxyz0123456789_-");
-
-	// the first char that isn't valid.
-	TCHAR InvalidChar = TEXT('\0');
-
-	// the chars in the name string
-	TArray<TCHAR> NameChars = NameString.GetCharArray();
-
-	for (auto Char : NameChars)
-	{
-		if (!ValidUnixUsernameChars.Contains(FString(1, &Char)))
-		{
-			InvalidChar = Char;
-			break;
-		}
-	}
-
-	// Did that for loop above change us?
-	if (InvalidChar != TEXT('\0'))
-	{
-		NameString.Split(FString(1, &InvalidChar), &FirstName, &Rem);
-	}
-	else
-	{
-		FirstName = NameString;
-	}
-
-	OutUsername = FirstName;
-	OutHostname = FirstName + TEXT("-pc");
-}
-
-void USystemContext::BroadcastNetMapEvent(int InEntityID, FNetMapScanEventArgs EventArgs)
-{
-	this->NetMapScan.Broadcast(InEntityID, EventArgs);
+	return GetPeacenet()->GetTimeOfDay();
 }
 
 void USystemContext::ExecuteCommand(FString InCommand)
 {
-	check(this->Desktop);
+	check(this->GetDesktop());
 
-	this->Desktop->ExecuteCommand(InCommand);
+	this->GetDesktop()->ExecuteCommand(InCommand);
 }
 
 void USystemContext::HandleFileSystemEvent(EFilesystemEventType InType, FString InPath)
@@ -485,4 +491,13 @@ void USystemContext::UpdateSystemFiles()
 	// This is also where we init our rainbow table.
 	this->RainbowTable = NewObject<URainbowTable>(this);
 	this->RainbowTable->Setup(this, "/etc/rainbow_table.db", true);
+}
+
+void USystemContext::Setup(int InComputerID, int InCharacterID, APeacenetWorldStateActor* InPeacenet)
+{
+	check(InPeacenet);
+
+	this->ComputerID = InComputerID;
+	this->CharacterID = InCharacterID;
+	this->Peacenet = InPeacenet;
 }

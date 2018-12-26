@@ -54,9 +54,9 @@ void UHelpCommand::NativeRunCommand(UConsoleContext* InConsole, const TMap<FStri
 	TMap<FName, FString> CommandList;
 	int MaxLength = 0;
 
-	for (auto Program : InConsole->SystemContext->Peacenet->Programs)
+	for (auto Program : InConsole->SystemContext->GetPeacenet()->Programs)
 	{
-		if (InConsole->SystemContext->Computer.InstalledPrograms.Contains(Program->ExecutableName))
+		if (InConsole->SystemContext->GetComputer().InstalledPrograms.Contains(Program->ExecutableName))
 		{
 			CommandList.Add(Program->ExecutableName, Program->AppLauncherItem.Description.ToString());
 			int Length = Program->ExecutableName.ToString().GetCharArray().Num();
@@ -67,11 +67,11 @@ void UHelpCommand::NativeRunCommand(UConsoleContext* InConsole, const TMap<FStri
 		}
 	}
 
-	for (auto Command : InConsole->SystemContext->Computer.InstalledCommands)
+	for (auto Command : InConsole->SystemContext->GetComputer().InstalledCommands)
 	{
-		if (!InConsole->SystemContext->Peacenet->ManPages.Contains(Command))
+		if (!InConsole->SystemContext->GetPeacenet()->ManPages.Contains(Command))
 			continue;
-		FManPage ManPage = InConsole->SystemContext->Peacenet->ManPages[Command];
+		FManPage ManPage = InConsole->SystemContext->GetPeacenet()->ManPages[Command];
 		CommandList.Add(Command, ManPage.Description);
 		int Length = Command.ToString().GetCharArray().Num();
 		if (Length > MaxLength)

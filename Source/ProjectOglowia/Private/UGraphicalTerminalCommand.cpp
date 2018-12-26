@@ -14,7 +14,7 @@ UGraphicalTerminalCommand::~UGraphicalTerminalCommand()
 
 void UGraphicalTerminalCommand::NativeRunCommand(UConsoleContext * InConsole, const TMap<FString, UDocoptValue*> InArguments)
 {
-	if (!InConsole->SystemContext->Desktop)
+	if (!InConsole->SystemContext->GetDesktop())
 	{
 		InConsole->WriteLine("error: cannot connect to Xorg server (Is Peacegate Desktop running?)");
 		this->Complete();
@@ -23,7 +23,7 @@ void UGraphicalTerminalCommand::NativeRunCommand(UConsoleContext * InConsole, co
 
 	UWindow* OutputWindow = nullptr;
 
-	UProgram* Program = UProgram::CreateProgram(InConsole->SystemContext->Peacenet->WindowClass, this->ProgramAsset->ProgramClass, InConsole->SystemContext, InConsole->UserID, OutputWindow);
+	UProgram* Program = UProgram::CreateProgram(InConsole->SystemContext->GetPeacenet()->WindowClass, this->ProgramAsset->ProgramClass, InConsole->SystemContext, InConsole->UserID, OutputWindow);
 
 	OutputWindow->WindowTitle = this->ProgramAsset->AppLauncherItem.Name;
 	OutputWindow->Icon = this->ProgramAsset->AppLauncherItem.Icon;

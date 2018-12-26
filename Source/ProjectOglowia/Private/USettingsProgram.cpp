@@ -4,5 +4,5 @@
 
 void USettingsProgram::NativeProgramLaunched()
 {
-	this->Desktop = this->Window->SystemContext->Desktop;
+	this->Desktop = this->Window->SystemContext->GetDesktop();
 }

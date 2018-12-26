@@ -6,6 +6,7 @@
 #include "USystemContext.h"
 #include "UPeacenetSaveGame.h"
 #include "FEnterpriseNetwork.h"
+#include "CommonUtils.h"
 #include "Base64.h"
 #include "UComputerTypeAsset.h"
 #include "UComputerService.h"
@@ -25,7 +26,7 @@ FString UWorldGenerator::GenerateRandomName(const FRandomStream& InGenerator, co
 	return first + TEXT(" ") + last;
 }
 
-UWorldGeneratorStatus* UWorldGenerator::GenerateCharacters(const APeacenetWorldStateActor* InWorld, const FRandomStream & InRandomStream, UPeacenetSaveGame * InSaveGame)
+UWorldGeneratorStatus* UWorldGenerator::GenerateCharacters(APeacenetWorldStateActor* InWorld, const FRandomStream & InRandomStream, UPeacenetSaveGame * InSaveGame)
 {
 	FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
 	
@@ -60,7 +61,7 @@ UWorldGeneratorStatus* UWorldGenerator::GenerateCharacters(const APeacenetWorldS
 
 	UWorldGeneratorStatus* WorldGenStatus = NewObject<UWorldGeneratorStatus>();
 
-	(new FAutoDeleteAsyncTask<FWorldGenTask>(InSaveGame, InRandomStream, WorldGenStatus, TrainingData, ComputerTypes, InWorld->PlayerComputerType, CompanyTypes, InWorld->ComputerServices))->StartBackgroundTask();
+	(new FAutoDeleteAsyncTask<FWorldGenTask>(InSaveGame, InRandomStream, WorldGenStatus, TrainingData, ComputerTypes, InWorld->PlayerComputerType, CompanyTypes, InWorld->ComputerServices, InWorld))->StartBackgroundTask();
 
 	return WorldGenStatus;
 }
@@ -181,7 +182,7 @@ void UWorldGenerator::GenerateSystemDirectories(USystemContext * InSystemContext
 	Filesystem->CreateDirectory(TEXT("/etc/peacegate"), InstallStatusCode);
 
 	// Now we can look through all the users and create their home directories.
-	for (auto User : InSystemContext->Computer.Users)
+	for (auto User : InSystemContext->GetComputer().Users)
 	{
 		FString Home = InSystemContext->GetUserHomeDirectory(User.ID);
 
@@ -474,16 +475,16 @@ FString FMarkovSource::ToString() const
 	return Out;
 }
 
-void UWorldGenerator::CreateFilesystem(FPeacenetIdentity& InCharacter, FComputer& InComputer, const FRandomStream& InGenerator, FString InHostname)
+void UWorldGenerator::CreateFilesystem(FPeacenetIdentity& InCharacter, FComputer& InComputer, const FRandomStream& InGenerator, APeacenetWorldStateActor* InPeacenet, FString InHostname)
 {
 	// Format the filesystem.
 	UFileUtilities::FormatFilesystem(InComputer.Filesystem);
 
 	// Create a system context.
 	USystemContext* SysCtx = NewObject<USystemContext>();
-	SysCtx->Computer = InComputer;
-	SysCtx->Character = InCharacter;
-	
+
+	SysCtx->Setup(InComputer.ID, InCharacter.ID, InPeacenet);
+
 	// Creates system directories for the computer. This should include all users' home directories.
 	UWorldGenerator::GenerateSystemDirectories(SysCtx);
 
@@ -491,7 +492,7 @@ void UWorldGenerator::CreateFilesystem(FPeacenetIdentity& InCharacter, FComputer
 	{
 		// Parse the character's name to give us a hostname to use.
 		FString Username;
-		USystemContext::ParseCharacterName(InCharacter.CharacterName, Username, InHostname);
+		UCommonUtils::ParseCharacterName(InCharacter.CharacterName, Username, InHostname);
 	}
 	// Get the root FS context.
 	UPeacegateFileSystem* RootFilesystem = SysCtx->GetFilesystem(0);
@@ -503,7 +504,7 @@ void UWorldGenerator::CreateFilesystem(FPeacenetIdentity& InCharacter, FComputer
 
 	// This system context isn't actually registered with a world context, so it can't update the save file.
 	// That's why we took in our computer by-reference, so we can report back the changes to the calling function.
-	InComputer = SysCtx->Computer;
+	InComputer = SysCtx->GetComputer();
 }
 
 
@@ -736,7 +737,7 @@ void FWorldGenTask::DoWork()
 		int PasswordLength = RandomStream.RandRange(3, 5) * FMath::Pow(2, NPC.Skill);
 
 		// Hostname and user generation is really easy, since this is a personal computer.
-		USystemContext::ParseCharacterName(NPC.CharacterName, Username, Hostname);
+		UCommonUtils::ParseCharacterName(NPC.CharacterName, Username, Hostname);
 
 		// For the password, I probably have a function for that. But who knows?
 		Password = UWorldGenerator::GenerateRandomPassword(RandomStream, PasswordLength);
@@ -804,7 +805,7 @@ void FWorldGenTask::DoWork()
 				if (Character.CharacterType == EIdentityType::NonPlayer)
 				{
 					// Generate an npc filesystem.
-					UWorldGenerator::CreateFilesystem(Character, Computer, RandomStream);
+					UWorldGenerator::CreateFilesystem(Character, Computer, RandomStream, this->Peacenet);
 				}
 
 				break;
@@ -916,44 +917,42 @@ void FWorldGenTask::DoWork()
 		// Is it less than or equal to the spawn rate?
 		if(SpawnValue <= SpawnRate)
 		{
-			// We're going to spawn. Find the computer.
-			for(FComputer& Computer : this->SaveGame->Computers)
+			// OPTIMIZATION: Use the GetComputerByID functions for the world generator.
+			FComputer Computer;
+			int ComputerIndex;
+
+			if(this->SaveGame->GetComputerByID(Character.ComputerID, Computer, ComputerIndex))
 			{
-				if(Computer.ID == Character.ComputerID)
+				USystemContext* ComputerContext = NewObject<USystemContext>();
+
+				// Set up the system context.
+				ComputerContext->Setup(Character.ID, Computer.ID, this->Peacenet);
+
+				URainbowTable* RainbowTableContext = NewObject<URainbowTable>(ComputerContext);
+					
+				// Register the rainbow table with the system, also we set "ShouldAutoFlush" to false for a massive speed increase since the filesystem api isn't fucked with till we finish adding passwords.
+				RainbowTableContext->Setup(ComputerContext, "/etc/rainbow_table.db", false);
+
+				int Passwords = this->RandomStream.RandRange(10, 50);
+
+				TArray<FString> UsedHashes;
+
+				while(Passwords > 0)
 				{
-					USystemContext* ComputerContext = NewObject<USystemContext>();
-					ComputerContext->Character = Character;
-					ComputerContext->Computer = Computer;
-					
-					URainbowTable* RainbowTableContext = NewObject<URainbowTable>(ComputerContext);
-					
-					// Register the rainbow table with the system, also we set "ShouldAutoFlush" to false for a massive speed increase since the filesystem api isn't fucked with till we finish adding passwords.
-					RainbowTableContext->Setup(ComputerContext, "/etc/rainbow_table.db", false);
-
-					int Passwords = this->RandomStream.RandRange(10, 50);
-
-					TArray<FString> UsedHashes;
-
-					while(Passwords > 0)
+					FString Hash;
+					FString Password;
+					do
 					{
-						FString Hash;
-						FString Password;
-						do
-						{
-							Hash = this->SaveGame->MPT[this->RandomStream.RandRange(0, this->SaveGame->MPT.Num() - 1)];
-						} while(UsedHashes.Contains(Hash));
-						FBase64::Decode(Hash, Password);
-						RainbowTableContext->AddPassword(Password);
-						UsedHashes.Add(Hash);
-						Passwords--;
-					}
-
-					// Flush the rainbow table to the computer.
-					RainbowTableContext->Flush();
-
-					// At this point, /etc/rainbow_table.db is written. We just need to pump the new filesystem into the save file.
-					Computer.Filesystem = ComputerContext->Computer.Filesystem;
+						Hash = this->SaveGame->MPT[this->RandomStream.RandRange(0, this->SaveGame->MPT.Num() - 1)];
+					} while(UsedHashes.Contains(Hash));
+					FBase64::Decode(Hash, Password);
+					RainbowTableContext->AddPassword(Password);
+					UsedHashes.Add(Hash);
+					Passwords--;
 				}
+
+				// Flush the rainbow table to the computer.
+				RainbowTableContext->Flush();
 			}
 		}
 

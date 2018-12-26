@@ -24,6 +24,9 @@ class PROJECTOGLOWIA_API UCommonUtils : public UObject
 	GENERATED_BODY()
 
 public:
+	UFUNCTION(BlueprintCallable, Category = "Peacegate|Setup")
+	static void ParseCharacterName(const FString InCharacterName, FString& OutUsername, FString& OutHostname);
+
 	UFUNCTION(BlueprintCallable, Category = "Event Log Entry", BlueprintPure)
 	static FString ParseEventLogEntryToString(const FEventLogEntry& InEventLogEntry);
 

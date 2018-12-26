@@ -11,7 +11,6 @@
 #include "CommonUtils.h"
 #include "WallpaperAsset.h"
 #include "UProgram.h"
-#include "UNetMapWidget.h"
 #include "UConsoleContext.h"
 
 void UDesktopWidget::ShowProgramOnWorkspace(UProgram* InProgram)
@@ -24,11 +23,6 @@ void UDesktopWidget::ShowProgramOnWorkspace(UProgram* InProgram)
 void UDesktopWidget::CloseActiveProgram()
 {
 	this->EventActiveProgramClose.Broadcast();
-}
-
-bool UDesktopWidget::IsInMission()
-{
-	return this->SystemContext->Peacenet->IsMissionActive();
 }
 
 void UDesktopWidget::ResetEventLog()
@@ -62,46 +56,13 @@ UProgram * UDesktopWidget::SpawnProgramFromClass(TSubclassOf<UProgram> InClass, 
 {
 	UWindow* OutputWindow = nullptr;
 
-	UProgram* Program = UProgram::CreateProgram(this->SystemContext->Peacenet->WindowClass, InClass, this->SystemContext, this->UserID, OutputWindow);
+	UProgram* Program = UProgram::CreateProgram(this->SystemContext->GetPeacenet()->WindowClass, InClass, this->SystemContext, this->UserID, OutputWindow);
 
 	OutputWindow->WindowTitle = InTitle;
 	OutputWindow->Icon = InIcon;
 	OutputWindow->EnableMinimizeAndMaximize = false;
 
 	return Program;
-}
-
-UNetMapWidget* UDesktopWidget::CreateNetMap(TSubclassOf<UNetMapWidget> InSubclass)
-{
-	UNetMapWidget* Result = CreateWidget<UNetMapWidget, APlayerController>(this->GetOwningPlayer(), InSubclass);
-	Result->Desktop = this;
-	this->NetMap = Result;
-	return Result;
-}
-
-void UDesktopWidget::ResetNetMap()
-{
-	check(this->NetMap);
-
-	this->NetMap->CollectDiscoveredNodes();
-}
-
-void UDesktopWidget::SelectCharacterNode(int InEntityID)
-{
-	for (auto& Character : this->SystemContext->Peacenet->SaveGame->Characters)
-	{
-		if (Character.ID == InEntityID)
-		{
-			for (auto& Computer : this->SystemContext->Peacenet->SaveGame->Computers)
-			{
-				if (Computer.ID == Character.ComputerID)
-				{
-					this->CharacterNodeSelected(Character, Computer);
-					return;
-				}
-			}
-		}
-	}
 }
 
 void UDesktopWidget::NativeConstruct()
@@ -141,7 +102,7 @@ void UDesktopWidget::NativeConstruct()
 	else 
 	{
 		// We need to find and set the default wallpaper.
-		for (auto WallpaperAsset : this->SystemContext->Peacenet->Wallpapers)
+		for (auto WallpaperAsset : this->SystemContext->GetPeacenet()->Wallpapers)
 		{
 			if (WallpaperAsset->IsDefault)
 			{
@@ -188,7 +149,7 @@ void UDesktopWidget::OnFilesystemOperation(EFilesystemEventType InType, FString 
 
 				this->EnqueueNotification(FText::FromString("New wallpaper"), FText::FromString("A new wallpaper has been set by a program."), this->WallpaperTexture);
 
-				this->SystemContext->Peacenet->SaveWorld();
+				this->SystemContext->GetPeacenet()->SaveWorld();
 			}
 			else if (InPath == "/var/log/peacegate.log")
 			{
@@ -201,10 +162,10 @@ void UDesktopWidget::OnFilesystemOperation(EFilesystemEventType InType, FString 
 void UDesktopWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	check(this->SystemContext);
-	check(this->SystemContext->Peacenet);
+	check(this->SystemContext->GetPeacenet());
 
-	this->MyCharacter = this->SystemContext->Character;
-	this->MyComputer = this->SystemContext->Computer;
+	this->MyCharacter = this->SystemContext->GetCharacter();
+	this->MyComputer = this->SystemContext->GetComputer();
 
 	// If a notification isn't currently active...
 	if (!bIsWaitingForNotification)
@@ -238,9 +199,9 @@ void UDesktopWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	this->CurrentHostname = this->SystemContext->GetHostname();
 
 	// And now the Peacenet name.
-	this->CurrentPeacenetName = this->SystemContext->Character.CharacterName;
+	this->CurrentPeacenetName = this->MyCharacter.CharacterName;
 
-	this->TimeOfDay = this->SystemContext->Peacenet->GetTimeOfDay();
+	this->TimeOfDay = this->SystemContext->GetPeacenet()->GetTimeOfDay();
 
 	Super::NativeTick(MyGeometry, InDeltaTime);
 }
@@ -252,11 +213,11 @@ void UDesktopWidget::ResetAppLauncher()
 
 	// Collect app launcher categories.
 	TArray<FString> CategoryNames;
-	for (auto ProgramName : SystemContext->Computer.InstalledPrograms)
+	for (auto ProgramName : this->SystemContext->GetComputer().InstalledPrograms)
 	{
 		UPeacegateProgramAsset* Program;
 
-		if (!this->SystemContext->Peacenet->FindProgramByName(ProgramName, Program))
+		if (!this->SystemContext->GetPeacenet()->FindProgramByName(ProgramName, Program))
 			continue;
 		if (!CategoryNames.Contains(Program->AppLauncherItem.Category.ToString()))
 		{
@@ -289,11 +250,11 @@ void UDesktopWidget::ShowAppLauncherCategory(const FString& InCategoryName)
 	this->ClearAppLauncherSubMenu();
 
 	// Add all the programs.
-	for (auto ProgramId : this->SystemContext->Computer.InstalledPrograms)
+	for (auto ProgramId : this->SystemContext->GetComputer().InstalledPrograms)
 	{
 		UPeacegateProgramAsset* Program = nullptr;
 
-		if (!this->SystemContext->Peacenet->FindProgramByName(ProgramId, Program))
+		if (!this->SystemContext->GetPeacenet()->FindProgramByName(ProgramId, Program))
 			continue;
 
 		if (Program->AppLauncherItem.Category.ToString() != InCategoryName)

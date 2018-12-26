@@ -119,3 +119,7 @@ void UConsoleContext::SetColor(ETerminalColor InColor)
 	Write(UCommonUtils::GetTerminalColorCode(InColor));
 }
 
+void UConsoleContext::ReadLine(UObject* WorldContextObject, FLatentActionInfo LatentInfo, FString& OutText)
+{
+	Terminal->ReadLine(this->SystemContext->GetPeacenet(), LatentInfo, OutText); 
+}

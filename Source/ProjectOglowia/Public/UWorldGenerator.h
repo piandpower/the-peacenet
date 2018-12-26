@@ -120,7 +120,7 @@ public:
 	static FString GenerateRandomName(const FRandomStream& InGenerator, const TArray<FString> InFirstNames, TArray<FString> InLastNames);
 
 	UFUNCTION(BlueprintCallable, Category = "World Generation")
-	static UWorldGeneratorStatus* GenerateCharacters(const APeacenetWorldStateActor* InWorld, const FRandomStream& InRandomStream, UPeacenetSaveGame* InSaveGame);
+	static UWorldGeneratorStatus* GenerateCharacters(APeacenetWorldStateActor* InWorld, const FRandomStream& InRandomStream, UPeacenetSaveGame* InSaveGame);
 
 	static FString GenerateIPAddress(const FRandomStream& InRandomStream, const ECountry InCountry, int InEntityID);
 	static FString GenerateIPAddress(const FRandomStream& InRandomStream, const ECountry InCountry, const FComputer& InComputer);
@@ -135,7 +135,7 @@ public:
 	static FString GenerateWordString(UMarkovChain* InMarkovChain, int Length);
 
 	UFUNCTION()
-	static void CreateFilesystem(FPeacenetIdentity& InCharacter, FComputer& InComputer, const FRandomStream& InGenerator, FString InHostname = "");
+	static void CreateFilesystem(FPeacenetIdentity& InCharacter, FComputer& InComputer, const FRandomStream& InGenerator, APeacenetWorldStateActor* InPeacenet, FString InHostname = "");
 };
 
 class PROJECTOGLOWIA_API FWorldGenTask : public FNonAbandonableTask
@@ -143,7 +143,7 @@ class PROJECTOGLOWIA_API FWorldGenTask : public FNonAbandonableTask
 	friend class FAutoDeleteAsyncTask<FWorldGenTask>;
 
 public:
-	FWorldGenTask(UPeacenetSaveGame* InSaveGame, const FRandomStream InRandomStream, UWorldGeneratorStatus* InStatus, TArray<UMarkovTrainingDataAsset*> InTrainingData, TArray<UComputerTypeAsset*> InComputerTypes, UComputerTypeAsset* InPersonalComputerType, TArray<UCompanyTypeAsset*> InCompanyTypes, TArray<UComputerService*> InComputerServices)
+	FWorldGenTask(UPeacenetSaveGame* InSaveGame, const FRandomStream InRandomStream, UWorldGeneratorStatus* InStatus, TArray<UMarkovTrainingDataAsset*> InTrainingData, TArray<UComputerTypeAsset*> InComputerTypes, UComputerTypeAsset* InPersonalComputerType, TArray<UCompanyTypeAsset*> InCompanyTypes, TArray<UComputerService*> InComputerServices, APeacenetWorldStateActor* InPeacenet)
 		: SaveGame(InSaveGame)
 		, RandomStream(InRandomStream)
 		, Status(InStatus)
@@ -151,8 +151,10 @@ public:
 		, ComputerTypes(InComputerTypes)
 		, PersonalComputerType(InPersonalComputerType)
 		, CompanyTypes(InCompanyTypes)
-		, ComputerServices(InComputerServices) {}
+		, ComputerServices(InComputerServices)
+		, Peacenet(InPeacenet) {}
 
+	APeacenetWorldStateActor* Peacenet;
 	UPeacenetSaveGame* SaveGame;
 	FRandomStream RandomStream;
 	UWorldGeneratorStatus* Status;

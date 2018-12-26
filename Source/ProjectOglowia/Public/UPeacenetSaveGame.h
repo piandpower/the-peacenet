@@ -90,13 +90,13 @@ public:
 	bool CountryHasEmailService(ECountry InCountry);
 
 	UFUNCTION()
-		bool GetCharacterByID(int InEntityID, FPeacenetIdentity& OutCharacter);
+		bool GetCharacterByID(int InEntityID, FPeacenetIdentity& OutCharacter, int& OutIndex);
 
 	UFUNCTION()
 		bool GetBusinessByID(int InEntityID, FEnterpriseNetwork& OutCompany);
 
 	UFUNCTION()
-	bool GetComputerByID(int InEntityID, FComputer& OutComputer);
+	bool GetComputerByID(int InEntityID, FComputer& OutComputer, int& OutIndex);
 
 	UFUNCTION()
 		bool IsEntityKnown(int InEntityID, EPinnedContactType InContactType);

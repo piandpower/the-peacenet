@@ -7,8 +7,6 @@
 #include "UPeacegateProgramAsset.h"
 #include "UVulnerability.h"
 #include "WallpaperAsset.h"
-#include "UMissionAsset.h"
-#include "UMissionUnlock.h"
 #include "UComputerService.h"
 #include "UNativeLatentAction.h"
 #include "UVulnerabilityTerminalCommand.h"
@@ -71,64 +69,6 @@ APeacenetWorldStateActor::APeacenetWorldStateActor()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-}
-
-bool APeacenetWorldStateActor::StartMission(UMissionAsset * InMission, USystemContext * InMissionSystem)
-{
-	check(InMission);
-	check(InMissionSystem);
-	check(!InMission->InternalID.ToString().IsEmpty());
-	check(InMissionSystem->Computer.OwnerType == EComputerOwnerType::Player);
-
-	check(!this->CurrentMissionAsset);
-	check(!this->MissionContext);
-
-	check(this->SaveGame);
-	check(this->GameType);
-	check(this->GameType->EnableMissions);
-
-	if (!this->SaveGame->Missions.Contains(InMission->InternalID))
-	{
-		for (auto Prerequisite : InMission->Prerequisites)
-		{
-			if (!this->SaveGame->Missions.Contains(Prerequisite->InternalID))
-			{
-				return false;
-			}
-		}
-
-		// if we make it this far, we can start the mission.
-		this->CurrentMissionAsset = InMission;
-		this->MissionContext = InMissionSystem;
-
-		// We need a save file to go back to if the player abandons/restarts the mission.
-		this->MissionStartSaveGame = DuplicateObject<UPeacenetSaveGame>(this->SaveGame, this);
-
-		// Clear the mission unlock list.
-		this->MissionUnlocks.Empty();
-
-		// Now, we need to get a DUPLICATE ARRAY of mission actions.
-		// We need to duplicate every action so that the player doesn't fuck up the mission's data asset
-		// by completing objectives. The way UE4's data asset system works, that is completely possible.
-		TArray<UMissionAction*> NewActionList;
-		for (auto Action : InMission->Actions)
-		{
-			UMissionAction* DuplicateAction = DuplicateObject<UMissionAction>(Action.Action, this);
-			DuplicateAction->SaveGame = this->SaveGame;
-			DuplicateAction->SystemContext = this->MissionContext;
-			NewActionList.Add(DuplicateAction);
-		}
-		this->CurrentMissionActions = NewActionList;
-
-		if (InMissionSystem->Desktop)
-		{
-			InMissionSystem->Desktop->EnqueueNotification(FText::FromString("Mission start"), InMission->MissionName, nullptr);
-		}
-
-		return true;
-	}
-
-	return false;
 }
 
 // Loads all the terminal commands in the game
@@ -290,33 +230,35 @@ bool APeacenetWorldStateActor::ResolveHost(FString InHost, FString& ResolvedIP, 
 		{
 			ResolvedIP = Computer.IPAddress;
 			ResolvedContext = NewObject<USystemContext>();
-			ResolvedContext->Computer = Computer;
+			FPeacenetIdentity ResolvedIdentity;
 			for(auto& Character : this->SaveGame->Characters)
 			{
 				if(Character.ComputerID == Computer.ID)
 				{
-					ResolvedContext->Character = Character;
+					ResolvedIdentity = Character;
 					break;
 				}
 			}
-			ResolvedContext->Peacenet = this;
+
+			ResolvedContext->Setup(Computer.ID, ResolvedIdentity.ID, this);
+
 			TArray<FName> Commands;
 			this->CommandInfo.GetKeys(Commands);
 			for(auto Command : Commands)
 			{
 				if (this->CommandInfo[Command]->UnlockedByDefault)
 				{
-					if (!ResolvedContext->Computer.InstalledCommands.Contains(Command))
+					if (!ResolvedContext->GetComputer().InstalledCommands.Contains(Command))
 					{
-						ResolvedContext->Computer.InstalledCommands.Add(Command);
+						ResolvedContext->GetComputer().InstalledCommands.Add(Command);
 					}
 				}
 			}
 			for (auto Program : this->Programs)
 			{
-				if (Program->IsUnlockedByDefault && !ResolvedContext->Computer.InstalledPrograms.Contains(Program->ExecutableName))
+				if (Program->IsUnlockedByDefault && !ResolvedContext->GetComputer().InstalledPrograms.Contains(Program->ExecutableName))
 				{
-					ResolvedContext->Computer.InstalledPrograms.Add(Program->ExecutableName);
+					ResolvedContext->GetComputer().InstalledPrograms.Add(Program->ExecutableName);
 				}
 			}
 			this->SystemContexts.Add(ResolvedContext);
@@ -344,73 +286,6 @@ void APeacenetWorldStateActor::Tick(float DeltaTime)
 		if (TimeOfDay >= SaveGame->SECONDS_DAY_LENGTH)
 		{
 			TimeOfDay = 0;
-		}
-
-		// Are we in a mission?
-		if (CurrentMissionAsset && MissionContext && !bIsMissionPaused)
-		{
-			// Do we have a latent action in progress?
-			if (CurrentLatentMissionAction)
-			{
-				// Tick it.
-				this->CurrentLatentMissionAction->Tick(DeltaTime);
-
-				// Check if it's completed.
-				if (this->CurrentLatentMissionAction->IsCompleted())
-				{
-					// Do something.
-				}
-				else if (this->CurrentLatentMissionAction->IsFailed())
-				{
-					// Announce that the mission's been failed.
-					MissionContext->Desktop->OnMissionFailed(CurrentMissionAsset, MissionContext, CurrentLatentMissionAction->GetFailReasonText());
-				
-					// Stop ticking the mission.
-					bIsMissionPaused = true;
-				}
-			}
-			else
-			{
-				// Check if we have any actions to perform.
-				if (this->CurrentMissionActions.Num())
-				{
-					// Pull down the first action.
-					UMissionAction* NextAction = this->CurrentMissionActions[0];
-					
-					// Is it latent?
-					if (NextAction->IsA<ULatentMissionAction>())
-					{
-						// We've hit a checkpoint, so back up the save file.
-						this->CheckpointSaveGame = DuplicateObject<UPeacenetSaveGame>(this->SaveGame, this);
-
-						// Do the same for mission unlocks.
-						this->CheckpointMissionUnlocks = this->MissionUnlocks;
-
-						// Now we need to create a checkpoint array of all mission actions at/after this point.
-						// So we need to empty it.
-						this->CheckpointMissionActions.Empty();
-
-						// And this does the duplication.
-						for (auto Action : this->CurrentMissionActions)
-						{
-							this->CheckpointMissionActions.Add(DuplicateObject<UMissionAction>(Action, this));
-						}
-
-						// Assign it as our current latent action.
-						this->CurrentLatentMissionAction = Cast<ULatentMissionAction>(NextAction);
-					}
-				
-					// We essentially de-queue it.
-					this->CurrentMissionActions.RemoveAt(0);
-
-					// Then we execute it.
-					NextAction->ExecuteMissionAction();
-				}
-				else
-				{
-					this->CompleteMission();
-				}
-			}
 		}
 
 		// Save it
@@ -501,12 +376,6 @@ void APeacenetWorldStateActor::StartGame()
 			// crash if we didn't find any
 			check(this->GameType);
 
-			// If we have missions enabled in this game mode then we load the missions in.
-			if (this->GameType->EnableMissions)
-			{
-				this->LoadAssets<UMissionAsset>("MissionAsset", this->Missions);
-			}
-
 			FComputer PlayerPC = SaveGame->Computers[SaveGame->Characters[SaveGame->PlayerCharacterID].ComputerID];
 
 			USystemContext* PlayerContext = NewObject<USystemContext>();
@@ -520,9 +389,7 @@ void APeacenetWorldStateActor::StartGame()
 				SaveGame->PinnedContacts.Add(PlayerContact);
 			}
 
-			PlayerContext->Computer = PlayerPC;
-			PlayerContext->Peacenet = this;
-			PlayerContext->Character = SaveGame->Characters[SaveGame->PlayerCharacterID];
+			PlayerContext->Setup(PlayerPC.ID, SaveGame->Characters[SaveGame->PlayerCharacterID].ID, this);
 
 			AsyncTask(ENamedThreads::AnyBackgroundThreadNormalTask, [this, PlayerContext]()
 			{
@@ -533,25 +400,11 @@ void APeacenetWorldStateActor::StartGame()
 					// Update the system's files.
 					PlayerContext->UpdateSystemFiles();
 
-					APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-
-					PlayerContext->Desktop = CreateWidget<UDesktopWidget, APlayerController>(PlayerController, this->DesktopClass);
-
-					PlayerContext->Desktop->SystemContext = PlayerContext;
-					PlayerContext->Desktop->UserID = SaveGame->PlayerUserID;
+					PlayerContext->SetupDesktop(SaveGame->PlayerUserID);
 
 					SystemContexts.Add(PlayerContext);
 
 					PlayerSystemReady.Broadcast(PlayerContext);
-
-					// If we have missions enabled, and we have a tutorial, and it's not complete, we should start that mission.
-					if (this->GameType->EnableMissions)
-					{
-						if (this->GameType->TutorialMission && !this->SaveGame->Missions.Contains(this->GameType->TutorialMission->InternalID))
-						{
-							this->StartMission(this->GameType->TutorialMission, PlayerContext);
-						}
-					}
 				});
 			});
 		});
@@ -612,11 +465,6 @@ bool APeacenetWorldStateActor::LoadAssets(FName ClassName, TArray<AssetType*>& O
 	}
 
 	return true;
-}
-
-bool APeacenetWorldStateActor::IsMissionActive()
-{
-	return this->CurrentMissionAsset;
 }
 
 bool APeacenetWorldStateActor::HasExistingOS()
@@ -703,10 +551,6 @@ APeacenetWorldStateActor* APeacenetWorldStateActor::GenerateAndCreateWorld(const
 	PlayerIdentity.Reputation = 0.f;
 	PlayerIdentity.ComputerID = PlayerComputer.ID;
 
-	// World generator can generate the computer's filesystem.
-	UWorldGenerator::CreateFilesystem(PlayerIdentity, PlayerComputer, WorldGenerator, InWorldInfo.PlayerHostname);
-
-
 	// Note: The save file would have been loaded as soon as the actor spawned - BeginPlay gets called during UWorld::SpawnActor.
 	// So, at this point, we've had a save file created and ready for us for a few CPU cycles now...
 	UPeacenetSaveGame* WorldSave = NewPeacenet->SaveGame;
@@ -720,6 +564,9 @@ APeacenetWorldStateActor* APeacenetWorldStateActor::GenerateAndCreateWorld(const
 
 	// Add the character
 	WorldSave->Characters.Add(PlayerIdentity);
+
+	// World generator can generate the computer's filesystem.
+	UWorldGenerator::CreateFilesystem(PlayerIdentity, PlayerComputer, WorldGenerator, NewPeacenet, InWorldInfo.PlayerHostname);
 
 	// And we can generate non-story NPCs.
 	auto Status = UWorldGenerator::GenerateCharacters(NewPeacenet, WorldGenerator, WorldSave);
@@ -736,67 +583,8 @@ APeacenetWorldStateActor* APeacenetWorldStateActor::GenerateAndCreateWorld(const
 	return NewPeacenet;
 }
 
-void APeacenetWorldStateActor::CompleteMission()
-{
-	check(CurrentMissionAsset);
-	check(CurrentMissionActions.Num() == 0);
-
-	check(MissionContext);
-	
-	if (MissionContext->Desktop)
-	{
-		MissionContext->Desktop->OnMissionCompleted(CurrentMissionAsset, MissionContext, MissionUnlocks);
-	}
-
-	SaveGame->Missions.Add(CurrentMissionAsset->InternalID);
-
-	CurrentMissionAsset = nullptr;
-	MissionContext = nullptr;
-
-	CurrentLatentMissionAction = nullptr;
-
-	CheckpointSaveGame = nullptr;
-	MissionStartSaveGame = nullptr;
-	CheckpointMissionActions.Empty();
-	CheckpointMissionUnlocks.Empty();
-	MissionUnlocks.Empty();
-
-	
-
-	this->SaveWorld();
-}
-
-void APeacenetWorldStateActor::ResynchronizeSystemContexts()
-{
-	for (auto Context : SystemContexts)
-	{
-		int ComputerID = Context->Computer.ID;
-		int CharacterID = Context->Character.ID;
-
-		for (auto Computer : SaveGame->Computers)
-		{
-			if (Computer.ID == ComputerID)
-			{
-				Context->Computer = Computer;
-			}
-		}
-
-		for (auto Character : SaveGame->Characters)
-		{
-			if (Character.ID == CharacterID)
-			{
-				Context->Character = Character;
-			}
-		}
-	}
-}
-
 void APeacenetWorldStateActor::SaveWorld()
 {
-	// Never save the game during a mission.
-	if (this->CurrentMissionAsset)
-		return;
-
 	// update game type, window decorator and desktop class
 	SaveGame->DesktopClass = this->DesktopClass;
 	SaveGame->GameTypeName = this->GameType->Name;

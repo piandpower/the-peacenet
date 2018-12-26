@@ -58,10 +58,10 @@ public:
     TArray<UContact*> GetContacts();
 
     UFUNCTION()
-    bool FindComputerAndContact(FPeacenetIdentity InCharacter, FComputer& OutComputer, FPinnedContact& OutContact);
+    bool FindComputerAndContact(FPeacenetIdentity InCharacter, FComputer& OutComputer, FPinnedContact& OutContact, int& OutComputerIndex);
 
     UFUNCTION()
-    bool FindCharacterByID(int InEntityID, FPeacenetIdentity& OutCharacter);
+    bool FindCharacterByID(int InEntityID, FPeacenetIdentity& OutCharacter, int& OutIndex);
 
     UFUNCTION()
     bool GetContactByEntityID(int InEntityID, UContact*& OutContact);

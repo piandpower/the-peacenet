@@ -34,10 +34,13 @@ int UContact::GetEntityID()
 
 bool UContact::FetchCharacter(FPeacenetIdentity& OutCharacter, FComputer& OutComputer, FPinnedContact& OutContact)
 {
-    if(!this->AddressBook->FindCharacterByID(this->EntityID, OutCharacter))
+    int CharacterIndex;
+    int ComputerIndex;
+
+    if(!this->AddressBook->FindCharacterByID(this->EntityID, OutCharacter, CharacterIndex))
         return false;
 
-    return this->AddressBook->FindComputerAndContact(OutCharacter, OutComputer, OutContact);
+    return this->AddressBook->FindComputerAndContact(OutCharacter, OutComputer, OutContact, ComputerIndex);
 }
 
 bool UContact::RetrieveName(FString& OutCharacterName)

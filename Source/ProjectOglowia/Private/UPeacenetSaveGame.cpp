@@ -75,16 +75,35 @@ bool UPeacenetSaveGame::CountryHasEmailService(ECountry InCountry)
 	return true;
 }
 
-bool UPeacenetSaveGame::GetCharacterByID(int InEntityID, FPeacenetIdentity & OutCharacter)
+bool UPeacenetSaveGame::GetCharacterByID(int InEntityID, FPeacenetIdentity & OutCharacter, int& OutIndex)
 {
-	for (auto& Character : this->Characters)
+	int min = 0;
+	int max = this->Characters.Num() - 1;
+
+	int average = (min + max) / 2;
+
+	while((max - min) >= 0)
 	{
-		if (Character.ID == InEntityID)
+		FPeacenetIdentity& Character = Characters[average];
+
+		if(Character.ID == InEntityID)
 		{
 			OutCharacter = Character;
+			OutIndex = average;
 			return true;
 		}
+		else if(Character.ID < InEntityID)
+		{
+			min = average + 1;
+			average = (min + max) / 2;
+		}
+		else
+		{
+			max = average - 1;
+			average = (min + max) / 2;
+		}
 	}
+
 	return false;
 }
 
@@ -112,15 +131,34 @@ bool UPeacenetSaveGame::IsEntityKnown(int InEntityID, EPinnedContactType InConta
 	return false;
 }
 
-bool UPeacenetSaveGame::GetComputerByID(int InEntityID, FComputer& OutComputer)
+bool UPeacenetSaveGame::GetComputerByID(int InEntityID, FComputer& OutComputer, int& OutIndex)
 {
-	for(auto& Computer : this->Computers)
+	int min = 0;
+	int max = this->Computers.Num() - 1;
+
+	int average = (min + max) / 2;
+
+	while((max - min) >= 0)
 	{
+		FComputer& Computer = Computers[average];
+
 		if(Computer.ID == InEntityID)
 		{
 			OutComputer = Computer;
+			OutIndex = average;
 			return true;
 		}
+		else if(Computer.ID < InEntityID)
+		{
+			min = average + 1;
+			average = (min + max) / 2;
+		}
+		else
+		{
+			max = average - 1;
+			average = (min + max) / 2;
+		}
 	}
+
 	return false;
 }

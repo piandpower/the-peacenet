@@ -40,7 +40,7 @@ TArray<FCommandRunInstruction> UCommandProcessor::ProcessCommand(UConsoleContext
 
 	if (!Instruction.OutputFile.IsEmpty())
 	{
-		if (InConsole->Filesystem->DirectoryExists(Instruction.OutputFile))
+		if (InConsole->GetUserContext()->GetFilesystem()->DirectoryExists(Instruction.OutputFile))
 		{
 			InConsole->WriteLine("`3`*error: " + Instruction.OutputFile + ": Directory exists.`1`r");
 			return CommandsToRun;
@@ -58,10 +58,11 @@ TArray<FCommandRunInstruction> UCommandProcessor::ProcessCommand(UConsoleContext
 		FString Home;
 		if (LastPiper)
 		{
-			Home = LastPiper->HomeDirectory;
+			Home = LastPiper->GetUserContext()->GetHomeDirectory();
 		}
-		else {
-			Home = InConsole->HomeDirectory;
+		else 
+		{
+			Home = InConsole->GetUserContext()->GetHomeDirectory();
 		}
 
 		FString TokenError;
@@ -82,7 +83,7 @@ TArray<FCommandRunInstruction> UCommandProcessor::ProcessCommand(UConsoleContext
 
 
 		UTerminalCommand* CommandImpl = nullptr;
-		if (InConsole->SystemContext->TryGetTerminalCommand(FName(*Name), CommandImpl, InternalUsage, FriendlyUsage))
+		if (InConsole->GetUserContext()->GetOwningSystem()->TryGetTerminalCommand(FName(*Name), CommandImpl, InternalUsage, FriendlyUsage))
 		{
 			bool DocoptError = false;
 			FString DocoptErrorMessage;
@@ -102,32 +103,27 @@ TArray<FCommandRunInstruction> UCommandProcessor::ProcessCommand(UConsoleContext
 			if (IsPiping)
 			{
 				UPiperContext* Ctx = NewObject<UPiperContext>();
-				Ctx->Input = LastPiper;
-				if (LastPiper)
+				if(LastPiper)
 				{
-					Ctx->HomeDirectory = LastPiper->HomeDirectory;
-					Ctx->UserID = LastPiper->UserID;
-					Ctx->SystemContext = LastPiper->SystemContext;
+					Ctx->Setup(LastPiper->GetUserContext());
 				}
 				else
 				{
-					Ctx->HomeDirectory = InConsole->HomeDirectory;
-					Ctx->UserID = InConsole->UserID;
-					Ctx->SystemContext = InConsole->SystemContext;
+					Ctx->Setup(InConsole->GetUserContext());
 				}
-
-				Ctx->Filesystem = Ctx->SystemContext->GetFilesystem(Ctx->UserID);
-				
+				Ctx->SetupPiper(LastPiper, nullptr);
 				NewInst.IntendedContext = Ctx;
 				LastPiper = Ctx;
 			}
 			else
 			{
 				UPiperContext* Ctx = nullptr;
+				UConsoleContext* Output = nullptr;
+				UPiperContext* Input = LastPiper;
 				if (Instruction.OutputFile.IsEmpty())
 				{
 					Ctx = NewObject<UPiperContext>();
-					Ctx->Output = InConsole;
+					Output = InConsole;
 				}
 				else
 				{
@@ -135,23 +131,18 @@ TArray<FCommandRunInstruction> UCommandProcessor::ProcessCommand(UConsoleContext
 					auto Redirected = Cast<URedirectedConsoleContext>(Ctx);
 					Redirected->OutputFilePath = Instruction.OutputFile;
 					Redirected->Overwrite = Instruction.Overwrites;
-
 				}
-				Ctx->Input = LastPiper;
+
 				if (LastPiper)
 				{
-					Ctx->HomeDirectory = LastPiper->HomeDirectory;
-					Ctx->UserID = LastPiper->UserID;
-					Ctx->SystemContext = LastPiper->SystemContext;
+					Ctx->Setup(LastPiper->GetUserContext());
 				}
 				else
 				{
-					Ctx->HomeDirectory = InConsole->HomeDirectory;
-					Ctx->UserID = InConsole->UserID;
-					Ctx->SystemContext = InConsole->SystemContext;
+					Ctx->Setup(InConsole->GetUserContext());
 				}
 
-				Ctx->Filesystem = Ctx->SystemContext->GetFilesystem(Ctx->UserID);
+				Ctx->SetupPiper(Input, Output);
 
 				NewInst.IntendedContext = Ctx;
 			}
@@ -164,10 +155,6 @@ TArray<FCommandRunInstruction> UCommandProcessor::ProcessCommand(UConsoleContext
 			return TArray<FCommandRunInstruction>();
 		}
 	}
-
-	
-
-
 
 	return CommandsToRun;
 }

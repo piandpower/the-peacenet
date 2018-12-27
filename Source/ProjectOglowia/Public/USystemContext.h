@@ -70,28 +70,28 @@ protected:
 
 public: // Property getters
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "System Context")
-	virtual APeacenetWorldStateActor* GetPeacenet();
+	APeacenetWorldStateActor* GetPeacenet();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "System Context")
-	virtual UDesktopWidget* GetDesktop();
+	UDesktopWidget* GetDesktop();
 
 	UFUNCTION()
-	virtual FPeacenetIdentity& GetCharacter();
+	FPeacenetIdentity& GetCharacter();
 
 	UFUNCTION()
-	virtual FComputer& GetComputer();
+	FComputer& GetComputer();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "System Context")
-	virtual UAddressBookContext* GetAddressBook();
+	UAddressBookContext* GetAddressBook();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "System Context")
-	virtual URainbowTable* GetRainbowTable();
+	URainbowTable* GetRainbowTable();
 
 	UFUNCTION(BlueprintCallable, Category = "System Context")
-	virtual FString GetHostname();
+	FString GetHostname();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "System Context")
-	virtual TArray<UPeacegateProgramAsset*> GetInstalledPrograms();
+	TArray<UPeacegateProgramAsset*> GetInstalledPrograms();
 
 public:
 	UFUNCTION()

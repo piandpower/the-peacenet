@@ -2,7 +2,41 @@
 
 #include "UConsoleContext.h"
 #include "CommonUtils.h"
+#include "UUserContext.h"
 #include "USystemContext.h"
+
+void UConsoleContext::Setup(UUserContext* InUserContext)
+{
+	// Crash if we're not being given a valid user context.
+	check(InUserContext);
+
+	// Crash if we already have a user context.
+	check(!this->GetUserContext());
+
+	// Set our user context.
+	this->UserContext = InUserContext;
+}
+
+FString UConsoleContext::GetWorkingDirectory()
+{
+	return this->WorkingDirectory;
+}
+
+UUserContext* UConsoleContext::GetUserContext()
+{
+	return this->UserContext;
+}
+
+UPTerminalWidget* UConsoleContext::GetTerminal()
+{
+	return this->Terminal;
+}
+
+void UConsoleContext::SetTerminal(UPTerminalWidget* InTerminalWidget)
+{
+	check(InTerminalWidget);
+	this->Terminal = InTerminalWidget;
+}
 
 void UConsoleContext::InjectInput(const FString & Input)
 {
@@ -14,7 +48,7 @@ void UConsoleContext::InjectInput(const FString & Input)
 
 FString UConsoleContext::SynchronouslyReadLine()
 {
-	while (!this->Terminal->IsInputLineAvailable) {	} //this is thread safe woo
+	while (!this->GetTerminal()->IsInputLineAvailable) {	} //this is thread safe woo
 	this->Terminal->IsInputLineAvailable = false;
 	FString Input = this->Terminal->GetInputText();
 	if (Input.EndsWith("\n"))
@@ -27,58 +61,43 @@ FString UConsoleContext::SynchronouslyReadLine()
 
 UConsoleContext * UConsoleContext::CreateChildContext(USystemContext* InSystemContext, int InUserID)
 {
-	UConsoleContext* NewCtx = NewObject<UConsoleContext>();
+	// Create a new console context owned by us.
+	UConsoleContext* NewCtx = NewObject<UConsoleContext>(this);
 
-	NewCtx->SystemContext = InSystemContext;
-	NewCtx->UserID = InUserID;
+	// Give it our user context
+	NewCtx->Setup(this->GetUserContext());
 
-	NewCtx->HomeDirectory = InSystemContext->GetUserHomeDirectory(InUserID);
-	NewCtx->WorkingDirectory = NewCtx->HomeDirectory;
-	NewCtx->Filesystem = InSystemContext->GetFilesystem(InUserID);
+	// Set the working directory to that of our home.
+	NewCtx->WorkingDirectory = this->GetUserContext()->GetHomeDirectory();
 
-	NewCtx->Terminal = this->Terminal;
+	// Set the terminal to ours.
+	NewCtx->SetTerminal(this->GetTerminal());
 
+	// Done.
 	return NewCtx;
-}
-
-FString UConsoleContext::GetHostname()
-{
-	return this->SystemContext->GetHostname();
-}
-
-FString UConsoleContext::GetUsername()
-{
-	FUserInfo User = this->SystemContext->GetUserInfo(this->UserID);
-	return User.Username;
-}
-
-FString UConsoleContext::GetUserTypeDisplay()
-{
-	FUserInfo User = this->SystemContext->GetUserInfo(this->UserID);
-	return User.IsAdminUser ? TEXT("#") : TEXT("$");
 }
 
 void UConsoleContext::SetWorkingDirectory(const FString & InPath)
 {
-	if (Filesystem->DirectoryExists(InPath))
+	if (this->GetUserContext()->GetFilesystem()->DirectoryExists(InPath))
 	{
-		WorkingDirectory = InPath;
+		this->WorkingDirectory = InPath;
 	}
 }
 
 FString UConsoleContext::CombineWithWorkingDirectory(const FString & InPath)
 {
 	if (InPath.StartsWith("/"))
-		return Filesystem->ResolveToAbsolute(InPath);
-	return Filesystem->ResolveToAbsolute(WorkingDirectory + TEXT("/") + InPath);
+		return this->GetUserContext()->GetFilesystem()->ResolveToAbsolute(InPath);
+	return this->GetUserContext()->GetFilesystem()->ResolveToAbsolute(WorkingDirectory + TEXT("/") + InPath);
 }
 
 FString UConsoleContext::GetDisplayWorkingDirectory()
 {
-	if (WorkingDirectory.StartsWith(HomeDirectory))
+	if (WorkingDirectory.StartsWith(this->GetUserContext()->GetHomeDirectory()))
 	{
 		FString NewWorkingDirectory(WorkingDirectory);
-		NewWorkingDirectory.RemoveFromStart(HomeDirectory);
+		NewWorkingDirectory.RemoveFromStart(this->GetUserContext()->GetHomeDirectory());
 		return TEXT("~") + NewWorkingDirectory;
 	}
 	return WorkingDirectory;
@@ -121,5 +140,5 @@ void UConsoleContext::SetColor(ETerminalColor InColor)
 
 void UConsoleContext::ReadLine(UObject* WorldContextObject, FLatentActionInfo LatentInfo, FString& OutText)
 {
-	Terminal->ReadLine(this->SystemContext->GetPeacenet(), LatentInfo, OutText); 
+	this->GetTerminal()->ReadLine(this->SystemContext->GetPeacenet(), LatentInfo, OutText); 
 }

@@ -9,17 +9,42 @@
 #include "ETerminalColor.h"
 #include "UConsoleContext.generated.h"
 
-class USystemContext;
+class UUserContext;
 
 /**
- * 
+ * Encapsulates a terminal.
  */
-UCLASS(Blueprintable)
+UCLASS(BlueprintType)
 class PROJECTOGLOWIA_API UConsoleContext : public UObject
 {
 	GENERATED_BODY()
 
+private:
+	UPROPERTY()
+	UUserContext* UserContext;
+
+	UPROPERTY()
+	FString WorkingDirectory;
+
+	UPROPERTY()
+	UPTerminalWidget* Terminal;
+
 public:
+	UFUNCTION()
+	void Setup(UUserContext* InUserContext);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Console Context")
+	UUserContext* GetUserContext();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Console Context")
+	FString GetWorkingDirectory();
+
+	UFUNCTION()
+	virtual UPTerminalWidget* GetTerminal();
+
+	UFUNCTION()
+	void SetTerminal(UPTerminalWidget* InTerminalWidget);
+
 	UFUNCTION(BlueprintCallable, Category = "Console|Formatting")
 	virtual void MakeBold();
 
@@ -40,24 +65,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Console|Formatting")
 	virtual void SetAttention();
-
-	UPROPERTY(BlueprintReadOnly)
-	int UserID;
-
-	UPROPERTY(BlueprintReadOnly)
-	FString HomeDirectory;
-
-	UPROPERTY()
-	USystemContext* SystemContext;
-
-	UPROPERTY()
-	UPTerminalWidget* Terminal;
-
-	UPROPERTY(BlueprintReadOnly)
-	FString WorkingDirectory;
-
-	UPROPERTY(BlueprintReadOnly)
-	UPeacegateFileSystem* Filesystem;
 
 	UFUNCTION(BlueprintCallable)
 		void InjectInput(const FString& Input);

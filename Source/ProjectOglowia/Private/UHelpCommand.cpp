@@ -22,11 +22,11 @@ void UHelpCommand::NativeRunCommand(UConsoleContext* InConsole, const TMap<FStri
 		}
 	}
 
-	for (auto Command : InConsole->SystemContext->GetComputer().InstalledCommands)
+	for (auto Command : InConsole->GetUserContext()->GetOwningSystem()->GetComputer().InstalledCommands)
 	{
-		if (!InConsole->SystemContext->GetPeacenet()->ManPages.Contains(Command))
+		if (!InConsole->GetUserContext()->GetPeacenet()->ManPages.Contains(Command))
 			continue;
-		FManPage ManPage = InConsole->SystemContext->GetPeacenet()->ManPages[Command];
+		FManPage ManPage = InConsole->GetUserContext()->GetPeacenet()->ManPages[Command];
 		CommandList.Add(Command, ManPage.Description);
 		int Length = Command.ToString().GetCharArray().Num();
 		if (Length > MaxLength)

@@ -111,51 +111,30 @@ UConsoleContext* UUserContext::CreateConsole(UPTerminalWidget* InTerminalWidget)
 	UConsoleContext* SubConsole = NewObject<UConsoleContext>(this);
 
 	// Assign it to the terminal widget.
-	SubConsole->Terminal = InTerminalWidget;
+	SubConsole->SetTerminal(InTerminalWidget);
 
     // TODO: Give the console context ourselves as a user context,
     // NOT OUR UNDERLYING SYSTEM AND UID.
 
 	// User ID matches our window.
-	SubConsole->UserID = this->UserID;
-	SubConsole->SystemContext = this->GetOwningSystem();
+	SubConsole->Setup(this);
 
-    // TODO: See above. We have our GetFilesystem() function which the console context should also have.
-	SubConsole->Filesystem = this->GetFilesystem();
+	SubConsole->SetWorkingDirectory(SubConsole->GetUserContext()->GetHomeDirectory());
+	
+	return SubConsole;
 
-	// Get user info.
-	FUserInfo User = this->GetUserInfo();
+}
 
-	// If the user's username is root, then we set the home directory to "/root."
-	if (User.IsAdminUser)
+FString UUserContext::GetUserTypeDisplay()
+{
+	if(this->IsAdministrator())
 	{
-		SubConsole->HomeDirectory = TEXT("/root");
+		return "#";
 	}
 	else
 	{
-		SubConsole->HomeDirectory = TEXT("/home/") + User.Username;
+		return "$";
 	}
-
-	SubConsole->WorkingDirectory = SubConsole->HomeDirectory;
-	
-	// Attempt to create the user directory if it's not there
-	if (!this->GetFilesystem()->DirectoryExists(SubConsole->WorkingDirectory))
-	{
-		EFilesystemStatusCode StatusCode;
-
-		if (!this->GetFilesystem()->CreateDirectory(SubConsole->WorkingDirectory, StatusCode))
-		{
-			FText Error = UCommonUtils::GetFriendlyFilesystemStatusCode(StatusCode);
-			SubConsole->Write(TEXT("peacegate: user home directory '`8") + SubConsole->WorkingDirectory + TEXT("`1' could not be created: "));
-			SubConsole->WriteLine(Error.ToString());
-
-			// Working directory becomes /.
-			SubConsole->WorkingDirectory = TEXT("/");
-		}
-	}
-
-	return SubConsole;
-
 }
 
 bool UUserContext::OpenFile(const FString& InPath, EFileOpenResult& OutResult)

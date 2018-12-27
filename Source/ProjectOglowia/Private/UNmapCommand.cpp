@@ -4,6 +4,7 @@
 #include "UNmapCommand.h"
 #include "UComputerTypeAsset.h"
 #include "TimerManager.h"
+#include "UUserContext.h"
 #include "UHackableAsset.h"
 
 void UNmapCommand::ListNextService()
@@ -29,7 +30,7 @@ void UNmapCommand::ListNextService()
 			this->NetMapEvent.Broadcast(this->ResolvedContext->GetComputer().ID, EventArgs);
 		}
 		FTimerHandle UnusedHandle;
-		this->Caller->SystemContext->GetPeacenet()->GetWorldTimerManager().SetTimer(
+		this->Caller->GetUserContext()->GetPeacenet()->GetWorldTimerManager().SetTimer(
 			UnusedHandle, this, &UNmapCommand::ListNextService, 0.6f, false);
 	}
 	else
@@ -46,14 +47,14 @@ void UNmapCommand::NativeRunCommand(UConsoleContext* InConsole, const TMap<FStri
 
     FString ResolvedIP;
 
-    if(InConsole->SystemContext->GetPeacenet()->ResolveHost(UserIP, ResolvedIP, ResolvedContext))
+    if(InConsole->GetUserContext()->GetPeacenet()->ResolveHost(UserIP, ResolvedIP, ResolvedContext))
     {
         InConsole->WriteLine("Nmap scan report for " + UserIP + " (" + ResolvedIP + ")");
         InConsole->WriteLine("Host is up.");
         InConsole->WriteLine("");
         InConsole->WriteLine("PORT\tSTATE\tSERVICE");
 
-        for(auto ComputerTypeAsset : InConsole->SystemContext->GetPeacenet()->ComputerTypes)
+        for(auto ComputerTypeAsset : InConsole->GetUserContext()->GetPeacenet()->ComputerTypes)
         {
             if(ComputerTypeAsset->InternalID == ResolvedContext->GetComputer().ComputerType)
             {

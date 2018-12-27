@@ -4,6 +4,8 @@
 #include "UPeacenetSaveGame.h"
 #include "URainbowTable.h"
 #include "Base64.h"
+#include "UUserContext.h"
+#include "UPiperContext.h"
 #include "UCommandProcessor.h"
 
 void ULogScraperCommand::NativeRunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments)
@@ -20,7 +22,7 @@ void ULogScraperCommand::NativeRunCommand(UConsoleContext* InConsole, const TMap
     FString InputBuffer = Cast<UPiperContext>(InConsole)->GetInputBuffer();
 
     // This is the current save game because this is a C++ command and we can do that.
-    UPeacenetSaveGame* SaveGame = InConsole->SystemContext->GetPeacenet()->SaveGame;
+    UPeacenetSaveGame* SaveGame = InConsole->GetUserContext()->GetPeacenet()->SaveGame;
 
     // The list of scraped passwords.
     TArray<FString> FoundPasswords;
@@ -46,7 +48,7 @@ void ULogScraperCommand::NativeRunCommand(UConsoleContext* InConsole, const TMap
     for(auto& Password : FoundPasswords)
     {
         InConsole->WriteLine("Scraped password: " + Password);
-        InConsole->SystemContext->GetRainbowTable()->AddPassword(Password);
+        InConsole->GetUserContext()->GetRainbowTable()->AddPassword(Password);
     }
 
     // If no passwords were found, the player is alerted.

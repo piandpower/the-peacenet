@@ -75,15 +75,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Peacegate")
 	virtual UConsoleContext* CreateChildContext(USystemContext* InSystemContext, int InUserID);
 
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Console Context")
-	FString GetHostname();
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Console Context")
-	FString GetUsername();
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Console Context")
-	FString GetUserTypeDisplay();
-
 	UFUNCTION(BlueprintCallable, Category = "Console Context")
 	void SetWorkingDirectory(const FString& InPath);
 

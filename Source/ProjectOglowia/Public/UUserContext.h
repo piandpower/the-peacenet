@@ -79,6 +79,9 @@ public:
     UFUNCTION(BlueprintCallable, Category = "User Context")
     UConsoleContext* CreateConsole(UPTerminalWidget* InTerminalWidget);
 
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "User Context")
+    FString GetUserTypeDisplay();
+
 	UFUNCTION(BlueprintCallable, Category = "Program")
 	bool OpenFile(const FString& InPath, EFileOpenResult& OutResult);
 

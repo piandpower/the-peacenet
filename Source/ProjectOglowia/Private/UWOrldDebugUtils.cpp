@@ -28,7 +28,7 @@ bool UWorldDebugUtils::RetrieveSystemContext(UObject* InContextObject, USystemCo
 
     if(Cast<UTerminalCommand>(InContextObject))
     {
-        OutSystemContext = Cast<UTerminalCommand>(InContextObject)->GetConsole()->SystemContext;
+        OutSystemContext = Cast<UTerminalCommand>(InContextObject)->GetConsole()->GetUserContext()->GetOwningSystem();
         return true;
     }
 
@@ -46,7 +46,7 @@ bool UWorldDebugUtils::RetrieveSystemContext(UObject* InContextObject, USystemCo
 
     if(Cast<UConsoleContext>(InContextObject))
     {
-        OutSystemContext = Cast<UConsoleContext>(InContextObject)->SystemContext;
+        OutSystemContext = Cast<UConsoleContext>(InContextObject)->GetUserContext()->GetOwningSystem();
         return true;
     }
 

@@ -2,6 +2,7 @@
 
 #include "UGraphicalTerminalCommand.h"
 #include "UProgram.h"
+#include "UUserContext.h"
 #include "PeacenetWorldStateActor.h"
 
 UGraphicalTerminalCommand::UGraphicalTerminalCommand()
@@ -14,20 +15,15 @@ UGraphicalTerminalCommand::~UGraphicalTerminalCommand()
 
 void UGraphicalTerminalCommand::NativeRunCommand(UConsoleContext * InConsole, const TMap<FString, UDocoptValue*> InArguments)
 {
-	if (!InConsole->SystemContext->GetDesktop())
+	if (!InConsole->GetUserContext()->GetDesktop())
 	{
 		InConsole->WriteLine("error: cannot connect to Xorg server (Is Peacegate Desktop running?)");
 		this->Complete();
 		return;
 	}
 
-	UWindow* OutputWindow = nullptr;
-
-	UProgram* Program = UProgram::CreateProgram(InConsole->SystemContext->GetPeacenet()->WindowClass, this->ProgramAsset->ProgramClass, InConsole->SystemContext, InConsole->UserID, OutputWindow);
-
-	OutputWindow->WindowTitle = this->ProgramAsset->AppLauncherItem.Name;
-	OutputWindow->Icon = this->ProgramAsset->AppLauncherItem.Icon;
-	OutputWindow->EnableMinimizeAndMaximize = this->ProgramAsset->AppLauncherItem.EnableMinimizeAndMaximize;
+	UProgram* OpenedProgram = nullptr;
+	InConsole->GetUserContext()->OpenProgram(this->ProgramAsset->ExecutableName, OpenedProgram, false);
 
 	this->Complete();
 }

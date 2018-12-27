@@ -4,6 +4,7 @@
 #include "PeacenetWorldStateActor.h"
 #include "USystemContext.h"
 #include "FComputer.h"
+#include "UUserContext.h"
 #include "ImageLoader.h"
 #include "UWorkspace.h"
 #include "PTerminalWidget.h"
@@ -118,18 +119,8 @@ void UDesktopWidget::NativeConstruct()
 
 UConsoleContext * UDesktopWidget::CreateConsole(UPTerminalWidget* InTerminal)
 {
-	UConsoleContext* Console = NewObject<UConsoleContext>(this);
-
-	Console->SystemContext = this->SystemContext;
-	Console->UserID = this->UserID;
-	Console->Terminal = InTerminal;
-
-	Console->HomeDirectory = Console->SystemContext->GetUserHomeDirectory(this->UserID);
-	Console->WorkingDirectory = Console->HomeDirectory;
-
-	Console->Filesystem = this->Filesystem;
-
-	return Console;
+	// DEPRECATED IN FAVOUR OF UUserContext::CreateConsole().
+	return this->SystemContext->GetUserContext(this->UserID)->CreateConsole(InTerminal);
 }
 
 void UDesktopWidget::SetWallpaper(UTexture2D* InTexture)

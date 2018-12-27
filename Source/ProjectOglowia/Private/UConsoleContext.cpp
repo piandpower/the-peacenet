@@ -140,5 +140,5 @@ void UConsoleContext::SetColor(ETerminalColor InColor)
 
 void UConsoleContext::ReadLine(UObject* WorldContextObject, FLatentActionInfo LatentInfo, FString& OutText)
 {
-	this->GetTerminal()->ReadLine(this->SystemContext->GetPeacenet(), LatentInfo, OutText); 
+	this->GetTerminal()->ReadLine(this->GetUserContext()->GetPeacenet(), LatentInfo, OutText); 
 }

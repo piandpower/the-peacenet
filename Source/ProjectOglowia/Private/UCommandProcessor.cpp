@@ -5,6 +5,7 @@
 #include "CommonUtils.h"
 #include "URedirectedConsoleContext.h"
 #include "UPiperContext.h"
+#include "UUserContext.h"
 #include "TerminalCommand.h"
 #include "TerminalCommandParserLibrary.h"
 
@@ -22,7 +23,7 @@ TArray<FCommandRunInstruction> UCommandProcessor::ProcessCommand(UConsoleContext
 
 	FString OutError;
 
-	FPeacegateCommandInstruction Instruction = UTerminalCommandParserLibrary::GetCommandList(InCommand, InConsole->HomeDirectory, OutError);
+	FPeacegateCommandInstruction Instruction = UTerminalCommandParserLibrary::GetCommandList(InCommand, InConsole->GetUserContext()->GetHomeDirectory(), OutError);
 
 	
 

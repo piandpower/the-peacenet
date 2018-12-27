@@ -9,6 +9,7 @@
 #include "CommonUtils.h"
 #include "UAddressBookContext.h"
 #include "UPeacegateProgramAsset.h"
+#include "UUserContext.h"
 #include "UProgram.h"
 #include "URainbowTable.h"
 #include "UVulnerability.h"
@@ -243,6 +244,7 @@ void USystemContext::LogEvent(int UserID, FString Message)
 
 void USystemContext::ShowWindowOnWorkspace(UProgram * InProgram)
 {
+	// DEPRECATED IN FAVOUR OF UUserContext::ShowProgramOnWorkspace().
 	if (Desktop && InProgram)
 	{
 		Desktop->ShowProgramOnWorkspace(InProgram);
@@ -342,6 +344,21 @@ FPeacenetIdentity& USystemContext::GetCharacter()
 	check(MyPeacenet->SaveGame->GetCharacterByID(this->CharacterID, Character, CharacterIndex));
 
 	return MyPeacenet->SaveGame->Characters[CharacterIndex];
+}
+
+UUserContext* USystemContext::GetUserContext(int InUserID)
+{
+	if(this->Users.Contains(InUserID))
+	{
+		return this->Users[InUserID];
+	}
+	else
+	{
+		UUserContext* User = NewObject<UUserContext>(this);
+		User->Setup(this, InUserID);
+		Users.Add(InUserID, User);
+		return User;
+	}
 }
 
 FComputer& USystemContext::GetComputer()

@@ -9,6 +9,7 @@
 #include "PeacenetWorldStateActor.h"
 #include "UPeacenetSaveGame.h"
 #include "TerminalCommand.h"
+#include "UUserContext.h"
 #include "UDesktopWidget.h"
 
 bool UWorldDebugUtils::RetrieveSystemContext(UObject* InContextObject, USystemContext*& OutSystemContext)
@@ -33,13 +34,13 @@ bool UWorldDebugUtils::RetrieveSystemContext(UObject* InContextObject, USystemCo
 
     if(Cast<UWindow>(InContextObject))
     {
-        OutSystemContext = Cast<UWindow>(InContextObject)->SystemContext;
+        OutSystemContext = Cast<UWindow>(InContextObject)->GetUserContext()->GetOwningSystem();
         return true;
     }
 
     if(Cast<UProgram>(InContextObject))
     {
-        OutSystemContext = Cast<UProgram>(InContextObject)->Window->SystemContext;
+        OutSystemContext = Cast<UProgram>(InContextObject)->GetUserContext()->GetOwningSystem();
         return true;
     }
 

@@ -4,13 +4,17 @@
 
 #include "CoreMinimal.h"
 #include "USystemContext.h"
+#include "EFileOpenResult.h"
 #include "UUserContext.generated.h"
 
 class UPeacegateFileSystem;
 class APeacenetWorldStateActor;
 class UAddressBookContext;
 class URainbowTable;
+class UPTerminalWidget;
 class UDesktopWidget;
+class UProgram;
+class UConsoleContext;
 
 /**
  * A System Context that acts as a specific user.
@@ -30,6 +34,9 @@ private:
     int UserID = 0;
 
 public:
+    UFUNCTION()
+    FUserInfo GetUserInfo();
+
     UFUNCTION()
     void Setup(USystemContext* InOwningSystem, int InUserID);
 
@@ -59,4 +66,19 @@ public:
 
     UFUNCTION(BlueprintCallable, BlueprintPure, Category = "User Context")
     UDesktopWidget* GetDesktop();
+
+    UFUNCTION()
+    USystemContext* GetOwningSystem();
+
+    UFUNCTION(BlueprintCallable, Category = "User Context")
+    bool OpenProgram(FName InExecutableName, UProgram*& OutProgram, bool InCheckForExistingWindow = true);
+
+    UFUNCTION()
+    void ShowProgramOnWorkspace(UProgram* InProgram);
+
+    UFUNCTION(BlueprintCallable, Category = "User Context")
+    UConsoleContext* CreateConsole(UPTerminalWidget* InTerminalWidget);
+
+	UFUNCTION(BlueprintCallable, Category = "Program")
+	bool OpenFile(const FString& InPath, EFileOpenResult& OutResult);
 };

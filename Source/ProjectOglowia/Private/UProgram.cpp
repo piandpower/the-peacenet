@@ -2,6 +2,7 @@
 #include "UConsoleContext.h"
 #include "UWindow.h"
 #include "USystemContext.h"
+#include "UUserContext.h"
 #include "CommonUtils.h"
 #include "GameFramework/PlayerController.h"
 #include "Kismet/GameplayStatics.h"
@@ -9,20 +10,14 @@
 #include "UPeacegateFileSystem.h"
 #include "UAddressBookContext.h"
 
-bool UProgram::OpenProgram(FName InExecutableName, UProgram*& OutProgram, bool InCheckForExistingWindow)
+UUserContext* UProgram::GetUserContext()
 {
-	return this->Window->SystemContext->OpenProgram(InExecutableName, OutProgram, InCheckForExistingWindow);
-}
-
-UAddressBookContext* UProgram::GetAddressBook()
-{
-	// This is all System Context stuff.
-	return this->Window->SystemContext->GetAddressBook();
+	return this->Window->GetUserContext();
 }
 
 void UProgram::PushNotification(const FText & InNotificationMessage)
 {
-	this->Window->SystemContext->GetDesktop()->EnqueueNotification(this->Window->WindowTitle, InNotificationMessage, this->Window->Icon);
+	this->GetUserContext()->GetDesktop()->EnqueueNotification(this->Window->WindowTitle, InNotificationMessage, this->Window->Icon);
 }
 
 void UProgram::RequestPlayerAttention(bool PlaySound)
@@ -30,14 +25,18 @@ void UProgram::RequestPlayerAttention(bool PlaySound)
 	this->PlayerAttentionNeeded.Broadcast(PlaySound);
 }
 
-void UProgram::ExecuteCommand(FString InCommand)
-{
-	this->Window->SystemContext->ExecuteCommand(InCommand);
-}
-
 UProgram* UProgram::CreateProgram(const TSubclassOf<UWindow> InWindow, const TSubclassOf<UProgram> InProgramClass, USystemContext* InSystem, const int InUserID, UWindow*& OutWindow, bool DoContextSetup)
 {
+	// Preventative: make sure the system context isn't null.
+	check(InSystem);
+
+	// TODO: Take in a user context instead of a system context and user ID.
 	check(InSystem->GetPeacenet());
+
+	// Grab a user context and check if it's valid.
+	UUserContext* User = InSystem->GetUserContext(InUserID);
+
+	check(User);
 
 	APlayerController* MyPlayer = UGameplayStatics::GetPlayerController(InSystem->GetPeacenet()->GetWorld(), 0);
 
@@ -50,15 +49,14 @@ UProgram* UProgram::CreateProgram(const TSubclassOf<UWindow> InWindow, const TSu
 	// Program and window are friends with each other
 	ProgramInstance->Window = Window;
 
-	// Window gets the system context and user ID.
-	Window->SystemContext = InSystem;
-	Window->UserID = InUserID;
+	// Window gets our user context.
+	Window->SetUserContext(User);
 
 	// Set up the program's contexts if we're told to.
 	if (DoContextSetup)
 	{
 		ProgramInstance->SetupContexts();
-		ProgramInstance->Window->SystemContext->ShowWindowOnWorkspace(ProgramInstance);
+		ProgramInstance->GetUserContext()->ShowProgramOnWorkspace(ProgramInstance);
 	}
 
 	// Return the window and program.
@@ -81,7 +79,7 @@ void UProgram::NativeConstruct()
 	{
 		TScriptDelegate<> OnActiveProgramClose;
 		OnActiveProgramClose.BindUFunction(this, "ActiveProgramCloseEvent");
-		this->Window->SystemContext->GetDesktop()->EventActiveProgramClose.Add(OnActiveProgramClose);
+		this->GetUserContext()->GetDesktop()->EventActiveProgramClose.Add(OnActiveProgramClose);
 
 		JustOpened = false;
 
@@ -99,76 +97,9 @@ void UProgram::ShowInfoWithCallbacks(const FText & InTitle, const FText & InMess
 	Window->ShowInfoWithCallbacks(InTitle, InMessage, InIcon, ButtonLayout, ShowTextInput, OnDismissed, ValidatorFunction);
 }
 
-FText UProgram::GetUsername()
-{
-	FUserInfo User = Window->SystemContext->GetUserInfo(Window->UserID);
-	return FText::FromString(User.Username);
-}
-
-FText UProgram::GetHostname()
-{
-	return FText::FromString(this->Window->SystemContext->GetHostname());
-}
-
-UConsoleContext* UProgram::CreateConsole(UPTerminalWidget* InTerminalWidget)
-{
-	UConsoleContext* SubConsole = NewObject<UConsoleContext>(this);
-
-	// Assign it to the terminal widget.
-	SubConsole->Terminal = InTerminalWidget;
-
-	// User ID matches our window.
-	SubConsole->UserID = Window->UserID;
-
-	// Same with system ctx.
-	SubConsole->SystemContext = Window->SystemContext;
-
-	// Get user info.
-	FUserInfo User = SubConsole->SystemContext->GetUserInfo(SubConsole->UserID);
-
-	// If the user's username is root, then we set the home directory to "/root."
-	if (User.IsAdminUser)
-	{
-		SubConsole->HomeDirectory = TEXT("/root");
-	}
-	else
-	{
-		SubConsole->HomeDirectory = TEXT("/home/") + User.Username;
-	}
-
-	SubConsole->WorkingDirectory = SubConsole->HomeDirectory;
-	
-	// Console FS matches ours.
-	SubConsole->Filesystem = this->Filesystem;
-
-	// Attempt to create the user directory if it's not there
-	if (!SubConsole->Filesystem->DirectoryExists(SubConsole->WorkingDirectory))
-	{
-		EFilesystemStatusCode StatusCode;
-
-		if (!SubConsole->Filesystem->CreateDirectory(SubConsole->WorkingDirectory, StatusCode))
-		{
-			FText Error = UCommonUtils::GetFriendlyFilesystemStatusCode(StatusCode);
-			SubConsole->Write(TEXT("peacegate: user home directory '`8") + Console->WorkingDirectory + TEXT("`1' could not be created: "));
-			SubConsole->WriteLine(Error.ToString());
-
-			// Working directory becomes /.
-			SubConsole->WorkingDirectory = TEXT("/");
-		}
-	}
-
-	return SubConsole;
-}
-
-
 void UProgram::ShowInfo(const FText & InTitle, const FText & InMessage, const EInfoboxIcon InIcon)
 {
 	Window->ShowInfo(InTitle, InMessage, InIcon);
-}
-
-FString UProgram::HomeDirectory()
-{
-	return Window->SystemContext->GetUserHomeDirectory(Window->UserID);
 }
 
 void UProgram::AskForFile(const FString InBaseDirectory, const FString InFilter, const EFileDialogType InDialogType, const FFileDialogDismissedEvent & OnDismissed)
@@ -178,11 +109,8 @@ void UProgram::AskForFile(const FString InBaseDirectory, const FString InFilter,
 
 void UProgram::SetupContexts()
 {
-	// Fetch a filesystem context from Peacegate, with the current User ID.
-	this->Filesystem = Window->SystemContext->GetFilesystem(Window->UserID);
-
 	// Add ourself to the window's client slot.
-	Window->AddWindowToClientSlot(this);
+	this->Window->AddWindowToClientSlot(this);
 
 	this->NativeProgramLaunched();
 }
@@ -190,49 +118,6 @@ void UProgram::SetupContexts()
 void UProgram::SetWindowMinimumSize(FVector2D InSize)
 {
 	Window->SetClientMinimumSize(InSize);
-}
-
-bool UProgram::OpenFile(const FString & InPath, EProgramFileOpenStatus & OutStatus)
-{
-	if (!Filesystem)
-	{
-		OutStatus = EProgramFileOpenStatus::PermissionDenied;
-		return false;
-	}
-
-	if (!Filesystem->FileExists(InPath))
-	{
-		OutStatus = EProgramFileOpenStatus::FileNotFound;
-		return false;
-	}
-
-	FString Path;
-	FString Extension;
-	if (!InPath.Split(TEXT("."), &Path, &Extension, ESearchCase::IgnoreCase, ESearchDir::FromEnd))
-	{
-		OutStatus = EProgramFileOpenStatus::NoSuitableProgram;
-		return false;
-	}
-
-	UPeacegateProgramAsset* ProgramAsset;
-	if (!Window->SystemContext->GetSuitableProgramForFileExtension(Extension, ProgramAsset))
-	{
-		OutStatus = EProgramFileOpenStatus::NoSuitableProgram;
-		return false;
-	}
-
-	TSubclassOf<UWindow> WindowClass(Window->GetClass());
-
-	UWindow* NewWindow;
-	UProgram* NewProgram = UProgram::CreateProgram(WindowClass, ProgramAsset->ProgramClass, Window->SystemContext, Window->UserID, NewWindow);
-
-	NewWindow->WindowTitle = ProgramAsset->AppLauncherItem.Name;
-	NewWindow->Icon = ProgramAsset->AppLauncherItem.Icon;
-	NewWindow->EnableMinimizeAndMaximize = ProgramAsset->AppLauncherItem.EnableMinimizeAndMaximize;
-
-	NewProgram->FileOpened(InPath);
-
-	return true;
 }
 
 void UProgram::NativeProgramLaunched() {}

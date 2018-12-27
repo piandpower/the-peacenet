@@ -9,6 +9,7 @@
 #include "UWindow.generated.h"
 
 class UWindow;
+class UUserContext;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FWindowFocusEvent, bool, IsFocused, UWindow*, Window);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FWindowClosedEvent, UWindow*, InWindow);
@@ -21,10 +22,35 @@ class PROJECTOGLOWIA_API UWindow : public UUserWidget
 {
 	GENERATED_BODY()
 
-public:
+private:
+	UPROPERTY()
+	UUserContext* UserContext;
+
+public: // Getters
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Window")
+	UUserContext* GetUserContext();
+
+public: // Setters
+	void SetUserContext(UUserContext* InUserContext);
+	
+public: // Blueprint properties
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ExposeOnSpawn = "true"))
+	FText WindowTitle;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ExposeOnSpawn = "true"))
+	UTexture2D* Icon;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ExposeOnSpawn = "true"))
+	bool EnableCloseButton = true;
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ExposeOnSpawn = "true"))
+	bool EnableMinimizeAndMaximize = true;
+
+public: // Events
 	UPROPERTY(BlueprintAssignable, Category = "Window")
 	FWindowClosedEvent NativeWindowClosed;
 
+public: // Functions
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Infobox")
 		void ShowInfoWithCallbacks(const FText& InTitle, const FText& InMessage, const EInfoboxIcon InIcon, const EInfoboxButtonLayout ButtonLayout, const bool ShowTextInput, const FInfoboxDismissedEvent& OnDismissed, const FInfoboxInputValidator& ValidatorFunction);
 
@@ -33,24 +59,6 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "File Management")
 	void AskForFile(const FString& InBaseDirectory, const FString& InFilter, const EFileDialogType InDialogType, const FFileDialogDismissedEvent& OnDismissed);
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ExposeOnSpawn = "true"))
-	FText WindowTitle;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ExposeOnSpawn = "true"))
-	UTexture2D* Icon;
-
-	UPROPERTY(BlueprintReadOnly)
-	int UserID;
-
-	UPROPERTY(BlueprintReadOnly)
-	USystemContext* SystemContext;
-	
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ExposeOnSpawn = "true"))
-	bool EnableCloseButton = true;
-	
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ExposeOnSpawn = "true"))
-	bool EnableMinimizeAndMaximize = true;
 
 	UFUNCTION(BlueprintCallable)
 	void Close();

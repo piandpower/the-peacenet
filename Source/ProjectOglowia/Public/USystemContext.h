@@ -64,6 +64,9 @@ protected:
 	UPROPERTY()
 	UDesktopWidget* Desktop;
 
+	UPROPERTY()
+	TMap<int, UUserContext*> Users;
+
 protected:
 	UFUNCTION()
 	void HandleFileSystemEvent(EFilesystemEventType InType, FString InPath);
@@ -108,6 +111,9 @@ public:
 
 	UFUNCTION()
 	bool OpenProgram(FName InExecutableName, UProgram*& OutProgram, bool InCheckForExistingWindow = true);
+
+	UFUNCTION()
+	UUserContext* GetUserContext(int InUserID);
 
 	UFUNCTION()
 	UPeacegateFileSystem* GetFilesystem(const int UserID);

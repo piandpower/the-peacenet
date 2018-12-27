@@ -1,10 +1,10 @@
 // Copyright (c) 2018 The Peacenet & Alkaline Thunder
 
 #include "CoreMinimal.h"
-#include "EProgramFileOpenStatus.generated.h"
+#include "EFileOpenResult.generated.h"
 
 UENUM(BlueprintType)
-enum class EProgramFileOpenStatus : uint8
+enum class EFileOpenResult : uint8
 {
 	OK,
 	FileNotFound,

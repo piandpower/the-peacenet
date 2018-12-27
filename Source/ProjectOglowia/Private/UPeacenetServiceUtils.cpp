@@ -2,6 +2,7 @@
 #include "Blueprint/UserWidget.h"
 #include "UProgram.h"
 #include "UWindow.h"
+#include "UUserContext.h"
 #include "USystemContext.h"
 #include "UPeacenetService.h"
 #include "AssetRegistryModule.h"
@@ -30,7 +31,7 @@ UPeacenetService* UPeacenetServiceUtils::CreateServiceWidget(UProgram* InOwningP
 {
     UPeacenetService* Service = CreateWidget<UPeacenetService>(InOwningProgram->GetOwningPlayer(), InService->ServiceWidget);
 
-    Service->Setup(InOwningProgram->Window->SystemContext, InService);
+    Service->Setup(InOwningProgram->GetUserContext()->GetOwningSystem(), InService);
 
     return Service;
 }

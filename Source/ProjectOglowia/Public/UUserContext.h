@@ -7,6 +7,9 @@
 #include "UUserContext.generated.h"
 
 class UPeacegateFileSystem;
+class APeacenetWorldStateActor;
+class UAddressBookContext;
+class URainbowTable;
 
 /**
  * A System Context that acts as a specific user.
@@ -44,4 +47,12 @@ public:
     UFUNCTION(BlueprintCallable, BlueprintPure, Category = "User Context")
     UPeacegateFileSystem* GetFilesystem();
 
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "User Context")
+    URainbowTable* GetRainbowTable();
+
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "User Context")
+    UAddressBookContext* GetAddressBook();
+
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "User Context")
+    APeacenetWorldStateActor* GetPeacenet();
 };

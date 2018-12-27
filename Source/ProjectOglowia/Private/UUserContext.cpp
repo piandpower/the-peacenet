@@ -1,4 +1,7 @@
 #include "UUserContext.h"
+#include "PeacenetWorldStateActor.h"
+#include "URainbowTable.h"
+#include "UAddressBookContext.h"
 #include "UPeacegateFileSystem.h"
 
 void UUserContext::Setup(USystemContext* InOwningSystem, int InUserID)
@@ -33,4 +36,19 @@ FString UUserContext::GetHomeDirectory()
 UPeacegateFileSystem* UUserContext::GetFilesystem()
 {
     return this->OwningSystem->GetFilesystem(this->UserID);
+}
+
+URainbowTable* UUserContext::GetRainbowTable()
+{
+    return this->OwningSystem->GetRainbowTable();
+}
+
+UAddressBookContext* UUserContext::GetAddressBook()
+{
+    return this->OwningSystem->GetAddressBook();
+}
+
+APeacenetWorldStateActor* UUserContext::GetPeacenet()
+{
+    return this->OwningSystem->GetPeacenet();
 }

@@ -1,6 +1,6 @@
-#include "UUserSystemContext.h"
+#include "UUserContext.h"
 
-void UUserSystemContext::UserSetup(USystemContext* InOwningSystem, int InUserID)
+void UUserContext::Setup(USystemContext* InOwningSystem, int InUserID)
 {
     // Make sure the owning system is valid.
     check(InOwningSystem);

@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "USystemContext.h"
-#include "UUserSystemContext.generated.h"
+#include "UUserContext.generated.h"
 
 /**
  * A System Context that acts as a specific user.
  */
 UCLASS(BlueprintType)
-class PROJECTOGLOWIA_API UUserSystemContext : public USystemContext
+class PROJECTOGLOWIA_API UUserContext : public UObject
 {
     GENERATED_BODY()
 
@@ -25,5 +25,5 @@ private:
 
 public:
     UFUNCTION()
-    void UserSetup(USystemContext* InOwningSystem, int InUserID);
+    void Setup(USystemContext* InOwningSystem, int InUserID);
 };

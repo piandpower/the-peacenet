@@ -26,4 +26,19 @@ private:
 public:
     UFUNCTION()
     void Setup(USystemContext* InOwningSystem, int InUserID);
+
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "User Context")
+    FString GetUsername();
+
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "User Context")
+    FString GetHostname();
+
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "User Context")
+    FString GetHomeDirectory();
+
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "User Context")
+    FString GetCharacterName();
+
+
+
 };

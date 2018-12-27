@@ -8,6 +8,7 @@
 #include "DocoptForUnrealBPLibrary.h"
 #include "UCommandProcessor.generated.h"
 
+class UPiperContext;
 class UTerminalCommand;
 
 class FPlaceboLatentAction : public FPendingLatentAction
@@ -25,99 +26,6 @@ public:
 	virtual void UpdateOperation(FLatentResponse& Response) override
 	{
 		Response.DoneIf(true);
-	}
-};
-
-
-UCLASS(Blueprintable)
-class PROJECTOGLOWIA_API UPiperContext : public UConsoleContext
-{
-	GENERATED_BODY()
-
-public:
-	UPiperContext* Input;
-	UConsoleContext* Output;
-	FString Log;
-	
-	virtual void Write(const FString& InText) override
-	{
-		if (Output)
-		{
-			Output->Write(InText);
-		}
-		else {
-			Log += InText;
-		}
-	}
-
-	virtual void WriteLine(const FString& InText) override { Write(InText + TEXT("\n")); }
-	virtual void OverwriteLine(const FString& InText) override
-	{
-		if (Output)
-		{
-			Output->OverwriteLine(InText);
-		}
-		else {
-			WriteLine(InText);
-		}
-	}
-
-	virtual UConsoleContext* CreateChildContext(USystemContext* InSystemContext, int InUserID) override
-	{
-		if (Output)
-		{
-			return Output->CreateChildContext(InSystemContext, InUserID);
-		}
-		else if (Input)
-		{
-			return Input->CreateChildContext(InSystemContext, InUserID);
-		}
-
-		return this;
-	}
-
-	virtual void Clear() override
-	{
-		if (Output)
-			Output->Clear();
-		else
-			Log = TEXT("");
-	}
-
-	virtual FString SynchronouslyReadLine() override;
-
-	FString GetInputBuffer();
-
-	virtual void ReadLine(UObject* WorldContextObject, struct FLatentActionInfo LatentInfo, FString& OutText) override
-	{
-		if (Input)
-		{
-			int NewlineIndex = -1;
-			if (Input->Log.FindChar(TEXT('\n'), NewlineIndex))
-			{
-				OutText = Input->Log.Left(NewlineIndex);
-				Input->Log.RemoveAt(0, NewlineIndex + 1);
-			}
-			else {
-				OutText = FString(Input->Log);
-				Input->Log = TEXT("");
-			}
-			UWorld* world = WorldContextObject->GetWorld();
-			if (world)
-			{
-				FLatentActionManager& LatentActionManager = world->GetLatentActionManager();
-				if (LatentActionManager.FindExistingAction<FPlaceboLatentAction>(LatentInfo.CallbackTarget, LatentInfo.UUID) == NULL)
-				{
-
-					//Here in a second, once I confirm the project loads, we need to see whats wrong with this
-					LatentActionManager.AddNewAction(LatentInfo.CallbackTarget, LatentInfo.UUID, new FPlaceboLatentAction(LatentInfo));
-				}
-			}
-
-		}
-		else {
-			Terminal->ReadLine(WorldContextObject, LatentInfo, OutText);
-		}
 	}
 };
 

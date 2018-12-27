@@ -3,20 +3,10 @@
 #include "UCommandProcessor.h"
 #include "USystemContext.h"
 #include "CommonUtils.h"
+#include "UPiperContext.h"
 #include "TerminalCommand.h"
 #include "TerminalCommandParserLibrary.h"
 
-FString UPiperContext::GetInputBuffer()
-{
-	if(this->Input)
-	{
-		return this->Input->Log;
-	}
-	else
-	{
-		return FString();
-	}
-}
 
 TArray<FCommandRunInstruction> UCommandProcessor::ProcessCommand(UConsoleContext* InConsole, const FString& InCommand)
 {
@@ -178,32 +168,6 @@ TArray<FCommandRunInstruction> UCommandProcessor::ProcessCommand(UConsoleContext
 
 
 	return CommandsToRun;
-}
-
-FString UPiperContext::SynchronouslyReadLine()
-{
-	if (Input)
-	{
-		if (Input->Log.IsEmpty())
-			return "\0";
-
-		FString OutText;
-		int NewlineIndex = -1;
-		if (Input->Log.FindChar(TEXT('\n'), NewlineIndex))
-		{
-			OutText = Input->Log.Left(NewlineIndex);
-			Input->Log.RemoveAt(0, NewlineIndex + 1);
-		}
-		else {
-			OutText = FString(Input->Log);
-			Input->Log = TEXT("");
-		}
-		return OutText;
-	}
-	else
-	{
-		return Super::SynchronouslyReadLine();
-	}
 }
 
 void URedirectedConsoleContext::DumpToFile(UConsoleContext* InConsole)

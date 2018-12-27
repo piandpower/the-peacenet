@@ -6,6 +6,8 @@
 #include "USystemContext.h"
 #include "UUserContext.generated.h"
 
+class UPeacegateFileSystem;
+
 /**
  * A System Context that acts as a specific user.
  */
@@ -39,6 +41,7 @@ public:
     UFUNCTION(BlueprintCallable, BlueprintPure, Category = "User Context")
     FString GetCharacterName();
 
-
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "User Context")
+    UPeacegateFileSystem* GetFilesystem();
 
 };

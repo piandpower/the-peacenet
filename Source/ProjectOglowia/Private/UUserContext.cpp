@@ -1,4 +1,5 @@
 #include "UUserContext.h"
+#include "UPeacegateFileSystem.h"
 
 void UUserContext::Setup(USystemContext* InOwningSystem, int InUserID)
 {
@@ -27,4 +28,9 @@ FString UUserContext::GetCharacterName()
 FString UUserContext::GetHomeDirectory()
 {
     return this->OwningSystem->GetUserHomeDirectory(this->UserID);
+}
+
+UPeacegateFileSystem* UUserContext::GetFilesystem()
+{
+    return this->OwningSystem->GetFilesystem(this->UserID);
 }

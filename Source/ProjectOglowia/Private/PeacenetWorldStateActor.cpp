@@ -6,6 +6,7 @@
 #include "UComputerTypeAsset.h"
 #include "UPeacegateProgramAsset.h"
 #include "UVulnerability.h"
+#include "UHelpCommand.h"
 #include "WallpaperAsset.h"
 #include "UComputerService.h"
 #include "UNativeLatentAction.h"

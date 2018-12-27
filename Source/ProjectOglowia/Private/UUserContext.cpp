@@ -1,6 +1,7 @@
 #include "UUserContext.h"
 #include "PeacenetWorldStateActor.h"
 #include "URainbowTable.h"
+#include "UDesktopWidget.h"
 #include "UAddressBookContext.h"
 #include "UPeacegateFileSystem.h"
 
@@ -51,4 +52,10 @@ UAddressBookContext* UUserContext::GetAddressBook()
 APeacenetWorldStateActor* UUserContext::GetPeacenet()
 {
     return this->OwningSystem->GetPeacenet();
+}
+
+UDesktopWidget* UUserContext::GetDesktop()
+{
+    // TODO: User context should own the desktop, not the system context. This will allow remote desktop hacking.
+    return this->OwningSystem->GetDesktop();
 }

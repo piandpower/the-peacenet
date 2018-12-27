@@ -10,6 +10,7 @@ class UPeacegateFileSystem;
 class APeacenetWorldStateActor;
 class UAddressBookContext;
 class URainbowTable;
+class UDesktopWidget;
 
 /**
  * A System Context that acts as a specific user.
@@ -55,4 +56,7 @@ public:
 
     UFUNCTION(BlueprintCallable, BlueprintPure, Category = "User Context")
     APeacenetWorldStateActor* GetPeacenet();
+
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "User Context")
+    UDesktopWidget* GetDesktop();
 };

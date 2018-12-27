@@ -9,6 +9,7 @@
 #include "UCommandProcessor.generated.h"
 
 class UPiperContext;
+class URedirectedConsoleContext;
 class UTerminalCommand;
 
 class FPlaceboLatentAction : public FPendingLatentAction
@@ -27,24 +28,6 @@ public:
 	{
 		Response.DoneIf(true);
 	}
-};
-
-UCLASS()
-class PROJECTOGLOWIA_API URedirectedConsoleContext : public UPiperContext
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY()
-	FString OutputFilePath;
-
-	UPROPERTY()
-	bool Overwrite = false;
-
-	UFUNCTION(BlueprintCallable, Category = "Console Redirection")
-	void DumpToFile(UConsoleContext* InConsole);
-
-
 };
 
 USTRUCT(BlueprintType)

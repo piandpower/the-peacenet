@@ -74,6 +74,19 @@ USystemContext* UUserContext::GetOwningSystem()
     return this->OwningSystem;
 }
 
+void UUserContext::LogEvent(FString InEvent)
+{
+	if(!InEvent.TrimStartAndEnd().IsEmpty())
+	{
+		this->GetOwningSystem()->LogEvent(this->UserID, InEvent);
+	}
+}
+
+bool UUserContext::IsAdministrator()
+{
+	return this->GetUserInfo().IsAdminUser;
+}
+
 bool UUserContext::OpenProgram(FName InExecutableName, UProgram*& OutProgram, bool InCheckForExistingWindow)
 {
     return this->GetOwningSystem()->OpenProgram(InExecutableName, OutProgram, InCheckForExistingWindow);

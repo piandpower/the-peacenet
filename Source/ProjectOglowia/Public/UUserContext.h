@@ -81,4 +81,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Program")
 	bool OpenFile(const FString& InPath, EFileOpenResult& OutResult);
+
+    UFUNCTION(BlueprintCallable, Category = "User Context")
+    void LogEvent(FString InEvent);
+
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "User Context")
+    bool IsAdministrator();
 };

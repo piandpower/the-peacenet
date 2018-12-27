@@ -9,8 +9,11 @@
 #include "USystemContext.h"
 #include "TerminalCommand.generated.h"
 
+class UUserContext;
 class UAddressBookContext;
 class UCommandInfo;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FCommandCompletedEvent);
 
 /**
  * A simple Unreal object containing functions needed to run a Peacegate OS Terminal command.
@@ -20,16 +23,11 @@ class PROJECTOGLOWIA_API UTerminalCommand : public UObject
 {
 	GENERATED_BODY()
 
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FCommandCompletedEvent);
-
-protected:
-	UFUNCTION(BlueprintCallable, BlueprintCallable, Category = "Address Book")
-	UAddressBookContext* GetAddressBook();
+private:
+	UPROPERTY()
+	UConsoleContext* Console;
 
 public:
-	UTerminalCommand();
-	~UTerminalCommand();
-
 	UPROPERTY(BlueprintReadOnly, Category = "Terminal Command")
 	UCommandInfo* CommandInfo;
 
@@ -39,15 +37,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Terminal Command")
 	void RunCommand(UPARAM(Ref) UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments);
 
-private:
-	UPROPERTY()
-	UConsoleContext* Console;
-
 public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Terminal Command")
 	UConsoleContext* GetConsole();
 
 protected:
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Terminal Command")
+	UUserContext* GetUserContext();
 
 	virtual void NativeRunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments);
 
@@ -56,22 +52,4 @@ protected:
 
 	UFUNCTION(BlueprintCallable, Category = "Terminal Command")
 	void Complete();
-};
-
-UCLASS(Blueprintable)
-class PROJECTOGLOWIA_API UAdminTerminalCommand : public UTerminalCommand
-{
-	GENERATED_BODY()
-
-protected:
-	virtual void NativeRunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments) override;
-};
-
-UCLASS()
-class PROJECTOGLOWIA_API UHelpCommand : public UTerminalCommand
-{
-	GENERATED_BODY()
-
-protected:
-	virtual void NativeRunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments) override;
 };

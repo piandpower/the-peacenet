@@ -5,6 +5,8 @@
 #include "PTerminalWidget.h"
 #include "UConsoleContext.h"
 #include "CommonUtils.h"
+#include "UVulnerability.h"
+#include "UComputerService.h"
 #include "UAddressBookContext.h"
 #include "UProgram.h"
 #include "UPeacegateFileSystem.h"
@@ -123,6 +125,23 @@ UConsoleContext* UUserContext::CreateConsole(UPTerminalWidget* InTerminalWidget)
 	
 	return SubConsole;
 
+}
+
+bool UUserContext::RetrieveUnlockedExploits(UComputerService* InComputerService, TArray<UVulnerability*>& OutVulnerabilities)
+{
+	auto UnlockedVulns = this->GetOwningSystem()->GetUnlockedVulnerabilities();
+
+	OutVulnerabilities = TArray<UVulnerability*>();
+
+	for(auto Vuln : UnlockedVulns)
+	{
+		if(Vuln->VulnerableAgainst.Contains(InComputerService))
+		{
+			OutVulnerabilities.Add(Vuln);
+		}
+	}
+
+	return OutVulnerabilities.Num();
 }
 
 FString UUserContext::GetUserTypeDisplay()

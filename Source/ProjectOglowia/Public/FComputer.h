@@ -6,6 +6,8 @@
 #include "FFolder.h"
 #include "FComputer.generated.h"
 
+class UVulnerability;
+
 /**
  * Represents a user's permission and authentication domain, dictating what the user can do and how they authenticate.
  */
@@ -91,6 +93,9 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Computer")
 	TArray<FFolder> Filesystem;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Computer")
+	TArray<TSubclassOf<UVulnerability>> UnlockedVulnerabilities;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Computer")
 	TArray<FUser> Users;

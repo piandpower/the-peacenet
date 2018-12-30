@@ -9,7 +9,9 @@
 #include "CommonUtils.h"
 #include "UAddressBookContext.h"
 #include "UPeacegateProgramAsset.h"
+#include "UVulnerabilityCommandInfo.h"
 #include "UUserContext.h"
+#include "UVulnerability.h"
 #include "UProgram.h"
 #include "URainbowTable.h"
 #include "UVulnerability.h"
@@ -344,6 +346,22 @@ FPeacenetIdentity& USystemContext::GetCharacter()
 	check(MyPeacenet->SaveGame->GetCharacterByID(this->CharacterID, Character, CharacterIndex));
 
 	return MyPeacenet->SaveGame->Characters[CharacterIndex];
+}
+
+TArray<UVulnerability*> USystemContext::GetUnlockedVulnerabilities()
+{
+	TArray<UVulnerability*> RetVal;
+
+	for(auto VulnClass : this->GetComputer().UnlockedVulnerabilities)
+	{
+		UVulnerability* Vuln = nullptr;
+		if(this->GetPeacenet()->FindVulnerabilityOfClass(VulnClass, Vuln))
+		{
+			RetVal.Add(Vuln);
+		}
+	}
+
+	return RetVal;
 }
 
 UUserContext* USystemContext::GetUserContext(int InUserID)

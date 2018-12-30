@@ -77,6 +77,9 @@ public:
 	UFUNCTION()
 	bool FindServiceByName(FName ServiceName, UComputerService*& OutService);
 
+	UFUNCTION()
+	bool FindVulnerabilityOfClass(TSubclassOf<UVulnerability> InClass, UVulnerability*& OutVulnerability);
+
 private:
 	UPROPERTY()
 	TArray<UNativeLatentAction*> LatentActions;

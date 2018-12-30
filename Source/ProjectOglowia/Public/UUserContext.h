@@ -12,7 +12,9 @@ class APeacenetWorldStateActor;
 class UAddressBookContext;
 class URainbowTable;
 class UPTerminalWidget;
+class UComputerService;
 class UDesktopWidget;
+class UVulnerability;
 class UProgram;
 class UConsoleContext;
 
@@ -34,6 +36,9 @@ private:
     int UserID = 0;
 
 public:
+    UFUNCTION(BlueprintCallable, Category = "User Context|Hacking")
+    bool RetrieveUnlockedExploits(UComputerService* InComputerService, TArray<UVulnerability*>& OutVulnerabilities);
+
     UFUNCTION()
     FUserInfo GetUserInfo();
 

@@ -12,6 +12,7 @@
 class UAddressBookContext;
 class UDesktopWidget;
 class UProgram;
+class UVulnerability;
 class URainbowTable;
 class APeacenetWorldStateActor;
 class UPeacegateProgramAsset;
@@ -83,6 +84,9 @@ public: // Property getters
 
 	UFUNCTION()
 	FComputer& GetComputer();
+
+	UFUNCTION()
+	TArray<UVulnerability*> GetUnlockedVulnerabilities();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "System Context")
 	UAddressBookContext* GetAddressBook();

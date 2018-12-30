@@ -13,6 +13,7 @@
 #include "UVulnerabilityTerminalCommand.h"
 #include "CommandInfo.h"
 #include "TerminalCommand.h"
+#include "UVulnerabilityCommandInfo.h"
 #include "AssetRegistry/Public/IAssetRegistry.h"
 #include "AssetRegistry/Public/AssetRegistryModule.h"
 #include "Async.h"
@@ -410,6 +411,19 @@ void APeacenetWorldStateActor::StartGame()
 			});
 		});
 	});
+}
+
+bool APeacenetWorldStateActor::FindVulnerabilityOfClass(TSubclassOf<UVulnerability> InClass, UVulnerability*& OutVulnerability)
+{
+	for(auto Vuln : this->Vulnerabilities)
+	{
+		if(Vuln->GetClass() == InClass)
+		{
+			OutVulnerability = Vuln;
+			return true;
+		}
+	}
+	return false;
 }
 
 bool APeacenetWorldStateActor::FindProgramByName(FName InName, UPeacegateProgramAsset *& OutProgram)

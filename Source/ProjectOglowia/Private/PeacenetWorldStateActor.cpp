@@ -391,7 +391,23 @@ void APeacenetWorldStateActor::StartGame()
 				SaveGame->PinnedContacts.Add(PlayerContact);
 			}
 
+			// Set up the player context to use their computer.
 			PlayerContext->Setup(PlayerPC.ID, SaveGame->Characters[SaveGame->PlayerCharacterID].ID, this);
+
+			// Go through every single vulnerability in the game.
+			for(auto Vuln : this->Vulnerabilities)
+			{
+				// Is it unlocked by default?
+				if(Vuln->UnlockedByDefault)
+				{
+					// Does the player's computer have it?
+					if(!PlayerPC.UnlockedVulnerabilities.Contains(Vuln->GetClass()))
+					{
+						// Add it to their system context.
+						PlayerContext->GetComputer().UnlockedVulnerabilities.Add(Vuln->GetClass());
+					}
+				}
+			}
 
 			AsyncTask(ENamedThreads::AnyBackgroundThreadNormalTask, [this, PlayerContext]()
 			{

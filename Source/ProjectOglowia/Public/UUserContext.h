@@ -36,8 +36,14 @@ private:
     int UserID = 0;
 
 public:
-    UFUNCTION(BlueprintCallable, Category = "User Context|Hacking")
-    bool RetrieveUnlockedExploits(UComputerService* InComputerService, TArray<UVulnerability*>& OutVulnerabilities);
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "User Context")
+    TArray<UWallpaperAsset*> GetAvailableWallpapers();
+
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "User Context")
+    UTexture2D* GetCurrentWallpaper();
+
+    UFUNCTION(BlueprintCallable, Category = "User Context")
+    void SetCurrentWallpaper(UWallpaperAsset* InWallpaperAsset);
 
     UFUNCTION()
     FUserInfo GetUserInfo();
@@ -64,9 +70,6 @@ public:
     URainbowTable* GetRainbowTable();
 
     UFUNCTION(BlueprintCallable, BlueprintPure, Category = "User Context")
-    UAddressBookContext* GetAddressBook();
-
-    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "User Context")
     APeacenetWorldStateActor* GetPeacenet();
 
     UFUNCTION(BlueprintCallable, BlueprintPure, Category = "User Context")
@@ -89,9 +92,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Program")
 	bool OpenFile(const FString& InPath, EFileOpenResult& OutResult);
-
-    UFUNCTION(BlueprintCallable, Category = "User Context")
-    void LogEvent(FString InEvent);
 
     UFUNCTION(BlueprintCallable, BlueprintPure, Category = "User Context")
     bool IsAdministrator();

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "FFolder.h"
+#include "Engine/Texture2D.h"
 #include "FComputer.generated.h"
 
 class UVulnerability;
@@ -94,9 +95,6 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Computer")
 	TArray<FFolder> Filesystem;
 
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Computer")
-	TArray<TSubclassOf<UVulnerability>> UnlockedVulnerabilities;
-
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Computer")
 	TArray<FUser> Users;
 
@@ -111,6 +109,12 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Hacking")
 	TArray<FServiceInfo> ActiveServices;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Computer")
+	UTexture2D* CurrentWallpaper;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Unlocks")
+	TArray<FName> UnlockedWallpapers;
 
 	// If true then the IP address of this computer is local to an enterprise network. No connections can be made to this computer directly.
 	UPROPERTY()

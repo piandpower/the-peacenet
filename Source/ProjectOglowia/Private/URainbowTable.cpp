@@ -63,7 +63,7 @@ void URainbowTable::ReloadTable()
 		// The rainbow table is just a database, like any .db file. So we can use the functions in UDatabase and UDatabaseParser to help us.
 
 		// This value is populated by the filesystem engine for certain operations and allows us to check what really happened with read/write ops. If something went wrong, it'll tell you, instead of asserting... since the player can easily fuck things up.
-		EFilesystemStatusCode DatabaseLoadStatus;
+		EFilesystemStatusCode DatabaseLoadStatus = EFilesystemStatusCode::OK;
 
 		// TODO: Pre-emptive recovery/recreation of the database if this fails. We want to be silent about it, we don't want to assert. The player can break this.
 		check(UDatabase::ReadFromFile(this->Filesystem, this->RainbowTablePath, DatabaseLoadStatus, this->RainbowTable));

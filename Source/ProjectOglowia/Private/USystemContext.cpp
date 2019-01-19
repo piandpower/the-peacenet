@@ -4,37 +4,15 @@
 #include "Kismet/GameplayStatics.h"
 #include "PeacenetWorldStateActor.h"
 #include "UDesktopWidget.h"
-#include "UWorkspace.h"
 #include "UPeacegateFileSystem.h"
 #include "CommonUtils.h"
-#include "UAddressBookContext.h"
 #include "UPeacegateProgramAsset.h"
-#include "UVulnerabilityCommandInfo.h"
 #include "UUserContext.h"
-#include "UVulnerability.h"
 #include "UProgram.h"
 #include "URainbowTable.h"
-#include "UVulnerability.h"
-#include "UVulnerabilityTerminalCommand.h"
 #include "WallpaperAsset.h"
-#include "ImageLoader.h"
 #include "UGraphicalTerminalCommand.h"
 #include "CommandInfo.h"
-
-UAddressBookContext* USystemContext::GetAddressBook()
-{
-	check(this->GetPeacenet());
-
-	
-
-	if(!this->AddressBook)
-	{
-		this->AddressBook = NewObject<UAddressBookContext>(this);
-		this->AddressBook->Setup(this);
-	}
-
-	return this->AddressBook;
-}
 
 FString ReadFirstLine(FString InText)
 {
@@ -97,41 +75,6 @@ TArray<UPeacegateProgramAsset*> USystemContext::GetInstalledPrograms()
 
 bool USystemContext::OpenProgram(FName InExecutableName, UProgram*& OutProgram, bool InCheckForExistingWindow)
 {
-	if (!Desktop)
-	{
-		return false;
-	}
-
-	for (auto Program : this->GetInstalledPrograms())
-	{
-		if (Program->ExecutableName == InExecutableName)
-		{
-			if(InCheckForExistingWindow || Program->IsSingleInstance)
-			{
-				UWorkspace* CurrentWorkspace = Desktop->GetCurrentWorkspace();
-				
-				if(CurrentWorkspace->HasExistingWindow(Program->ProgramClass, OutProgram))
-				{
-					return true;
-				}
-			}
-
-			UWindow* MyWindow = nullptr;
-
-			UProgram* MyProgram = UProgram::CreateProgram(Peacenet->WindowClass, Program->ProgramClass, this, Desktop->UserID, MyWindow);
-
-			if (MyWindow && MyProgram)
-			{
-				MyWindow->Icon = Program->AppLauncherItem.Icon;
-				MyWindow->WindowTitle = Program->AppLauncherItem.Name;
-			}
-
-			OutProgram = MyProgram;
-
-			return true;
-		}
-	}
-
 	return false;
 }
 
@@ -185,12 +128,6 @@ bool USystemContext::TryGetTerminalCommand(FName CommandName, UTerminalCommand *
 
 	OutCommand->CommandInfo = Info;
 
-	if (Info->IsA<UVulnerabilityCommandInfo>())
-	{
-		UVulnerability* Vuln = Cast<UVulnerabilityCommandInfo>(Info)->Vulnerability;
-		Cast<UVulnerabilityTerminalCommand>(OutCommand)->Vulnerability = Vuln;
-	}
-
 	return true;
 }
 
@@ -216,32 +153,6 @@ FUserInfo USystemContext::GetUserInfo(const int InUserID)
 	}
 
 	return FUserInfo();
-}
-
-void USystemContext::LogEvent(int UserID, FString Message)
-{
-	auto UserInfo = this->GetUserInfo(UserID);
-
-	check(!UserInfo.Username.IsEmpty());
-
-	float CurrentTimeOfDay = this->Peacenet->SaveGame->EpochTime;
-
-	FEventLogEntry NewEntry;
-	NewEntry.TimeOfDay = CurrentTimeOfDay;
-	NewEntry.Username = UserInfo.Username;
-	NewEntry.Message = Message;
-
-	FString Serialized = UCommonUtils::ParseEventLogEntryToString(NewEntry);
-
-	auto RootFS = this->GetFilesystem(0);
-
-	FString LogText;
-	EFilesystemStatusCode Anus;
-	check(RootFS->ReadText("/var/log/peacegate.log", LogText, Anus));
-
-	LogText.Append(Serialized + "\n");
-
-	RootFS->WriteText("/var/log/peacegate.log", LogText);
 }
 
 void USystemContext::ShowWindowOnWorkspace(UProgram * InProgram)
@@ -340,28 +251,12 @@ FPeacenetIdentity& USystemContext::GetCharacter()
 
 	auto MyPeacenet = this->GetPeacenet();
 
-	int CharacterIndex;
+	int CharacterIndex = 0;
 	FPeacenetIdentity Character;
 
 	check(MyPeacenet->SaveGame->GetCharacterByID(this->CharacterID, Character, CharacterIndex));
 
 	return MyPeacenet->SaveGame->Characters[CharacterIndex];
-}
-
-TArray<UVulnerability*> USystemContext::GetUnlockedVulnerabilities()
-{
-	TArray<UVulnerability*> RetVal;
-
-	for(auto VulnClass : this->GetComputer().UnlockedVulnerabilities)
-	{
-		UVulnerability* Vuln = nullptr;
-		if(this->GetPeacenet()->FindVulnerabilityOfClass(VulnClass, Vuln))
-		{
-			RetVal.Add(Vuln);
-		}
-	}
-
-	return RetVal;
 }
 
 UUserContext* USystemContext::GetUserContext(int InUserID)
@@ -385,7 +280,7 @@ FComputer& USystemContext::GetComputer()
 
 	auto MyPeacenet = this->GetPeacenet();
 
-	int ComputerIndex;
+	int ComputerIndex = 0;
 	FComputer Computer;
 
 	check(MyPeacenet->SaveGame->GetComputerByID(this->ComputerID, Computer, ComputerIndex));
@@ -481,6 +376,40 @@ void USystemContext::HandleFileSystemEvent(EFilesystemEventType InType, FString 
 	}
 }
 
+TArray<UWallpaperAsset*> USystemContext::GetAvailableWallpapers()
+{
+	TArray<UWallpaperAsset*> Ret;
+	for (auto Wallpaper : this->GetPeacenet()->Wallpapers)
+	{
+		if(Wallpaper->IsDefault || Wallpaper->UnlockedByDefault || this->GetComputer().UnlockedWallpapers.Contains(Wallpaper->InternalID))
+		{
+			Ret.Add(Wallpaper);
+		}
+	}
+	return Ret;
+}
+
+void USystemContext::SetCurrentWallpaper(UWallpaperAsset* InWallpaperAsset)
+{
+	// Make sure it's not null.
+	check(InWallpaperAsset);
+
+	// If it's unlocked by default or already unlocked, we just set it.
+	if(InWallpaperAsset->UnlockedByDefault || InWallpaperAsset->IsDefault || this->GetComputer().UnlockedWallpapers.Contains(InWallpaperAsset->InternalID))
+	{
+		// Set the wallpaper.
+		this->GetComputer().CurrentWallpaper = InWallpaperAsset->WallpaperTexture;
+	}
+	else
+	{
+		// BETA TODO: Announce item unlock.
+		this->GetComputer().UnlockedWallpapers.Add(InWallpaperAsset->InternalID);
+
+		// Set the wallpaper.
+		this->GetComputer().CurrentWallpaper = InWallpaperAsset->WallpaperTexture;
+	}
+}
+
 void USystemContext::UpdateSystemFiles()
 {
 	// This function updates the system based on save data and in-game assets.
@@ -489,20 +418,6 @@ void USystemContext::UpdateSystemFiles()
 
 	// So first we need a root fs context.
 	UPeacegateFileSystem* RootFS = this->GetFilesystem(0);
-
-	// We're going to set up wallpapers.
-	for (auto Wallpaper : this->Peacenet->Wallpapers)
-	{
-		// Is the wallpaper available? We don't care about removing those that aren't available but already exist on disk. We just want to update the ones that are unlocked.
-		if (Wallpaper->UnlockedByDefault)
-		{
-			// Grab the texture's bitmap data.
-			TArray<uint8> UETextureData = UImageLoader::GetBitmapData(Wallpaper->WallpaperTexture);
-
-			// Now we just need to write it to disk.
-			RootFS->WriteBinary(TEXT("/usr/share/wallpapers/") + Wallpaper->FriendlyName.ToString() + TEXT(".png"), UETextureData);
-		}
-	}
 
 	EFilesystemStatusCode Anus;
 

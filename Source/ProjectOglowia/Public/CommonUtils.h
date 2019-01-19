@@ -4,12 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "UPeacegateFileSystem.h"
-#include "FEventLogEntry.h"
 #include "SlateFontInfo.h"
 #include "ETerminalColor.h"
 #include "Camera/CameraComponent.h"
-#include "FEmailMessage.h"
-#include "FEmailAttachment.h"
 #include "CommonUtils.generated.h"
 
 class UPeacenetSaveGame;
@@ -26,15 +23,6 @@ class PROJECTOGLOWIA_API UCommonUtils : public UObject
 public:
 	UFUNCTION(BlueprintCallable, Category = "Peacegate|Setup")
 	static void ParseCharacterName(const FString InCharacterName, FString& OutUsername, FString& OutHostname);
-
-	UFUNCTION(BlueprintCallable, Category = "Event Log Entry", BlueprintPure)
-	static FString ParseEventLogEntryToString(const FEventLogEntry& InEventLogEntry);
-
-	UFUNCTION()
-	static FEventLogEntry ReadEventLogEntry(FString InString);
-
-	UFUNCTION()
-	static TArray<FEventLogEntry> ReadEventLogFile(FString InString);
 
 private:
 	template<typename T>
@@ -69,9 +57,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Settings")
 	static void SetEnableBloom(UCameraComponent* InCamera, bool InEnableBloom);
-
-	UFUNCTION()
-	void SendEmailChecked(UPeacenetSaveGame* InSaveGame, int FromEntity, int ToEntity, const FText& Subject, const FText& Message, TArray<FEmailAttachment> InAttachments = TArray<FEmailAttachment>(), TArray<FEmailMission> InMissions = TArray<FEmailMission>());
 };
 
 template<typename T>

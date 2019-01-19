@@ -6,6 +6,11 @@
 #include "Rendering/DrawElements.h"
 #include "FTerminalSlowTypeLatentAction.h"
 
+FReply UPTerminalWidget::NativeOnMouseButtonDown( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent )
+{
+	return FReply::Handled().SetUserFocus(this->TakeWidget());
+}
+
 FSlateFontInfo UPTerminalWidget::ZoomText(FSlateFontInfo InFont) const
 {
 	FSlateFontInfo Zoomed = FSlateFontInfo(InFont);

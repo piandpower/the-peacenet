@@ -6,13 +6,10 @@
 #include "UWindow.h"
 #include "USystemContext.h"
 #include "Engine/DataAsset.h"
-#include "FNetMapScanEventArgs.h"
 #include "UPeacegateProgramAsset.generated.h"
 
-class UAddressBookContext;
 class UConsoleContext;
 class UPTerminalWidget;
-class UMissionAsset;
 class APeacenetWorldStateActor;
 
 

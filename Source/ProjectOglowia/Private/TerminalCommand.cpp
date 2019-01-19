@@ -4,7 +4,6 @@
 #include "CommandInfo.h"
 #include "PeacenetWorldStateActor.h"
 #include "UUserContext.h"
-#include "UAddressBookContext.h"
 
 UUserContext* UTerminalCommand::GetUserContext()
 {
@@ -19,13 +18,7 @@ UConsoleContext* UTerminalCommand::GetConsole()
 
 void UTerminalCommand::RunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments)
 {
-	this->Console = InConsole;
-
-	if(this->CommandInfo)
-	{
-		this->GetUserContext()->LogEvent("ran " + this->CommandInfo->Info.CommandName.ToString());
-	}
-	
+	this->Console = InConsole;	
 	NativeRunCommand(InConsole, InArguments);
 }
 

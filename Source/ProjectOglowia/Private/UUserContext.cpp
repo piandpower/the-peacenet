@@ -5,9 +5,6 @@
 #include "PTerminalWidget.h"
 #include "UConsoleContext.h"
 #include "CommonUtils.h"
-#include "UVulnerability.h"
-#include "UComputerService.h"
-#include "UAddressBookContext.h"
 #include "UProgram.h"
 #include "UPeacegateFileSystem.h"
 
@@ -55,11 +52,6 @@ URainbowTable* UUserContext::GetRainbowTable()
     return this->OwningSystem->GetRainbowTable();
 }
 
-UAddressBookContext* UUserContext::GetAddressBook()
-{
-    return this->OwningSystem->GetAddressBook();
-}
-
 APeacenetWorldStateActor* UUserContext::GetPeacenet()
 {
     return this->OwningSystem->GetPeacenet();
@@ -74,14 +66,6 @@ UDesktopWidget* UUserContext::GetDesktop()
 USystemContext* UUserContext::GetOwningSystem()
 {
     return this->OwningSystem;
-}
-
-void UUserContext::LogEvent(FString InEvent)
-{
-	if(!InEvent.TrimStartAndEnd().IsEmpty())
-	{
-		this->GetOwningSystem()->LogEvent(this->UserID, InEvent);
-	}
 }
 
 bool UUserContext::IsAdministrator()
@@ -125,23 +109,6 @@ UConsoleContext* UUserContext::CreateConsole(UPTerminalWidget* InTerminalWidget)
 	
 	return SubConsole;
 
-}
-
-bool UUserContext::RetrieveUnlockedExploits(UComputerService* InComputerService, TArray<UVulnerability*>& OutVulnerabilities)
-{
-	auto UnlockedVulns = this->GetOwningSystem()->GetUnlockedVulnerabilities();
-
-	OutVulnerabilities = TArray<UVulnerability*>();
-
-	for(auto Vuln : UnlockedVulns)
-	{
-		if(Vuln->VulnerableAgainst.Contains(InComputerService))
-		{
-			OutVulnerabilities.Add(Vuln);
-		}
-	}
-
-	return OutVulnerabilities.Num();
 }
 
 FString UUserContext::GetUserTypeDisplay()
@@ -198,4 +165,19 @@ bool UUserContext::OpenFile(const FString& InPath, EFileOpenResult& OutResult)
 	NewProgram->FileOpened(InPath);
 
 	return true;
+}
+
+TArray<UWallpaperAsset*> UUserContext::GetAvailableWallpapers()
+{
+	return this->GetOwningSystem()->GetAvailableWallpapers();
+}
+
+UTexture2D* UUserContext::GetCurrentWallpaper()
+{
+	return this->GetOwningSystem()->GetComputer().CurrentWallpaper;
+}
+
+void UUserContext::SetCurrentWallpaper(UWallpaperAsset* InWallpaperAsset)
+{
+	this->GetOwningSystem()->SetCurrentWallpaper(InWallpaperAsset);
 }

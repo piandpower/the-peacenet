@@ -6,14 +6,11 @@
 #include "UserWidget.h"
 #include "UPeacegateProgramAsset.h" 
 #include "UPeacegateFileSystem.h"
-#include "FEventLogEntry.h"
 #include "UDesktopWidget.generated.h"
 
-class UWorkspace;
 class USystemContext;
 class UConsoleContext;
 class UPTerminalWidget;
-class UImageLoader;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FActiveProgramCloseEvent);
 
@@ -40,9 +37,6 @@ UCLASS(Blueprintable, Abstract)
 class PROJECTOGLOWIA_API UDesktopWidget : public UUserWidget
 {
 	GENERATED_BODY()
-
-private:
-	void ResetEventLog();
 
 protected:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "System")
@@ -80,10 +74,6 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Console")
 	UConsoleContext* CreateConsole(UPTerminalWidget* InTerminal);
 
-protected:
-	UPROPERTY()
-	UImageLoader* ImageLoader;
-
 public:
 	UPROPERTY()
 	USystemContext * SystemContext;
@@ -106,12 +96,6 @@ protected:
 
 	UPROPERTY()
 	UPeacegateFileSystem* Filesystem;
-
-	UFUNCTION(BlueprintImplementableEvent, Category = "Event Log")
-		void OnClearEventLog();
-
-	UFUNCTION(BlueprintImplementableEvent, Category = "Event Log")
-	void OnAddEventToLog(FEventLogEntry InEvent);
 
 public:
 	UPROPERTY(BlueprintReadOnly, Category = "Desktop")
@@ -139,9 +123,6 @@ public:
 	UTexture2D* WallpaperTexture;
 
 public:
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "System")
-	UWorkspace* GetCurrentWorkspace();
-
 	UFUNCTION()
 	void ShowProgramOnWorkspace(UProgram* InProgram);
 
@@ -149,7 +130,7 @@ public:
 	void ClearAppLauncherMainMenu();
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Desktop")
-		void ClearAppLauncherSubMenu();
+	void ClearAppLauncherSubMenu();
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Desktop")
 	void AddAppLauncherMainMenuItem(const FText& ItemName);

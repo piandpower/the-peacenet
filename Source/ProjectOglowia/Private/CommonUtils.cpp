@@ -6,53 +6,6 @@
 #include "Parse.h"
 #include "USystemContext.h"
 
-FEventLogEntry UCommonUtils::ReadEventLogEntry(FString InString)
-{
-	check(!InString.IsEmpty());
-	check(InString.Contains("\t"));
-
-	TArray<FString> Tokens;
-	InString.ParseIntoArray(Tokens, TEXT("\t"), true);
-
-	check(Tokens.Num() == 3);
-
-	FString TimeOfDay = Tokens[0];
-	FString Username = Tokens[1];
-	FString Message = Tokens[2];
-
-	TimeOfDay.RemoveFromStart("[");
-	TimeOfDay.RemoveFromEnd("]");
-
-	Username.RemoveFromStart("<");
-	Username.RemoveFromEnd(">");
-
-	FEventLogEntry ReturnValue;
-	ReturnValue.TimeOfDay = FCString::Atof(TimeOfDay.GetCharArray().GetData());
-	ReturnValue.Username = Username;
-	ReturnValue.Message = Message;
-
-	return ReturnValue;
-}
-
-TArray<FEventLogEntry> UCommonUtils::ReadEventLogFile(FString InString)
-{
-	TArray<FEventLogEntry> Ret;
-
-	TArray<FString> Lines;
-	InString.ParseIntoArray(Lines, TEXT("\n"), true);
-
-	for (auto Line : Lines)
-	{
-		if (Line.TrimStartAndEnd().IsEmpty())
-			continue;
-
-		FEventLogEntry Log = UCommonUtils::ReadEventLogEntry(Line.TrimStartAndEnd());
-		Ret.Add(Log);
-	}
-
-	return Ret;
-}
-
 FText UCommonUtils::GetFriendlyFilesystemStatusCode(const EFilesystemStatusCode InStatusCode)
 {
 	switch (InStatusCode)
@@ -203,36 +156,6 @@ void UCommonUtils::SetEnableBloom(UCameraComponent * InCamera, bool InEnableBloo
 	auto PostProcessSettings = InCamera->PostProcessSettings;
 	PostProcessSettings.bOverride_BloomIntensity = InEnableBloom;
 	InCamera->PostProcessSettings = PostProcessSettings;
-}
-
-void UCommonUtils::SendEmailChecked(UPeacenetSaveGame * InSaveGame, int FromEntity, int ToEntity, const FText & Subject, const FText & Message, TArray<FEmailAttachment> InAttachments, TArray<FEmailMission> InMissions)
-{
-	int FromIndex;
-	int ToIndex;
-
-	FPeacenetIdentity FromCharacter;
-	FPeacenetIdentity ToCharacter;
-
-	// Do these character entities exist?
-	check(InSaveGame->GetCharacterByID(FromEntity, FromCharacter, FromIndex));
-	check(InSaveGame->GetCharacterByID(ToEntity, ToCharacter, ToIndex));
-
-	FEmailMessage NewMessage;
-	NewMessage.EntityID = InSaveGame->Emails.Num();
-	NewMessage.Subject = Subject;
-	NewMessage.Message = Message;
-	NewMessage.Attachments = InAttachments;
-	NewMessage.Missions = InMissions;
-	NewMessage.IsUnread = true;
-	
-	InSaveGame->Emails.Add(NewMessage);
-}
-
-FString UCommonUtils::ParseEventLogEntryToString(const FEventLogEntry& InEventLogEntry)
-{
-	FString TimeOfDay = FString::SanitizeFloat(InEventLogEntry.TimeOfDay);
-	
-	return "[" + TimeOfDay + "]\t<" + InEventLogEntry.Username + ">\t" + InEventLogEntry.Message;
 }
 
 void UCommonUtils::ParseCharacterName(const FString InCharacterName, FString & OutUsername, FString & OutHostname)

@@ -5,12 +5,9 @@
 #include "CoreMinimal.h"
 #include "GameFramework/SaveGame.h"
 #include "FComputer.h"
-#include "FEmailMessage.h"
 #include "FPeacenetIdentity.h"
 #include "UDesktopWidget.h"
-#include "FEnterpriseNetwork.h"
 #include "UWindow.h"
-#include "FPinnedContact.h"
 #include "UPeacenetSaveGame.generated.h"
 
 class UDesktopWidget;
@@ -48,9 +45,6 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "World")
 	float EpochTime = 43200.f;
 
-	UPROPERTY(VisibleAnywhere, Category = "World")
-	TArray<FEnterpriseNetwork> Businesses;
-
 	UPROPERTY(VisibleAnywhere, Category = "Unlocks and Game State")
 	TMap<FName, bool> Booleans;
 
@@ -60,12 +54,6 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Missions")
 	TArray<FName> Missions;
 
-	UPROPERTY(VisibleAnywhere, Category = "NetMap")
-	TArray<FPinnedContact> PinnedContacts;
-
-	UPROPERTY(VisibleAnywhere, Category = "Email")
-	TArray<FEmailMessage> Emails;
-
 	UPROPERTY(VisibleAnywhere, Category = "Master Password Table")
 	TArray<FString> MPT;
 
@@ -73,9 +61,6 @@ public:
 
 	UFUNCTION()
 	bool CharacterNameExists(FString CharacterName);
-
-	UFUNCTION()
-	bool CompanyNameExists(FString CompanyName);
 
 	UFUNCTION()
 	bool DomainNameExists(FString InDomainName);
@@ -87,17 +72,8 @@ public:
 	bool IsCharacterNodePositionTaken(ECountry InCountry, FVector2D InPosition);
 
 	UFUNCTION()
-	bool CountryHasEmailService(ECountry InCountry);
-
-	UFUNCTION()
 		bool GetCharacterByID(int InEntityID, FPeacenetIdentity& OutCharacter, int& OutIndex);
 
 	UFUNCTION()
-		bool GetBusinessByID(int InEntityID, FEnterpriseNetwork& OutCompany);
-
-	UFUNCTION()
 	bool GetComputerByID(int InEntityID, FComputer& OutComputer, int& OutIndex);
-
-	UFUNCTION()
-		bool IsEntityKnown(int InEntityID, EPinnedContactType InContactType);
 };

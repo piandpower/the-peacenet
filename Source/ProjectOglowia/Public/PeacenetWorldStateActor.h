@@ -23,26 +23,6 @@ class UVulnerability;
 class UMissionUnlock;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPlayerSystemContextReadyEvent, USystemContext*, InSystemContext);
-DECLARE_DYNAMIC_DELEGATE_OneParam(FShowLoadingScreenEvent, UWorldGeneratorStatus*, InStatus);
-
-USTRUCT(BlueprintType)
-struct PROJECTOGLOWIA_API FPeacenetWorldInfo
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FString PlayerName;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FString PlayerUsername;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FString PlayerHostname;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FString PlayerPassword;
-};
 
 USTRUCT()
 struct FManPage
@@ -70,34 +50,10 @@ class PROJECTOGLOWIA_API APeacenetWorldStateActor : public AActor
 	GENERATED_BODY()
 	
 private:
-	UPROPERTY()
-	TArray<UVulnerability*> Vulnerabilities;
-
-public:
-	UFUNCTION()
-	bool FindServiceByName(FName ServiceName, UComputerService*& OutService);
-
-	UFUNCTION()
-	bool FindVulnerabilityOfClass(TSubclassOf<UVulnerability> InClass, UVulnerability*& OutVulnerability);
-
-private:
-	UPROPERTY()
-	TArray<UNativeLatentAction*> LatentActions;
-
-private:
 	UFUNCTION()
 	void LoadTerminalCommands();
 
 public:	
-	UPROPERTY()
-	TArray<UComputerService*> ComputerServices;
-
-	UFUNCTION()
-	void AddLatentAction(UNativeLatentAction* InAction);
-
-	UFUNCTION()
-	bool ResolveHost(FString InHost, FString& ResolvedIP, USystemContext*& ResolvedContext);
-
 	UFUNCTION()
 	void SaveWorld();
 
@@ -110,17 +66,8 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Meta = (ExposeOnSpawn))
 	UPeacenetGameTypeAsset* GameType;
 
-	UFUNCTION()
-	bool UpdateComputer(int InEntityID, FComputer& InComputer, bool InSaveGame = true);
-	
-	UFUNCTION()
-	bool UpdateCharacter(int InEntityID, FPeacenetIdentity& InCharacter);
-
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Meta = (ExposeOnSpawn))
 	TSubclassOf<UWindow> WindowClass;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Meta = (ExposeOnSpawn))
-	UComputerTypeAsset* PlayerComputerType;
 
 	UPROPERTY(BlueprintAssignable, Category = "Peacenet")
 	FPlayerSystemContextReadyEvent PlayerSystemReady;
@@ -158,9 +105,6 @@ protected:
 	virtual void EndPlay(const EEndPlayReason::Type InReason) override;
 	
 public:	
-	UPROPERTY()
-	TArray<UComputerTypeAsset*> ComputerTypes;
-
 	UFUNCTION()
 	bool FindProgramByName(FName InName, UPeacegateProgramAsset*& OutProgram);
 
@@ -173,16 +117,9 @@ public:
 	void StartGame();
 	
 public:
-	UPROPERTY()
-	UWorldGeneratorStatus* WorldGeneratorStatus = nullptr;
-
-public:
 	// Used by the Ubiquity menu to see if the "Boot existing OS" screen should show.
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Peacegate")
 	static bool HasExistingOS();
-
-	UFUNCTION(BlueprintCallable, Category = "Peacegate")
-		static APeacenetWorldStateActor* GenerateAndCreateWorld(const APlayerController* InPlayerController, const FPeacenetWorldInfo& InWorldInfo, TSubclassOf<UDesktopWidget> InDesktop, UPeacenetGameTypeAsset* InGameType, TSubclassOf<UWindow> InWindowDecorator, FShowLoadingScreenEvent InShowLoadingScreen);
 
 	UFUNCTION(BlueprintCallable, Category = "Peacegate")
 	static APeacenetWorldStateActor* LoadExistingOS(const APlayerController* InPlayerController);

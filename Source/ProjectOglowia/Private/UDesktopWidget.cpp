@@ -5,8 +5,6 @@
 #include "USystemContext.h"
 #include "FComputer.h"
 #include "UUserContext.h"
-#include "ImageLoader.h"
-#include "UWorkspace.h"
 #include "PTerminalWidget.h"
 #include "FPeacenetIdentity.h"
 #include "CommonUtils.h"
@@ -16,36 +14,11 @@
 
 void UDesktopWidget::ShowProgramOnWorkspace(UProgram* InProgram)
 {
-	UWorkspace* Workspace = this->GetCurrentWorkspace();
-	if (Workspace)
-		Workspace->ShowProgramOnWorkspace(InProgram);
 }
 
 void UDesktopWidget::CloseActiveProgram()
 {
 	this->EventActiveProgramClose.Broadcast();
-}
-
-void UDesktopWidget::ResetEventLog()
-{
-	this->OnClearEventLog();
-
-	auto RootFS = this->SystemContext->GetFilesystem(0);
-
-	if (RootFS->FileExists("/var/log/peacegate.log"))
-	{
-		FString LogText;
-		EFilesystemStatusCode Anus;
-		
-		check(RootFS->ReadText("/var/log/peacegate.log", LogText, Anus));
-
-		TArray<FEventLogEntry> LogEntries = UCommonUtils::ReadEventLogFile(LogText);
-
-		for (auto Log : LogEntries)
-		{
-			this->OnAddEventToLog(Log);
-		}
-	}
 }
 
 USystemContext* UDesktopWidget::GetSystemContext()
@@ -71,9 +44,6 @@ void UDesktopWidget::NativeConstruct()
 	// Reset the app launcher.
 	this->ResetAppLauncher();
 
-	// reset event log.
-	this->ResetEventLog();
-
 	// Grab the user's home directory.
 	this->UserHomeDirectory = this->SystemContext->GetUserHomeDirectory(this->UserID);
 
@@ -87,29 +57,17 @@ void UDesktopWidget::NativeConstruct()
 	this->Filesystem->FilesystemOperation.Add(FSOperation);
 	this->SystemContext->GetFilesystem(0)->FilesystemOperation.Add(FSOperation);
 
-	// Create an image loader to use for wallpaper loading.
-	this->ImageLoader = NewObject<UImageLoader>(this);
-
-	// Create a function binding.
-	TScriptDelegate<> ImageLoaded;
-	ImageLoaded.BindUFunction(this, "SetWallpaper");
-	this->ImageLoader->OnLoadCompleted().Add(ImageLoaded);
-
-	// Does this user have an existing wallpaper?
-	if (this->Filesystem->FileExists(this->UserHomeDirectory + TEXT("/.peacegate/wallpaper.png")))
+	// Set the default wallpaper if our computer doesn't have one.
+	if(!this->GetSystemContext()->GetComputer().CurrentWallpaper)
 	{
-		this->ImageLoader->LoadImageAsync(this->Filesystem, this, this->UserHomeDirectory + TEXT("/.peacegate/wallpaper.png"));
-	}
-	else 
-	{
-		// We need to find and set the default wallpaper.
-		for (auto WallpaperAsset : this->SystemContext->GetPeacenet()->Wallpapers)
+		// Go through all wallpaper assets.
+		for(auto Wallpaper : this->GetSystemContext()->GetPeacenet()->Wallpapers)
 		{
-			if (WallpaperAsset->IsDefault)
+			// Is it the default wallpaper?
+			if(Wallpaper->IsDefault)
 			{
-				this->SetWallpaper(WallpaperAsset->WallpaperTexture);
-				this->Filesystem->WriteBinary(this->UserHomeDirectory + TEXT("/.peacegate/wallpaper.png"), UImageLoader::GetBitmapData(this->WallpaperTexture));
-				break;
+				// Assign the texture to the computer.
+				this->GetSystemContext()->GetComputer().CurrentWallpaper = Wallpaper->WallpaperTexture;
 			}
 		}
 	}
@@ -125,29 +83,11 @@ UConsoleContext * UDesktopWidget::CreateConsole(UPTerminalWidget* InTerminal)
 
 void UDesktopWidget::SetWallpaper(UTexture2D* InTexture)
 {
-	this->WallpaperTexture = InTexture;
+	this->GetSystemContext()->GetComputer().CurrentWallpaper = InTexture;
 }
 
 void UDesktopWidget::OnFilesystemOperation(EFilesystemEventType InType, FString InPath)
 {
-	switch (InType)
-	{
-		case EFilesystemEventType::WriteFile:
-			if (InPath == this->UserHomeDirectory + TEXT("/.peacegate/wallpaper.png"))
-			{
-				// Wallpaper update.
-				this->WallpaperTexture = UImageLoader::LoadImageFromDisk(this->Filesystem, this, this->UserHomeDirectory + TEXT("/.peacegate/wallpaper.png"));
-
-				this->EnqueueNotification(FText::FromString("New wallpaper"), FText::FromString("A new wallpaper has been set by a program."), this->WallpaperTexture);
-
-				this->SystemContext->GetPeacenet()->SaveWorld();
-			}
-			else if (InPath == "/var/log/peacegate.log")
-			{
-				this->ResetEventLog();
-			}
-			break;
-	}
 }
 
 void UDesktopWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -193,6 +133,9 @@ void UDesktopWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	this->CurrentPeacenetName = this->MyCharacter.CharacterName;
 
 	this->TimeOfDay = this->SystemContext->GetPeacenet()->GetTimeOfDay();
+
+	// Set our wallpaper.
+	this->WallpaperTexture = this->GetSystemContext()->GetComputer().CurrentWallpaper;
 
 	Super::NativeTick(MyGeometry, InDeltaTime);
 }

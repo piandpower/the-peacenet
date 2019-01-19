@@ -9,9 +9,9 @@ public class ProjectOglowia : ModuleRules
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
         // Makes the filesystem in Peacegate able to load textures.
-        PublicDependencyModuleNames.AddRange(new string[] { "Json", "ImageWrapper", "RenderCore" });
+        PrivateDependencyModuleNames.AddRange(new string[] { "Json", "ImageWrapper", "RenderCore" });
 
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Slate", "SlateCore" });
+        PrivateDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Slate", "SlateCore" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 

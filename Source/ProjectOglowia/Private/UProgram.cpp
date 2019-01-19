@@ -8,7 +8,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "PeacenetWorldStateActor.h"
 #include "UPeacegateFileSystem.h"
-#include "UAddressBookContext.h"
 
 UUserContext* UProgram::GetUserContext()
 {

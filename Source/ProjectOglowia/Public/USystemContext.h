@@ -6,18 +6,14 @@
 #include "FComputer.h"
 #include "UPeacegateFileSystem.h"
 #include "FPeacenetIdentity.h"
-#include "FNetMapScanEventArgs.h"
 #include "USystemContext.generated.h"
 
-class UAddressBookContext;
 class UDesktopWidget;
 class UProgram;
-class UVulnerability;
 class URainbowTable;
 class APeacenetWorldStateActor;
 class UPeacegateProgramAsset;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FNetMapScanEvent, int, EntityID, FNetMapScanEventArgs, Args);
 
 USTRUCT(BlueprintType)
 struct PROJECTOGLOWIA_API FUserInfo
@@ -48,9 +44,6 @@ protected:
 	TMap<int, UPeacegateFileSystem*> RegisteredFilesystems;
 
 	UPROPERTY()
-	UAddressBookContext* AddressBook;
-
-	UPROPERTY()
 	URainbowTable* RainbowTable;
 
 	UPROPERTY()
@@ -77,6 +70,12 @@ public: // Property getters
 	APeacenetWorldStateActor* GetPeacenet();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "System Context")
+	TArray<UWallpaperAsset*> GetAvailableWallpapers();
+
+	UFUNCTION(BlueprintCallable, Category = "System Context")
+	void SetCurrentWallpaper(UWallpaperAsset* InWallpaperAsset);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "System Context")
 	UDesktopWidget* GetDesktop();
 
 	UFUNCTION()
@@ -84,12 +83,6 @@ public: // Property getters
 
 	UFUNCTION()
 	FComputer& GetComputer();
-
-	UFUNCTION()
-	TArray<UVulnerability*> GetUnlockedVulnerabilities();
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "System Context")
-	UAddressBookContext* GetAddressBook();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "System Context")
 	URainbowTable* GetRainbowTable();
@@ -127,9 +120,6 @@ public:
 
 	UFUNCTION()
 	FUserInfo GetUserInfo(const int InUserID);
-
-	UFUNCTION()
-	void LogEvent(int UserID, FString Message);
 
 	UFUNCTION()
 	void ShowWindowOnWorkspace(UProgram* InProgram);

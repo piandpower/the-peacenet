@@ -10,6 +10,7 @@
 #include "AssetRegistry/Public/IAssetRegistry.h"
 #include "AssetRegistry/Public/AssetRegistryModule.h"
 #include "Async.h"
+#include "UPeacenetGameInstance.h"
 #include "UWindow.h"
 
 // Sets default values
@@ -133,8 +134,45 @@ void APeacenetWorldStateActor::Tick(float DeltaTime)
 	}
 }
 
-void APeacenetWorldStateActor::StartGame()
+void APeacenetWorldStateActor::StartGame(TSubclassOf<UDesktopWidget> InDesktopClass, TSubclassOf<UWindow> InWindowClass)
 {
+	check(HasExistingOS() || this->SaveGame);
+
+	if(!this->SaveGame)
+		this->SaveGame = Cast<UPeacenetSaveGame>(UGameplayStatics::LoadGameFromSlot("PeacegateOS", 0));
+
+	this->DesktopClass = InDesktopClass;
+	this->WindowClass = InWindowClass;
+
+	UPeacenetGameInstance* GameInstance = Cast<UPeacenetGameInstance>(GetGameInstance());
+
+	for(auto GameTypeAsset : GameInstance->GameTypes)
+	{
+		if(GameTypeAsset->Name == this->SaveGame->GameTypeName)
+		{
+			this->GameType = GameTypeAsset;
+			break;
+		}
+	}
+
+	check(GameType);
+
+	// Find the player character.
+	FPeacenetIdentity Character;
+	int CharacterIndex = -1;
+	bool result = this->SaveGame->GetCharacterByID(this->SaveGame->PlayerCharacterID, Character, CharacterIndex);
+	check(result);
+
+	// Create a system context.
+	USystemContext* PlayerSystemContext = NewObject<USystemContext>(this);
+
+	// Link it to the character and computer.
+	PlayerSystemContext->Setup(Character.ComputerID, Character.ID, this);
+
+	// Set up the desktop.
+	PlayerSystemContext->SetupDesktop(this->SaveGame->PlayerUserID);
+
+	this->PlayerSystemReady.Broadcast(PlayerSystemContext);
 }
 
 bool APeacenetWorldStateActor::FindProgramByName(FName InName, UPeacegateProgramAsset *& OutProgram)
@@ -201,9 +239,7 @@ bool APeacenetWorldStateActor::HasExistingOS()
 void APeacenetWorldStateActor::SaveWorld()
 {
 	// update game type, window decorator and desktop class
-	SaveGame->DesktopClass = this->DesktopClass;
 	SaveGame->GameTypeName = this->GameType->Name;
-	SaveGame->WindowClass = this->WindowClass;
 
 	// Actually save the game.
 	UGameplayStatics::SaveGameToSlot(this->SaveGame, TEXT("PeacegateOS"), 0);

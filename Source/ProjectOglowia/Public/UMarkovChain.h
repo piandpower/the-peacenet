@@ -1,5 +1,7 @@
 // Copyright (c) 2019 Alkaline Thunder & Bit Phoenix Software
 
+#pragma once
+
 #include "CoreMinimal.h"
 #include "FMarkovSource.h"
 #include "Math/RandomStream.h"

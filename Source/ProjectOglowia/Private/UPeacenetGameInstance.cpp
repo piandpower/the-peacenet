@@ -1,7 +1,15 @@
 // Copyright (c) 2018 The Peacenet & Alkaline Thunder.
 
 #include "UPeacenetGameInstance.h"
+#include "UGameTypeAsset.h"
+#include "AssetRegistry/Public/IAssetRegistry.h"
+#include "AssetRegistry/Public/AssetRegistryModule.h"
 #include "Kismet/GameplayStatics.h"
+
+TArray<UPeacenetGameTypeAsset*> const& UPeacenetGameInstance::GetGameTypes() const
+{
+	return this->GameTypes;
+}
 
 UPeacenetSettings * UPeacenetGameInstance::GetSettings()
 {
@@ -35,6 +43,20 @@ void UPeacenetGameInstance::Init()
 		this->Settings = NewObject<UPeacenetSettings>();
 
 		this->SaveSettings();
+	}
+
+		// Get the Asset Registry
+	FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
+
+	// A place to store computer type asset data
+	TArray<FAssetData> Assets;
+
+	if (!AssetRegistryModule.Get().GetAssetsByClass("PeacenetGameTypeAsset", Assets, true))
+		check(false);
+
+	for (auto& Asset : Assets)
+	{
+		this->GameTypes.Add(Cast<UPeacenetGameTypeAsset>(Asset.GetAsset()));
 	}
 }
 

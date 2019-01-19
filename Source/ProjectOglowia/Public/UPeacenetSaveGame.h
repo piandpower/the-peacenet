@@ -31,9 +31,6 @@ public:
 	TSubclassOf<UWindow> WindowClass;
 
 	UPROPERTY(VisibleAnywhere, Category = "Peacegate")
-	TSubclassOf<UDesktopWidget> DesktopClass;
-
-	UPROPERTY(VisibleAnywhere, Category = "Peacegate")
 	FString GameTypeName;
 
 	UPROPERTY(VisibleAnywhere, Category = "Entities")

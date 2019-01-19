@@ -53,7 +53,7 @@ TArray<UPeacegateProgramAsset*> USystemContext::GetInstalledPrograms()
 {
 	check(Peacenet);
 
-	if (GetPeacenet()->GameType->UnlockAllProgramsByDefault)
+	if (!GetPeacenet()->GameType->GameRules.DoUnlockables)
 	{
 		// Return ALL loaded programs if we're in a sandbox environment with all programs unlocked.
 		return GetPeacenet()->Programs;
@@ -97,7 +97,7 @@ bool USystemContext::TryGetTerminalCommand(FName CommandName, UTerminalCommand *
 {
 	check(Peacenet);
 
-	if (!(GetComputer().InstalledCommands.Contains(CommandName) || GetComputer().InstalledPrograms.Contains(CommandName)) && !Peacenet->GameType->UnlockAllProgramsByDefault)
+	if (!(GetComputer().InstalledCommands.Contains(CommandName) || GetComputer().InstalledPrograms.Contains(CommandName)) && Peacenet->GameType->GameRules.DoUnlockables)
 		return false;
 
 	if (!GetPeacenet()->ManPages.Contains(CommandName))

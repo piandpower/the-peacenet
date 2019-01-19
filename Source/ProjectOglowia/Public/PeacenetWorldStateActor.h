@@ -114,7 +114,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Peacenet")
-	void StartGame();
+	void StartGame(TSubclassOf<UDesktopWidget> InDesktopClass, TSubclassOf<UWindow> InWindowClass);
 	
 public:
 	// Used by the Ubiquity menu to see if the "Boot existing OS" screen should show.

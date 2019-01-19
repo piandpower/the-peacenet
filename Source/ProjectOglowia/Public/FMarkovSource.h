@@ -1,5 +1,7 @@
 // Copyright (c) 2018 Alkaline Thunder & Bit Phoenix Software
 
+#pragma once
+
 #include "CoreMinimal.h"
 #include "FMarkovSource.generated.h"
 

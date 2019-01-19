@@ -9,6 +9,8 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSettingsAppliedEvent, UPeacenetSettings*, InSettings);
 
+class UPeacenetGameTypeAsset;
+
 /**
  * A game instance specifically for Peacenet.
  */
@@ -18,6 +20,9 @@ class PROJECTOGLOWIA_API UPeacenetGameInstance : public UGameInstance
 	GENERATED_BODY()
 
 public:
+	UPROPERTY()
+	TArray<UPeacenetGameTypeAsset*> GameTypes;
+
 	// The settings for the current instance of The Peacenet.
 	UPROPERTY()
 	UPeacenetSettings* Settings;
@@ -33,6 +38,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Settings")
 	void LoadSettings();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Peacenet")
+	TArray<UPeacenetGameTypeAsset*> const& GetGameTypes() const;
 
 public: // UGameInstance overrides.
 	virtual void Init() override;

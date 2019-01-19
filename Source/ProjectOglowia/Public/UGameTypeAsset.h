@@ -3,7 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ECountry.h"
+#include "FGameRules.h"
+#include "Engine/Texture2D.h"
+#include "Engine/DataAsset.h"
 #include "UGameTypeAsset.generated.h"
 
 /**
@@ -25,11 +27,11 @@ public:
 	UTexture2D* Icon;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	ECountry SpawnCountry;
+	bool AllowCustomSpawnCountry = false;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	bool EnableMissions = false;
+	bool AllowCustomGameRules = false;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	bool UnlockAllProgramsByDefault = false;
+	FGameRules GameRules;
 };

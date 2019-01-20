@@ -6,7 +6,9 @@
 #include "GameFramework/Actor.h"
 #include "UDesktopWidget.h"
 #include "FManPage.h"
+#include "EGovernmentAlertStatus.h"
 #include "UPeacenetSaveGame.h"
+#include "FGovernmentAlertInfo.h"
 #include "UGameTypeAsset.h"
 #include "PeacenetWorldStateActor.generated.h"
 
@@ -31,6 +33,9 @@ public: // Constructors
 private: // Properties
 	UPROPERTY()
 	TArray<USystemContext*> SystemContexts;
+
+	UPROPERTY()
+	TMap<int, FGovernmentAlertInfo> GovernmentAlertInfo;
 
 public: //Properties
 	UPROPERTY()
@@ -75,6 +80,9 @@ public:	// Functions
 
 	UFUNCTION()
 	void SaveWorld();
+
+	UFUNCTION()
+	FGovernmentAlertInfo GetAlertInfo(int InCharacterID);
 
 	UFUNCTION(BlueprintCallable, Category = "Peacenet")
 	void StartGame(TSubclassOf<UDesktopWidget> InDesktopClass, TSubclassOf<UWindow> InWindowClass);

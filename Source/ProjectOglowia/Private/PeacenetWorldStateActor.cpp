@@ -134,6 +134,26 @@ void APeacenetWorldStateActor::Tick(float DeltaTime)
 	}
 }
 
+FGovernmentAlertInfo APeacenetWorldStateActor::GetAlertInfo(int InCharacterId)
+{
+	check(this->SaveGame);
+
+	FPeacenetIdentity Character;
+	int CharacterIndex;
+	bool result = this->SaveGame->GetCharacterByID(InCharacterId, Character, CharacterIndex);
+	check(result);
+
+	if(!GovernmentAlertInfo.Contains(Character.ID))
+	{
+		FGovernmentAlertInfo Info;
+		Info.Status = EGovernmentAlertStatus::NoAlert;
+		Info.AlertLevel = 0.f;
+		this->GovernmentAlertInfo.Add(Character.ID, Info);
+	}
+
+	return GovernmentAlertInfo[Character.ID];
+}
+
 void APeacenetWorldStateActor::StartGame(TSubclassOf<UDesktopWidget> InDesktopClass, TSubclassOf<UWindow> InWindowClass)
 {
 	check(HasExistingOS() || this->SaveGame);

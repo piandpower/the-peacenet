@@ -6,6 +6,7 @@
 #include "FComputer.h"
 #include "UUserContext.h"
 #include "PTerminalWidget.h"
+#include "UGameTypeAsset.h"
 #include "FPeacenetIdentity.h"
 #include "CommonUtils.h"
 #include "WallpaperAsset.h"
@@ -90,6 +91,9 @@ void UDesktopWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	check(this->SystemContext);
 	check(this->SystemContext->GetPeacenet());
+
+	// Keep track of the current game rules.
+	this->GameRules = this->SystemContext->GetPeacenet()->GameType->GameRules;
 
 	this->MyCharacter = this->SystemContext->GetCharacter();
 	this->MyComputer = this->SystemContext->GetComputer();

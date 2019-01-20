@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "UDesktopWidget.h"
+#include "FManPage.h"
 #include "UPeacenetSaveGame.h"
 #include "UGameTypeAsset.h"
 #include "PeacenetWorldStateActor.generated.h"
@@ -23,26 +24,6 @@ class UVulnerability;
 class UMissionUnlock;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPlayerSystemContextReadyEvent, USystemContext*, InSystemContext);
-
-USTRUCT()
-struct FManPage
-{
-	GENERATED_BODY()
-
-public:
-
-	UPROPERTY()
-	FString Description;
-
-	UPROPERTY()
-	FString LongDescription;
-
-	UPROPERTY()
-	FString InternalUsage;
-
-	UPROPERTY()
-	FString FriendlyUsage;
-};
 
 UCLASS()
 class PROJECTOGLOWIA_API APeacenetWorldStateActor : public AActor

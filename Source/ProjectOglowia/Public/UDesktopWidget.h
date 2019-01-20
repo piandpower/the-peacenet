@@ -6,6 +6,7 @@
 #include "UserWidget.h"
 #include "UPeacegateProgramAsset.h" 
 #include "UPeacegateFileSystem.h"
+#include "FGameRules.h"
 #include "UDesktopWidget.generated.h"
 
 class USystemContext;
@@ -122,6 +123,10 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Desktop")
 	UTexture2D* WallpaperTexture;
+
+protected:
+	UPROPERTY(BlueprintReadOnly, Category = "Game Rules")
+	FGameRules GameRules;
 
 public:
 	UFUNCTION(BlueprintImplementableEvent)

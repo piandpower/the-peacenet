@@ -53,24 +53,43 @@ TArray<UPeacegateProgramAsset*> USystemContext::GetInstalledPrograms()
 {
 	check(Peacenet);
 
-	if (!GetPeacenet()->GameType->GameRules.DoUnlockables)
-	{
-		// Return ALL loaded programs if we're in a sandbox environment with all programs unlocked.
-		return GetPeacenet()->Programs;
-	}
-
 	TArray<UPeacegateProgramAsset*> OutArray;
 
-	for (auto Executable : GetComputer().InstalledPrograms)
+	for(auto Program : this->GetPeacenet()->Programs)
 	{
-		UPeacegateProgramAsset* FoundProgram;
-		if (GetPeacenet()->FindProgramByName(Executable, FoundProgram))
+		if(GetPeacenet()->GameType->GameRules.DoUnlockables)
 		{
-			OutArray.Add(FoundProgram);
+			if(!GetComputer().InstalledPrograms.Contains(Program->ExecutableName) && !Program->IsUnlockedByDefault)
+				continue;
 		}
+		OutArray.Add(Program);
 	}
 
 	return OutArray;
+}
+
+TArray<UCommandInfo*> USystemContext::GetInstalledCommands()
+{
+	check(this->GetPeacenet());
+
+	TArray<UCommandInfo*> Ret;
+
+	TArray<FName> CommandNames;
+	GetPeacenet()->CommandInfo.GetKeys(CommandNames);
+
+	for(auto Name : CommandNames)
+	{
+		UCommandInfo* Info = GetPeacenet()->CommandInfo[Name];
+
+		if(GetPeacenet()->GameType->GameRules.DoUnlockables)
+		{
+			if(!GetComputer().InstalledCommands.Contains(Name) && !Info->UnlockedByDefault)
+				continue;
+		}
+		Ret.Add(Info);
+	}
+
+	return Ret;
 }
 
 bool USystemContext::OpenProgram(FName InExecutableName, UProgram*& OutProgram, bool InCheckForExistingWindow)
@@ -119,9 +138,6 @@ bool USystemContext::TryGetTerminalCommand(FName CommandName, UTerminalCommand *
 {
 	check(Peacenet);
 
-	if (!(GetComputer().InstalledCommands.Contains(CommandName) || GetComputer().InstalledPrograms.Contains(CommandName)) && Peacenet->GameType->GameRules.DoUnlockables)
-		return false;
-
 	if (!GetPeacenet()->ManPages.Contains(CommandName))
 		return false;
 
@@ -133,6 +149,14 @@ bool USystemContext::TryGetTerminalCommand(FName CommandName, UTerminalCommand *
 	UPeacegateProgramAsset* Program = nullptr;
 	if (GetPeacenet()->FindProgramByName(CommandName, Program))
 	{
+		if(GetPeacenet()->GameType->GameRules.DoUnlockables)
+		{
+			if(!GetComputer().InstalledPrograms.Contains(CommandName) && !Program->IsUnlockedByDefault)
+			{
+				return false;
+			}
+		}
+
 		UGraphicalTerminalCommand* GraphicalCommand = NewObject<UGraphicalTerminalCommand>(this);
 		GraphicalCommand->ProgramAsset = Program;
 		GraphicalCommand->CommandInfo = Peacenet->CommandInfo[CommandName];
@@ -146,6 +170,15 @@ bool USystemContext::TryGetTerminalCommand(FName CommandName, UTerminalCommand *
 	}
 
 	UCommandInfo* Info = GetPeacenet()->CommandInfo[CommandName];
+
+	if(GetPeacenet()->GameType->GameRules.DoUnlockables)
+	{
+		if(!GetComputer().InstalledCommands.Contains(CommandName) && !Info->UnlockedByDefault)
+		{
+			return false;
+		}
+	}
+
 	OutCommand = NewObject<UTerminalCommand>(this, Info->Info.CommandClass);
 
 	OutCommand->CommandInfo = Info;

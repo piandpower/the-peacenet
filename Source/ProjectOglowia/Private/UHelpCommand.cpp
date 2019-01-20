@@ -1,4 +1,5 @@
 #include "UHelpCommand.h"
+#include "CommandInfo.h"
 #include "UUserContext.h"
 
 void UHelpCommand::NativeRunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments)
@@ -9,26 +10,23 @@ void UHelpCommand::NativeRunCommand(UConsoleContext* InConsole, const TMap<FStri
 	TMap<FName, FString> CommandList;
 	int MaxLength = 0;
 
-	for (auto Program : InConsole->GetUserContext()->GetPeacenet()->Programs)
+	for (auto Program : InConsole->GetUserContext()->GetOwningSystem()->GetInstalledPrograms())
 	{
-		if (InConsole->GetUserContext()->GetOwningSystem()->GetComputer().InstalledPrograms.Contains(Program->ExecutableName))
+		CommandList.Add(Program->ExecutableName, Program->AppLauncherItem.Description.ToString());
+		int Length = Program->ExecutableName.ToString().GetCharArray().Num();
+		if (Length > MaxLength)
 		{
-			CommandList.Add(Program->ExecutableName, Program->AppLauncherItem.Description.ToString());
-			int Length = Program->ExecutableName.ToString().GetCharArray().Num();
-			if (Length > MaxLength)
-			{
-				MaxLength = Length;
-			}
+			MaxLength = Length;
 		}
 	}
 
-	for (auto Command : InConsole->GetUserContext()->GetOwningSystem()->GetComputer().InstalledCommands)
+	for (auto Command : InConsole->GetUserContext()->GetOwningSystem()->GetInstalledCommands())
 	{
-		if (!InConsole->GetUserContext()->GetPeacenet()->ManPages.Contains(Command))
+		if (!InConsole->GetUserContext()->GetPeacenet()->ManPages.Contains(Command->Info.CommandName))
 			continue;
-		FManPage ManPage = InConsole->GetUserContext()->GetPeacenet()->ManPages[Command];
-		CommandList.Add(Command, ManPage.Description);
-		int Length = Command.ToString().GetCharArray().Num();
+		FManPage ManPage = InConsole->GetUserContext()->GetPeacenet()->ManPages[Command->Info.CommandName];
+		CommandList.Add(Command->Info.CommandName, ManPage.Description);
+		int Length = Command->Info.CommandName.ToString().GetCharArray().Num();
 		if (Length > MaxLength)
 		{
 			MaxLength = Length;

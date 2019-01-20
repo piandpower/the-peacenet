@@ -155,12 +155,8 @@ void UDesktopWidget::ResetAppLauncher()
 
 	// Collect app launcher categories.
 	TArray<FString> CategoryNames;
-	for (auto ProgramName : this->SystemContext->GetComputer().InstalledPrograms)
+	for (auto Program : this->SystemContext->GetInstalledPrograms())
 	{
-		UPeacegateProgramAsset* Program;
-
-		if (!this->SystemContext->GetPeacenet()->FindProgramByName(ProgramName, Program))
-			continue;
 		if (!CategoryNames.Contains(Program->AppLauncherItem.Category.ToString()))
 		{
 			CategoryNames.Add(Program->AppLauncherItem.Category.ToString());
@@ -188,18 +184,13 @@ void UDesktopWidget::ShowAppLauncherCategory(const FString& InCategoryName)
 	this->ClearAppLauncherSubMenu();
 
 	// Add all the programs.
-	for (auto ProgramId : this->SystemContext->GetComputer().InstalledPrograms)
+	for (auto Program : this->SystemContext->GetInstalledPrograms())
 	{
-		UPeacegateProgramAsset* Program = nullptr;
-
-		if (!this->SystemContext->GetPeacenet()->FindProgramByName(ProgramId, Program))
-			continue;
-
 		if (Program->AppLauncherItem.Category.ToString() != InCategoryName)
 			continue;
 
 		// because Blueprints hate strings being passed by-value.
-		FString ProgramName = ProgramId.ToString();
+		FString ProgramName = Program->ExecutableName.ToString();
 
 		// Add the item. Woohoo.
 		this->AddAppLauncherSubMenuItem(Program->AppLauncherItem.Name, Program->AppLauncherItem.Description, ProgramName, Program->AppLauncherItem.Icon);

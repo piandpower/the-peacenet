@@ -86,12 +86,6 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Computer")
 	EComputerOwnerType OwnerType = EComputerOwnerType::NPC;
 
-	UPROPERTY(BlueprintReadOnly)
-	FString IPAddress;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Computer")
-	FName ComputerType = NAME_None;
-
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Computer")
 	TArray<FFolder> Filesystem;
 
@@ -115,8 +109,4 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Unlocks")
 	TArray<FName> UnlockedWallpapers;
-
-	// If true then the IP address of this computer is local to an enterprise network. No connections can be made to this computer directly.
-	UPROPERTY()
-	bool IsNATted = false;
 };

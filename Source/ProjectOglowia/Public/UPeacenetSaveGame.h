@@ -22,6 +22,9 @@ class PROJECTOGLOWIA_API UPeacenetSaveGame : public USaveGame
 
 public:
 	UPROPERTY(VisibleAnywhere, Category = "Peacegate")
+	bool IsNewGame = true;
+
+	UPROPERTY(VisibleAnywhere, Category = "Peacegate")
 	int PlayerCharacterID = 0;
 
 	UPROPERTY(VisibleAnywhere, Category = "Peacegate")
@@ -64,9 +67,6 @@ public:
 
 	UFUNCTION()
 	bool IPAddressAllocated(FString InIPAddress);
-
-	UFUNCTION()
-	bool IsCharacterNodePositionTaken(ECountry InCountry, FVector2D InPosition);
 
 	UFUNCTION()
 		bool GetCharacterByID(int InEntityID, FPeacenetIdentity& OutCharacter, int& OutIndex);

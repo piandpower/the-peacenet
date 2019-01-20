@@ -98,6 +98,9 @@ public:
 	void SetupDesktop(int InUserID);
 
 	UFUNCTION()
+	TArray<UCommandInfo*> GetInstalledCommands();
+
+	UFUNCTION()
 	void Setup(int InComputerID, int InCharacterID, APeacenetWorldStateActor* InPeacenet);
 
 	UFUNCTION()

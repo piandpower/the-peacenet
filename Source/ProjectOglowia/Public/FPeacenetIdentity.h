@@ -32,13 +32,6 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FString CharacterName;
 
-	// Temporary value: emails will be dictated by hub membership in m2.
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
-	FString Email;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FVector2D NodePosition;
-
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	int Skill;
 
@@ -53,10 +46,4 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	EIdentityType CharacterType;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	TArray<int> Friends;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	TArray<int> Enemies;
 };

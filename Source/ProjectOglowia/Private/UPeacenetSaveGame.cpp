@@ -21,31 +21,7 @@ bool UPeacenetSaveGame::DomainNameExists(FString InDomainName)
 
 bool UPeacenetSaveGame::IPAddressAllocated(FString InIPAddress)
 {
-	for (auto& Computer : this->Computers)
-	{
-		if (Computer.IPAddress == InIPAddress)
-		{
-			return true;
-		}
-	}
-	return false;
-}
-
-bool UPeacenetSaveGame::IsCharacterNodePositionTaken(ECountry InCountry, FVector2D InPosition)
-{
-	const float DISTANCE = 0.1f;
-
-	for (auto& Character : this->Characters)
-	{
-		if (Character.Country != InCountry)
-			continue;
-
-		if (FVector2D::Distance(InPosition, Character.NodePosition) <= DISTANCE) 
-		{
-			return true;
-		}
-	}
-	return false;
+	return true;
 }
 
 bool UPeacenetSaveGame::GetCharacterByID(int InEntityID, FPeacenetIdentity & OutCharacter, int& OutIndex)

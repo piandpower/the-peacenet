@@ -14,6 +14,7 @@
 
 class USystemContext;
 class UWallpaperAsset;
+class UMarkovTrainingDataAsset;
 class UPeacegateProgramAsset;
 class UTerminalCommand;
 class UCommandInfo;
@@ -38,6 +39,9 @@ private: // Properties
 	TMap<int, FGovernmentAlertInfo> GovernmentAlertInfo;
 
 public: //Properties
+	UPROPERTY()
+	TArray<UMarkovTrainingDataAsset*> MarkovData;
+
 	UPROPERTY()
 	TArray<UWallpaperAsset*> Wallpapers;
 

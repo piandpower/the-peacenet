@@ -5,6 +5,7 @@
 #include "UPeacegateProgramAsset.h"
 #include "UHelpCommand.h"
 #include "WallpaperAsset.h"
+#include "UMarkovTrainingDataAsset.h"
 #include "CommandInfo.h"
 #include "TerminalCommand.h"
 #include "AssetRegistry/Public/IAssetRegistry.h"
@@ -89,6 +90,9 @@ void APeacenetWorldStateActor::BeginPlay()
 
 	// Load wallpaper assets.
 	this->LoadAssets<UWallpaperAsset>(TEXT("WallpaperAsset"), this->Wallpapers);
+
+	// Load markov training data for world gen stuff.
+	this->LoadAssets<UMarkovTrainingDataAsset>("MarkovTrainingDataAsset", this->MarkovData);
 
 	// Do we have an existing OS?
 	if (!HasExistingOS())

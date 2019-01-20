@@ -3,7 +3,7 @@
 
 void UHelpCommand::NativeRunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments)
 {
-	InConsole->WriteLine(TEXT("&*&ACommand help&r&1"));
+	InConsole->WriteLine(TEXT("&*&FCommand help&r&7"));
 	InConsole->WriteLine(TEXT("------------------- \n"));
 
 	TMap<FName, FString> CommandList;
@@ -43,7 +43,7 @@ void UHelpCommand::NativeRunCommand(UConsoleContext* InConsole, const TMap<FStri
 		FString NameStr = Name.ToString();
 		int DistLength = (MaxLength + 2) - (NameStr.GetCharArray().Num() + 2);
 
-		InConsole->WriteLine(TEXT("`8`*") + NameStr + TEXT("`r`1: ") + FString::ChrN(DistLength, TEXT(' ')) + CommandList[Name]);
+		InConsole->WriteLine("&8&*" + NameStr + "&r&7: " + FString::ChrN(DistLength, TEXT(' ')) + CommandList[Name]);
 	}
 	this->Complete();
 }

@@ -5,6 +5,7 @@
 #include "UPeacegateProgramAsset.h"
 #include "UHelpCommand.h"
 #include "WallpaperAsset.h"
+#include "UProceduralGenerationEngine.h"
 #include "UMarkovTrainingDataAsset.h"
 #include "CommandInfo.h"
 #include "TerminalCommand.h"
@@ -106,6 +107,10 @@ void APeacenetWorldStateActor::BeginPlay()
 
 	// Load terminal command assets, build usage strings, populate command map.
 	this->LoadTerminalCommands();
+
+	// Spin up the procedural generation engine.
+	this->Procgen = NewObject<UProceduralGenerationEngine>(this);
+	this->Procgen->Initialize(this);
 }
 
 void APeacenetWorldStateActor::EndPlay(const EEndPlayReason::Type InReason)

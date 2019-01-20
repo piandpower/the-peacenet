@@ -15,6 +15,7 @@
 class USystemContext;
 class UWallpaperAsset;
 class UMarkovTrainingDataAsset;
+class UProceduralGenerationEngine;
 class UPeacegateProgramAsset;
 class UTerminalCommand;
 class UCommandInfo;
@@ -32,6 +33,9 @@ public: // Constructors
 	APeacenetWorldStateActor();
 
 private: // Properties
+	UPROPERTY()
+	UProceduralGenerationEngine* Procgen;
+
 	UPROPERTY()
 	TArray<USystemContext*> SystemContexts;
 

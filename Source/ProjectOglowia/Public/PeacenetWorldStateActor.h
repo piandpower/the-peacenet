@@ -10,18 +10,12 @@
 #include "UGameTypeAsset.h"
 #include "PeacenetWorldStateActor.generated.h"
 
-class UNativeLatentAction;
-class UMissionAsset;
-class UComputerService;
-class UComputerTypeAsset;
 class USystemContext;
 class UWallpaperAsset;
 class UPeacegateProgramAsset;
 class UTerminalCommand;
 class UCommandInfo;
 class UWindow;
-class UVulnerability;
-class UMissionUnlock;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPlayerSystemContextReadyEvent, USystemContext*, InSystemContext);
 

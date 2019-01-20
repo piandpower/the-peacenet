@@ -57,10 +57,11 @@ public:
 
 	FActiveProgramCloseEvent EventActiveProgramClose;
 
-protected:
+public:
 	UFUNCTION(BlueprintCallable, Category = "Desktop")
 	UProgram* SpawnProgramFromClass(TSubclassOf<UProgram> InClass, const FText& InTitle, UTexture2D* InIcon);
 
+protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Desktop")
 	FPeacenetIdentity MyCharacter;
 
@@ -123,7 +124,7 @@ public:
 	UTexture2D* WallpaperTexture;
 
 public:
-	UFUNCTION()
+	UFUNCTION(BlueprintImplementableEvent)
 	void ShowProgramOnWorkspace(UProgram* InProgram);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Desktop")
@@ -161,9 +162,6 @@ public:
 	UFUNCTION()
 	void EnqueueNotification(const FText& InTitle, const FText& InMessage, UTexture2D* InIcon);
 
-	UFUNCTION()
-	void ResetWindowList();
-	
 	UFUNCTION()
 	void ResetDesktopIcons();
 

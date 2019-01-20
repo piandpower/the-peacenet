@@ -75,7 +75,29 @@ TArray<UPeacegateProgramAsset*> USystemContext::GetInstalledPrograms()
 
 bool USystemContext::OpenProgram(FName InExecutableName, UProgram*& OutProgram, bool InCheckForExistingWindow)
 {
-	return false;
+	check(this->GetPeacenet());
+	check(this->GetDesktop());
+
+	UPeacegateProgramAsset* PeacegateProgram = nullptr;
+
+	if(!this->GetPeacenet()->FindProgramByName(InExecutableName, PeacegateProgram))
+		return false;
+
+	if(this->GetPeacenet()->GameType->GameRules.DoUnlockables)
+	{
+		if(!this->GetComputer().InstalledPrograms.Contains(InExecutableName) && !PeacegateProgram->IsUnlockedByDefault)
+		{
+			return false;
+		}
+	}
+
+	UProgram* Program = this->GetDesktop()->SpawnProgramFromClass(PeacegateProgram->ProgramClass, PeacegateProgram->AppLauncherItem.Name, PeacegateProgram->AppLauncherItem.Icon);
+
+	check(Program);
+
+	this->GetDesktop()->ShowProgramOnWorkspace(Program);
+
+	return Program;
 }
 
 UPeacegateFileSystem * USystemContext::GetFilesystem(const int UserID)

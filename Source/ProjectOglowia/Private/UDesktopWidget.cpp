@@ -12,10 +12,6 @@
 #include "UProgram.h"
 #include "UConsoleContext.h"
 
-void UDesktopWidget::ShowProgramOnWorkspace(UProgram* InProgram)
-{
-}
-
 void UDesktopWidget::CloseActiveProgram()
 {
 	this->EventActiveProgramClose.Broadcast();
@@ -168,10 +164,6 @@ void UDesktopWidget::EnqueueNotification(const FText & InTitle, const FText & In
 	note.Message = InMessage;
 	note.Icon = InIcon;
 	this->NotificationQueue.Add(note);
-}
-
-void UDesktopWidget::ResetWindowList()
-{
 }
 
 void UDesktopWidget::ResetDesktopIcons()

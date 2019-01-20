@@ -6,6 +6,11 @@
 #include "AssetRegistry/Public/AssetRegistryModule.h"
 #include "Kismet/GameplayStatics.h"
 
+void UPeacenetGameInstance::CreateWorld(FString InCharacterName, UPeacenetGameTypeAsset* InGameType)
+{
+
+}
+
 TArray<UPeacenetGameTypeAsset*> const& UPeacenetGameInstance::GetGameTypes() const
 {
 	return this->GameTypes;

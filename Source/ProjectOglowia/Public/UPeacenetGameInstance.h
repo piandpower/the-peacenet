@@ -42,6 +42,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Peacenet")
 	TArray<UPeacenetGameTypeAsset*> const& GetGameTypes() const;
 
+	UFUNCTION(BlueprintCallable, Category = "Peacenet")
+	void CreateWorld(FString InCharacterName, UPeacenetGameTypeAsset* InGameType);
+
 public: // UGameInstance overrides.
 	virtual void Init() override;
 	virtual void Shutdown() override;

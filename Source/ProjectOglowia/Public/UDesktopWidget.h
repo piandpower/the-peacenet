@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "UserWidget.h"
 #include "UPeacegateProgramAsset.h" 
+#include "EGovernmentAlertStatus.h"
+#include "FGovernmentAlertInfo.h"
 #include "UPeacegateFileSystem.h"
 #include "FGameRules.h"
 #include "UDesktopWidget.generated.h"
@@ -42,6 +44,12 @@ class PROJECTOGLOWIA_API UDesktopWidget : public UUserWidget
 protected:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "System")
 	USystemContext* GetSystemContext();
+
+	UPROPERTY()
+	FGovernmentAlertInfo AlertInfo;
+
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "Government Alert")
+	EGovernmentAlertStatus GetAlertStatus();
 
 public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "System")

@@ -78,6 +78,11 @@ UConsoleContext * UDesktopWidget::CreateConsole(UPTerminalWidget* InTerminal)
 	return this->SystemContext->GetUserContext(this->UserID)->CreateConsole(InTerminal);
 }
 
+EGovernmentAlertStatus UDesktopWidget::GetAlertStatus()
+{
+	return this->AlertInfo.Status;
+}
+
 void UDesktopWidget::SetWallpaper(UTexture2D* InTexture)
 {
 	this->GetSystemContext()->GetComputer().CurrentWallpaper = InTexture;
@@ -94,6 +99,9 @@ void UDesktopWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 
 	// Keep track of the current game rules.
 	this->GameRules = this->SystemContext->GetPeacenet()->GameType->GameRules;
+
+	// Fetch government alert status.
+	this->AlertInfo = this->SystemContext->GetPeacenet()->GetAlertInfo(this->SystemContext->GetCharacter().ID);
 
 	this->MyCharacter = this->SystemContext->GetCharacter();
 	this->MyComputer = this->SystemContext->GetComputer();

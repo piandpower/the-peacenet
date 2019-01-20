@@ -24,14 +24,15 @@ class PROJECTOGLOWIA_API APeacenetWorldStateActor : public AActor
 {
 	GENERATED_BODY()
 	
-private:
-	UFUNCTION()
-	void LoadTerminalCommands();
+public: // Constructors
+	// Sets default values for this actor's properties
+	APeacenetWorldStateActor();
 
-public:	
-	UFUNCTION()
-	void SaveWorld();
+private: // Properties
+	UPROPERTY()
+	TArray<USystemContext*> SystemContexts;
 
+public: //Properties
 	UPROPERTY()
 	TArray<UWallpaperAsset*> Wallpapers;
 
@@ -62,36 +63,36 @@ public:
 	UPROPERTY()
 	TMap<FName, UCommandInfo*> CommandInfo;
 
-	// Sets default values for this actor's properties
-	APeacenetWorldStateActor();
-
-private:
-
-	UPROPERTY()
-	TArray<USystemContext*> SystemContexts;
+private: // Functions
+	UFUNCTION()
+	void LoadTerminalCommands();
 
 	template<typename AssetType>
 	bool LoadAssets(FName ClassName, TArray<AssetType*>& OutArray);
 
-protected:
+public:	// Functions
+	FText GetTimeOfDay();
+
+	UFUNCTION()
+	void SaveWorld();
+
+	UFUNCTION(BlueprintCallable, Category = "Peacenet")
+	void StartGame(TSubclassOf<UDesktopWidget> InDesktopClass, TSubclassOf<UWindow> InWindowClass);
+
+	UFUNCTION()
+	bool FindProgramByName(FName InName, UPeacegateProgramAsset*& OutProgram);
+
+protected: // AActor overrides
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	virtual void EndPlay(const EEndPlayReason::Type InReason) override;
 	
-public:	
-	UFUNCTION()
-	bool FindProgramByName(FName InName, UPeacegateProgramAsset*& OutProgram);
-
-	FText GetTimeOfDay();
-
+public:	// AActor Overrides
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	UFUNCTION(BlueprintCallable, Category = "Peacenet")
-	void StartGame(TSubclassOf<UDesktopWidget> InDesktopClass, TSubclassOf<UWindow> InWindowClass);
 	
-public:
+public: // Static functions
 	// Used by the Ubiquity menu to see if the "Boot existing OS" screen should show.
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Peacegate")
 	static bool HasExistingOS();

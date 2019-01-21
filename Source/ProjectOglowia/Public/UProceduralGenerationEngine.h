@@ -25,5 +25,8 @@ private:
 
 public:
     UFUNCTION()
+    FComputer& GenerateComputer(FString InHostname, EComputerOwnerType InOwnerType);
+
+    UFUNCTION()
     void Initialize(APeacenetWorldStateActor* InPeacenet);
 };

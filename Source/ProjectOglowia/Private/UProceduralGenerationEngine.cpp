@@ -1,5 +1,6 @@
 #include "UProceduralGenerationEngine.h"
 #include "UPeacenetSaveGame.h"
+#include "Base64.h"
 #include "PeacenetWorldStateActor.h"
 
 void UProceduralGenerationEngine::Initialize(APeacenetWorldStateActor* InPeacenet)
@@ -30,4 +31,62 @@ void UProceduralGenerationEngine::Initialize(APeacenetWorldStateActor* InPeacene
     // Recall when we set the world seed in the save file?
     // This is where we need it.
     this->RNG = FRandomStream(this->Peacenet->SaveGame->WorldSeed);
+}
+
+FComputer& UProceduralGenerationEngine::GenerateComputer(FString InHostname, EComputerOwnerType InOwnerType)
+{
+    FComputer Ret;
+
+    // Set up the core metadata.
+    Ret.ID = this->Peacenet->SaveGame->Computers.Num();
+    Ret.OwnerType = InOwnerType;
+    
+    // Create the barebones filesystem.
+    FFolder Root;
+    Root.FolderID = 0;
+    Root.FolderName = "";
+    Root.ParentID = -1;
+
+    FFolder RootHome;
+    RootHome.FolderID = 1;
+    RootHome.FolderName = "root";
+    RootHome.ParentID = 0;
+
+    FFolder UserHome;
+    UserHome.FolderID = 2;
+    UserHome.FolderName = "home";
+    UserHome.ParentID = 0;
+
+    FFolder Etc;
+    Etc.FolderID = 3;
+    Etc.FolderName = "etc";
+    Etc.ParentID = 0;
+
+    // Write the hostname to a file.
+    FFile HostnameFile;
+    HostnameFile.FileName = "hostname";
+    HostnameFile.FileContent = FBase64::Encode(InHostname);
+
+    // Write the file in /etc.
+    Etc.Files.Add(HostnameFile);
+
+    // Link up the three folders to the root.
+    Root.SubFolders.Add(RootHome.FolderID);
+    Root.SubFolders.Add(Etc.FolderID);
+    Root.SubFolders.Add(UserHome.FolderID);
+    
+    // Add all the folders to the computer's disk.
+    Ret.Filesystem.Add(Root);
+    Ret.Filesystem.Add(Etc);
+    Ret.Filesystem.Add(RootHome);
+    Ret.Filesystem.Add(UserHome);
+    
+    // Add the computer to the save file.
+    this->Peacenet->SaveGame->Computers.Add(Ret);
+
+    // Grab the index of that computer in the save.
+    int ComputerIndex = this->Peacenet->SaveGame->Computers.Num() - 1;
+
+    // Return it.
+    return this->Peacenet->SaveGame->Computers[ComputerIndex];
 }

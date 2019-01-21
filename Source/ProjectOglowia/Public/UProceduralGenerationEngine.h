@@ -20,6 +20,9 @@ private:
     UPROPERTY()
     APeacenetWorldStateActor* Peacenet;
 
+    UPROPERTY()
+    FRandomStream RNG;
+
 public:
     UFUNCTION()
     void Initialize(APeacenetWorldStateActor* InPeacenet);

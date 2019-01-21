@@ -110,7 +110,6 @@ void APeacenetWorldStateActor::BeginPlay()
 
 	// Spin up the procedural generation engine.
 	this->Procgen = NewObject<UProceduralGenerationEngine>(this);
-	this->Procgen->Initialize(this);
 }
 
 void APeacenetWorldStateActor::EndPlay(const EEndPlayReason::Type InReason)
@@ -185,6 +184,8 @@ void APeacenetWorldStateActor::StartGame(TSubclassOf<UDesktopWidget> InDesktopCl
 	}
 
 	check(GameType);
+
+	this->Procgen->Initialize(this);
 
 	// Find the player character.
 	FPeacenetIdentity Character;

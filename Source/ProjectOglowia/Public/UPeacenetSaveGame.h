@@ -57,6 +57,9 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Master Password Table")
 	TArray<FString> MPT;
 
+	UPROPERTY(VisibleAnywhere, Category = "Master Password Table")
+	int WorldSeed = -1;
+
 	const float SECONDS_DAY_LENGTH = 86400.f;
 
 	UFUNCTION()

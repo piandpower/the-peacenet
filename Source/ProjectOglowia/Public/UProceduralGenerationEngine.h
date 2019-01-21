@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "FComputer.h"
 #include "FPeacenetIdentity.h"
+#include "UMarkovTrainingDataAsset.h"
 #include "ECountry.h"
 #include "RandomStream.h"
 #include "UProceduralGenerationEngine.generated.h"
@@ -31,9 +32,27 @@ private:
     UPROPERTY()
     UMarkovChain* FemaleNameGenerator;
 
+    UPROPERTY()
+    UMarkovChain* LastNameGenerator;
+
+private:
+    TArray<FString> GetMarkovData(EMarkovTrainingDataUsage InUsage);
+
 public:
     UFUNCTION()
-    FComputer& GenerateComputer(FString InHostname, EComputerOwnerType InOwnerType);
+    void GenerateNonPlayerCharacters();
+
+    UFUNCTION()
+    FPeacenetIdentity& GenerateNonPlayerCharacter();
+
+    UFUNCTION()
+    FString GeneratePassword(int InLength);
+
+    UFUNCTION()
+    void ClearNonPlayerEntities();
+
+    UFUNCTION()
+    FComputer& GenerateComputer(FString InHostname, EComputerType InComputerType, EComputerOwnerType InOwnerType);
 
     UFUNCTION()
     FString GenerateIPAddress(ECountry InCountry);

@@ -71,6 +71,13 @@ enum class EComputerOwnerType : uint8
 	Story
 };
 
+UENUM(BlueprintType)
+enum class EComputerType : uint8
+{
+	Personal,
+	Hub
+};
+
 /**
  * Represents a computer within The Peacenet.
  */
@@ -85,6 +92,9 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Computer")
 	EComputerOwnerType OwnerType = EComputerOwnerType::NPC;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Computer")
+	EComputerType ComputerType = EComputerType::Personal;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Computer")
 	TArray<FFolder> Filesystem;

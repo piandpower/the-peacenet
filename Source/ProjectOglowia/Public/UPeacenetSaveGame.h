@@ -57,6 +57,9 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Procgen")
 	TMap<ECountry, uint8> CountryIPRanges;
 
+	UPROPERTY(VisibleAnywhere, Category = "Procgen")
+	TMap<FString, int> ComputerIPMap;
+	
 	UPROPERTY(VisibleAnywhere, Category = "Master Password Table")
 	TArray<FString> MPT;
 
@@ -64,6 +67,9 @@ public:
 	int WorldSeed = -1;
 
 	const float SECONDS_DAY_LENGTH = 86400.f;
+
+	UFUNCTION()
+	void FixEntityIDs();
 
 	UFUNCTION()
 	bool CharacterNameExists(FString CharacterName);

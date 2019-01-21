@@ -129,7 +129,7 @@ void UMarkovChain::Init(TArray<FString> InArray, int N, FRandomStream InRng)
 		FMarkovSource Source;
 		Source.SetCount(N);
 
-		for (TCHAR Char : ArrayString.ToLower())
+		for (TCHAR Char : ArrayString)
 		{
 			if (Char == TEXT('\0'))
 				break;

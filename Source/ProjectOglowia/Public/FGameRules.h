@@ -41,4 +41,7 @@ public:
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Game Rules")
 	ECountry SpawnCountry = ECountry::Oglowia;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Game Rules")
+    int MaximumSkillLevel = 15;
 };

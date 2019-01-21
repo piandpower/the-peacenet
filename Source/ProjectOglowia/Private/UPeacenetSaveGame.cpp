@@ -21,7 +21,55 @@ bool UPeacenetSaveGame::DomainNameExists(FString InDomainName)
 
 bool UPeacenetSaveGame::IPAddressAllocated(FString InIPAddress)
 {
-	return true;
+	for(auto IP : this->ComputerIPMap)
+	{
+		if(IP.Key == InIPAddress)
+			return true;
+	}
+	return false;
+}
+
+void UPeacenetSaveGame::FixEntityIDs()
+{
+	TMap<int, int> ComputerIDMap;
+	TMap<int, int> CharacterIDMap;
+
+	// Set the IDs of every computer to match their array index.
+	for(int i = 0; i < Computers.Num(); i++)
+	{
+		ComputerIDMap.Add(Computers[i].ID, i);
+		Computers[i].ID = i;
+	}
+
+	// Fix up character IDs and reassign their computer IDs
+	for(int i = 0; i < Characters.Num(); i++)
+	{
+		CharacterIDMap.Add(Characters[i].ID, i);
+		Characters[i].ID = i;
+		Characters[i].ComputerID = ComputerIDMap[Characters[i].ComputerID];
+	}
+
+	// Fix up player character ID
+	PlayerCharacterID = CharacterIDMap[PlayerCharacterID];
+
+	// Fix up IP addresses.
+	TArray<FString> IPsToRemove;
+	for(auto& IPAddress : ComputerIPMap)
+	{
+		if(ComputerIDMap.Contains(IPAddress.Value))
+		{
+			IPAddress.Value = ComputerIDMap[IPAddress.Value];
+		}
+		else
+		{
+			IPsToRemove.Add(IPAddress.Key);
+		}
+	}
+	while(IPsToRemove.Num())
+	{
+		ComputerIPMap.Remove(IPsToRemove[0]);
+		IPsToRemove.RemoveAt(0);
+	}
 }
 
 bool UPeacenetSaveGame::GetCharacterByID(int InEntityID, FPeacenetIdentity & OutCharacter, int& OutIndex)

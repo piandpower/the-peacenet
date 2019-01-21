@@ -3,6 +3,7 @@
 #include "PeacenetWorldStateActor.h"
 #include "Kismet/GameplayStatics.h"
 #include "UPeacegateProgramAsset.h"
+#include "UComputerService.h"
 #include "UHelpCommand.h"
 #include "WallpaperAsset.h"
 #include "UProceduralGenerationEngine.h"
@@ -88,6 +89,9 @@ void APeacenetWorldStateActor::LoadTerminalCommands()
 void APeacenetWorldStateActor::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// Load computer services in.
+	this->LoadAssets<UComputerService>("ComputerService", this->ComputerServices);
 
 	// Load wallpaper assets.
 	this->LoadAssets<UWallpaperAsset>(TEXT("WallpaperAsset"), this->Wallpapers);

@@ -70,6 +70,44 @@ void UPeacenetSaveGame::FixEntityIDs()
 		ComputerIPMap.Remove(IPsToRemove[0]);
 		IPsToRemove.RemoveAt(0);
 	}
+
+	TArray<int> RelationshipsToRemove;
+
+	// Now we fix up character relationships.
+	for(int i = 0; i < CharacterRelationships.Num(); i++)
+	{
+		FCharacterRelationship& Relationship = this->CharacterRelationships[i];
+		if(!(CharacterIDMap.Contains(Relationship.FirstEntityID) && CharacterIDMap.Contains(Relationship.SecondEntityID)))
+		{
+			RelationshipsToRemove.Add(i);
+			continue;
+		}
+
+		Relationship.FirstEntityID = CharacterIDMap[Relationship.FirstEntityID];
+		Relationship.SecondEntityID = CharacterIDMap[Relationship.SecondEntityID];
+	}
+
+	while(RelationshipsToRemove.Num())
+	{
+		CharacterRelationships.RemoveAt(RelationshipsToRemove[0]);
+		RelationshipsToRemove.RemoveAt(0);
+		for(int i = 0; i < RelationshipsToRemove.Num(); i++)
+		{
+			RelationshipsToRemove[i]--;
+		}
+	}
+}
+
+bool UPeacenetSaveGame::RelatesWith(int InFirstEntity, int InSecondEntity)
+{
+	for(auto& Relationship : this->CharacterRelationships)
+	{
+		if(Relationship.FirstEntityID == InFirstEntity && Relationship.SecondEntityID == InSecondEntity)
+			return true;
+		if(Relationship.SecondEntityID == InFirstEntity && Relationship.FirstEntityID == InSecondEntity)
+			return true;	
+	}
+	return false;
 }
 
 bool UPeacenetSaveGame::GetCharacterByID(int InEntityID, FPeacenetIdentity & OutCharacter, int& OutIndex)

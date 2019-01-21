@@ -43,6 +43,9 @@ public:
     void GenerateNonPlayerCharacters();
 
     UFUNCTION()
+    void GenerateCharacterRelationships();
+
+    UFUNCTION()
     FPeacenetIdentity& GenerateNonPlayerCharacter();
 
     UFUNCTION()

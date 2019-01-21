@@ -6,6 +6,7 @@
 #include "GameFramework/SaveGame.h"
 #include "FComputer.h"
 #include "FPeacenetIdentity.h"
+#include "FCharacterRelationship.h"
 #include "UDesktopWidget.h"
 #include "UWindow.h"
 #include "UPeacenetSaveGame.generated.h"
@@ -35,6 +36,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, Category = "Peacegate")
 	FString GameTypeName;
+
+	UPROPERTY(VisibleAnywhere, Category = "Peacenet")
+	TArray<FCharacterRelationship> CharacterRelationships;
 
 	UPROPERTY(VisibleAnywhere, Category = "Entities")
 	TArray<FComputer> Computers;
@@ -70,6 +74,9 @@ public:
 
 	UFUNCTION()
 	void FixEntityIDs();
+
+	UFUNCTION()
+	bool RelatesWith(int InFirstEntity, int InSecondEntity);
 
 	UFUNCTION()
 	bool CharacterNameExists(FString CharacterName);

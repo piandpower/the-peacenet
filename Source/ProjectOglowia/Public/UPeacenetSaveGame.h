@@ -54,6 +54,9 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Missions")
 	TArray<FName> Missions;
 
+	UPROPERTY(VisibleAnywhere, Category = "Procgen")
+	TMap<ECountry, uint8> CountryIPRanges;
+
 	UPROPERTY(VisibleAnywhere, Category = "Master Password Table")
 	TArray<FString> MPT;
 

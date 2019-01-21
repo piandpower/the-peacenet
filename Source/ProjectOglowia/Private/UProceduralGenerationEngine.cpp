@@ -1,7 +1,49 @@
 #include "UProceduralGenerationEngine.h"
 #include "UPeacenetSaveGame.h"
 #include "Base64.h"
+#include "UMarkovChain.h"
 #include "PeacenetWorldStateActor.h"
+
+FString UProceduralGenerationEngine::GenerateIPAddress(ECountry InCountry)
+{
+    uint8 Byte1, Byte2, Byte3, Byte4 = 0;
+
+    // First byte is the country range.
+    if(this->Peacenet->SaveGame->CountryIPRanges.Contains(InCountry))
+    {
+        Byte1 = this->Peacenet->SaveGame->CountryIPRanges[InCountry];
+    }
+    else
+    {
+        bool taken = false;
+
+        do
+        {
+            // Generate a new one!
+            Byte1 = (uint8)RNG.RandRange(0, 255);
+        
+            for(auto Elem : this->Peacenet->SaveGame->CountryIPRanges)
+            {
+                if(Elem.Value == Byte1)
+                {
+                    taken = true;
+                    break;
+                }
+            }
+
+        } while(taken);
+
+        this->Peacenet->SaveGame->CountryIPRanges.Add(InCountry, Byte1);
+    }
+
+    // The other three are easy.
+    Byte2 = (uint8)RNG.RandRange(0, 255);
+    Byte3 = (uint8)RNG.RandRange(0, 255);
+    Byte4 = (uint8)RNG.RandRange(0, 255);
+    
+    // We only support IPv4 in 2025 lol.
+    return FString::FromInt(Byte1) + "." + FString::FromInt(Byte2) + "." + FString::FromInt(Byte3) + "." + FString::FromInt(Byte4);
+}
 
 void UProceduralGenerationEngine::Initialize(APeacenetWorldStateActor* InPeacenet)
 {

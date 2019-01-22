@@ -165,6 +165,11 @@ void UDesktopWidget::ResetAppLauncher()
 	}
 }
 
+FString UDesktopWidget::GetIPAddress()
+{
+	return this->GetSystemContext()->GetIPAddress();
+}
+
 void UDesktopWidget::EnqueueNotification(const FText & InTitle, const FText & InMessage, UTexture2D * InIcon)
 {
 	FDesktopNotification note;

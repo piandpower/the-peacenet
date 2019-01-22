@@ -103,6 +103,9 @@ public:	// Functions
 	void StartGame(TSubclassOf<UDesktopWidget> InDesktopClass, TSubclassOf<UWindow> InWindowClass);
 
 	UFUNCTION()
+	FString GetIPAddress(FComputer& InComputer);
+
+	UFUNCTION()
 	bool FindProgramByName(FName InName, UPeacegateProgramAsset*& OutProgram);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Network Map")

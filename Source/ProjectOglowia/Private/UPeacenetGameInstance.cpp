@@ -111,6 +111,9 @@ void UPeacenetGameInstance::CreateWorld(FString InCharacterName, UPeacenetGameTy
 	PlayerComputer.Filesystem.Add(RootFolder);
 	PlayerComputer.Filesystem.Add(HomeFolder);
 	PlayerComputer.Filesystem.Add(UserFolder);
+
+	// Wallpaper needs to be nullptr to prevent a crash.
+	PlayerComputer.CurrentWallpaper = nullptr;
 	
 	// Next thing we need to do is assign these folder IDs as sub folders to the root.
 	PlayerComputer.Filesystem[0].SubFolders.Add(EtcFolder.FolderID);

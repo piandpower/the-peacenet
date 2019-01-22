@@ -194,6 +194,13 @@ bool USystemContext::TryGetTerminalCommand(FName CommandName, ATerminalCommand *
 	return true;
 }
 
+FString USystemContext::GetIPAddress()
+{
+	check(this->GetPeacenet());
+
+	return this->GetPeacenet()->GetIPAddress(this->GetComputer());
+}
+
 FUserInfo USystemContext::GetUserInfo(const int InUserID)
 {
 	if (InUserID == -1)

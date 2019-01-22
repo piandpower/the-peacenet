@@ -153,6 +153,9 @@ public:
 	void AddAppLauncherSubMenuItem(const FText& ItemName, const FText& ItemDescription, const FString& ExecutableName, const UTexture2D* Icon);
 
 protected:
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Desktop")
+	FString GetIPAddress();
+
 	UPROPERTY()
 	TArray<FDesktopNotification> NotificationQueue;
 

@@ -60,6 +60,36 @@ TArray<UComputerService*> APeacenetWorldStateActor::GetServicesFor(EComputerType
 	return Ret;
 }
 
+FString APeacenetWorldStateActor::GetIPAddress(FComputer& InComputer)
+{
+	check(this->SaveGame);
+	check(this->Procgen);
+
+	for(auto& IP : this->SaveGame->ComputerIPMap)
+	{
+		if(IP.Value == InComputer.ID)
+			return IP.Key;
+	}
+
+	// No IP address exists for this computer. So we'll generate one.
+	// First we look through all Peacenet identities to see if one
+	// owns this comuter. If one is found, we generate a public IP.
+	//
+	// Else we generate a private one for an enterprise net (NYI).
+
+	for(auto& Identity: this->SaveGame->Characters)
+	{
+		if(Identity.ComputerID == InComputer.ID)
+		{
+			FString IP = this->Procgen->GenerateIPAddress(Identity.Country);
+			this->SaveGame->ComputerIPMap.Add(IP, InComputer.ID);
+			return IP;
+		}
+	}
+
+	return "0.0.0.0";
+}
+
 // Loads all the terminal commands in the game
 void APeacenetWorldStateActor::LoadTerminalCommands()
 {

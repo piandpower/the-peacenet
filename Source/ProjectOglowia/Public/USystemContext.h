@@ -122,6 +122,9 @@ public:
 	bool TryGetTerminalCommand(FName CommandName, ATerminalCommand*& OutCommand, FString& InternalUsage, FString& FriendlyUsage);
 
 	UFUNCTION()
+	FString GetIPAddress();
+
+	UFUNCTION()
 	FUserInfo GetUserInfo(const int InUserID);
 
 	UFUNCTION()

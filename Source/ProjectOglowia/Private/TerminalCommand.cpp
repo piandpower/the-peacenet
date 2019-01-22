@@ -31,4 +31,10 @@ void ATerminalCommand::NativeRunCommand(UConsoleContext * InConsole, const TMap<
 void ATerminalCommand::Complete()
 {
 	this->Completed.Broadcast();
+	
+	// Despawn the actor and clean up memory used by the
+	// terminal command. If we were a UObject we wouldn't
+	// have to manually destroy ourselves, but then we
+	// also wouldn't have access to "Delay" in Blueprint.
+	this->DestroyActor();
 }

@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Engine/Texture2D.h"
 #include "Engine/DataAsset.h"
-#include "FComputer.h"
+#include "EComputerType.h"
 #include "UComputerService.generated.h"
 
 UENUM(BlueprintType)
@@ -43,4 +43,8 @@ public:
 
     UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Spawning")
     bool IsDefault = false;
+
+    UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Spawning")
+    int Port;
+
 };

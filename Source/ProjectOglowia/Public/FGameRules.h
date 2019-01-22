@@ -37,6 +37,9 @@ public:
     bool DoGovernmentAlert = true;
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Game Rules")
+    bool DoFirewalls = true;
+
+    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Game Rules")
     bool DoSkillProgression = true;
 
     UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Game Rules")

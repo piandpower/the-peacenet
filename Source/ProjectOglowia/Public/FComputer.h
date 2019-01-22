@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "FFolder.h"
 #include "Engine/Texture2D.h"
+#include "FFirewallRule.h"
 #include "FComputer.generated.h"
 
 class UVulnerability;
@@ -71,13 +72,6 @@ enum class EComputerOwnerType : uint8
 	Story
 };
 
-UENUM(BlueprintType)
-enum class EComputerType : uint8
-{
-	Personal,
-	Hub
-};
-
 /**
  * Represents a computer within The Peacenet.
  */
@@ -119,4 +113,7 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Unlocks")
 	TArray<FName> UnlockedWallpapers;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Firewall")
+	TArray<FFirewallRule> FirewallRules;
 };

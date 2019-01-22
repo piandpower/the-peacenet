@@ -1,10 +1,33 @@
 #include "UProceduralGenerationEngine.h"
 #include "UPeacenetSaveGame.h"
 #include "Base64.h"
+#include "FFirewallRule.h"
+#include "UComputerService.h"
 #include "CommonUtils.h"
 #include "WallpaperAsset.h"
 #include "UMarkovChain.h"
 #include "PeacenetWorldStateActor.h"
+
+void UProceduralGenerationEngine::GenerateFirewallRules(FComputer& InComputer)
+{
+    // Don't do this if the computer already has firewall rules!
+    if(InComputer.FirewallRules.Num())
+        return;
+
+    TArray<UComputerService*> Services = this->Peacenet->GetServicesFor(InComputer.ComputerType);
+
+    for(int i = 0; i < Services.Num(); i++)
+    {
+        if(Services[i]->IsDefault || RNG.RandRange(0, 6) % 2)
+        {
+            FFirewallRule Rule;
+            Rule.Port = Services[i]->Port;
+            Rule.Service = Services[i];
+            Rule.IsFiltered = false;
+            InComputer.FirewallRules.Add(Rule);
+        }
+    }
+}
 
 TArray<FString> UProceduralGenerationEngine::GetMarkovData(EMarkovTrainingDataUsage InUsage)
 {

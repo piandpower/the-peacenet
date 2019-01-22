@@ -24,6 +24,42 @@ APeacenetWorldStateActor::APeacenetWorldStateActor()
 
 }
 
+bool APeacenetWorldStateActor::ScanForServices(FString InIPAddress, TArray<FFirewallRule>& OutRules)
+{
+	check(this->SaveGame);
+	check(this->Procgen);
+
+	if(!this->SaveGame->IPAddressAllocated(InIPAddress))
+		return false;
+
+	int ComputerID = this->SaveGame->ComputerIPMap[InIPAddress];
+
+	FComputer Computer;
+	int ComputerIndex;
+	bool result = this->SaveGame->GetComputerByID(ComputerID, Computer, ComputerIndex);
+
+	check(result);
+
+	FComputer& RefComputer = this->SaveGame->Computers[ComputerIndex];
+
+	this->Procgen->GenerateFirewallRules(RefComputer);
+
+	OutRules = RefComputer.FirewallRules;
+
+	return OutRules.Num();
+}
+
+TArray<UComputerService*> APeacenetWorldStateActor::GetServicesFor(EComputerType InComputerType)
+{
+	TArray<UComputerService*> Ret;
+	for(auto Service : this->ComputerServices)
+	{
+		if(Service->TargetComputerType == InComputerType)
+			Ret.Add(Service);
+	}
+	return Ret;
+}
+
 // Loads all the terminal commands in the game
 void APeacenetWorldStateActor::LoadTerminalCommands()
 {

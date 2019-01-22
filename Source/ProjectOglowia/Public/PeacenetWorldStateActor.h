@@ -91,6 +91,9 @@ public:	// Functions
 	FText GetTimeOfDay();
 
 	UFUNCTION()
+	TArray<UComputerService*> GetServicesFor(EComputerType InComputerType);
+
+	UFUNCTION()
 	void SaveWorld();
 
 	UFUNCTION()
@@ -101,6 +104,9 @@ public:	// Functions
 
 	UFUNCTION()
 	bool FindProgramByName(FName InName, UPeacegateProgramAsset*& OutProgram);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Network Map")
+	bool ScanForServices(FString InIPAddress, TArray<FFirewallRule>& OutRules);
 
 protected: // AActor overrides
 	// Called when the game starts or when spawned

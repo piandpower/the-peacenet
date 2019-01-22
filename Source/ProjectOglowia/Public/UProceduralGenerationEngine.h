@@ -40,6 +40,9 @@ private:
 
 public:
     UFUNCTION()
+    void GenerateFirewallRules(FComputer& InComputer);
+
+    UFUNCTION()
     void GenerateNonPlayerCharacters();
 
     UFUNCTION()

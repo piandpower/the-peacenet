@@ -119,7 +119,7 @@ public:
 	UPeacegateFileSystem* GetFilesystem(const int UserID);
 
 	UFUNCTION()
-	bool TryGetTerminalCommand(FName CommandName, UTerminalCommand*& OutCommand, FString& InternalUsage, FString& FriendlyUsage);
+	bool TryGetTerminalCommand(FName CommandName, ATerminalCommand*& OutCommand, FString& InternalUsage, FString& FriendlyUsage);
 
 	UFUNCTION()
 	FUserInfo GetUserInfo(const int InUserID);

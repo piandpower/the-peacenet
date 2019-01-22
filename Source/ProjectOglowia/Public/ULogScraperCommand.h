@@ -12,7 +12,7 @@
  * Performs scraping of the stdin stream for passwords.
  */
 UCLASS(BlueprintType)
-class PROJECTOGLOWIA_API ULogScraperCommand : public UTerminalCommand
+class PROJECTOGLOWIA_API ALogScraperCommand : public ATerminalCommand
 {
     GENERATED_BODY()
 

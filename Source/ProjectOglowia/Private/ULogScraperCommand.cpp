@@ -8,7 +8,7 @@
 #include "UPiperContext.h"
 #include "UCommandProcessor.h"
 
-void ULogScraperCommand::NativeRunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments)
+void ALogScraperCommand::NativeRunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments)
 {
     // Check if we're in a unix pipe. If we're not then we simply exit with an error.
     if(!InConsole->IsA<UPiperContext>())

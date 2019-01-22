@@ -82,7 +82,7 @@ TArray<FCommandRunInstruction> UCommandProcessor::ProcessCommand(UConsoleContext
 
 
 
-		UTerminalCommand* CommandImpl = nullptr;
+		ATerminalCommand* CommandImpl = nullptr;
 		if (InConsole->GetUserContext()->GetOwningSystem()->TryGetTerminalCommand(FName(*Name), CommandImpl, InternalUsage, FriendlyUsage))
 		{
 			bool DocoptError = false;

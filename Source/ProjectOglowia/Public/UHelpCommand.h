@@ -9,7 +9,7 @@
 #include "UHelpCommand.generated.h"
 
 UCLASS()
-class PROJECTOGLOWIA_API UHelpCommand : public UTerminalCommand
+class PROJECTOGLOWIA_API AHelpCommand : public ATerminalCommand
 {
 	GENERATED_BODY()
 

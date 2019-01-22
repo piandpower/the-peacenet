@@ -12,24 +12,6 @@ class UPiperContext;
 class URedirectedConsoleContext;
 class UTerminalCommand;
 
-class FPlaceboLatentAction : public FPendingLatentAction
-{
-public:
-	FName ExecutionFunction;
-	int32 OutputLink;
-	FWeakObjectPtr CallbackTarget;
-
-	FPlaceboLatentAction(const FLatentActionInfo& InLatentInfo)
-		: ExecutionFunction(InLatentInfo.ExecutionFunction)
-		, OutputLink(InLatentInfo.Linkage)
-		, CallbackTarget(InLatentInfo.CallbackTarget) {}
-
-	virtual void UpdateOperation(FLatentResponse& Response) override
-	{
-		Response.DoneIf(true);
-	}
-};
-
 USTRUCT(BlueprintType)
 struct PROJECTOGLOWIA_API FCommandRunInstruction
 {
@@ -37,7 +19,7 @@ struct PROJECTOGLOWIA_API FCommandRunInstruction
 
 public:
 	UPROPERTY(BlueprintReadOnly)
-	UTerminalCommand* Command;
+	ATerminalCommand* Command;
 
 	UPROPERTY(BlueprintReadOnly)
 	TMap<FString, UDocoptValue*> Arguments;

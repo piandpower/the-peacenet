@@ -5,15 +5,15 @@
 #include "UUserContext.h"
 #include "PeacenetWorldStateActor.h"
 
-UGraphicalTerminalCommand::UGraphicalTerminalCommand()
+AGraphicalTerminalCommand::AGraphicalTerminalCommand()
 {
 }
 
-UGraphicalTerminalCommand::~UGraphicalTerminalCommand()
+AGraphicalTerminalCommand::~AGraphicalTerminalCommand()
 {
 }
 
-void UGraphicalTerminalCommand::NativeRunCommand(UConsoleContext * InConsole, const TMap<FString, UDocoptValue*> InArguments)
+void AGraphicalTerminalCommand::NativeRunCommand(UConsoleContext * InConsole, const TMap<FString, UDocoptValue*> InArguments)
 {
 	if (!InConsole->GetUserContext()->GetDesktop())
 	{

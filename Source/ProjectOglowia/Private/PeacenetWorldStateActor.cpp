@@ -72,7 +72,7 @@ void APeacenetWorldStateActor::LoadTerminalCommands()
 	UCommandInfo* HelpInfo = NewObject<UCommandInfo>(this);
 	HelpInfo->Info.CommandName = TEXT("help");
 	HelpInfo->Info.Description = TEXT("Shows a list of commands you can run.");
-	HelpInfo->Info.CommandClass = TSubclassOf<UTerminalCommand>(UHelpCommand::StaticClass());
+	HelpInfo->Info.CommandClass = TSubclassOf<ATerminalCommand>(AHelpCommand::StaticClass());
 	HelpInfo->UnlockedByDefault = true;
 	Commands.Add(HelpInfo);
 

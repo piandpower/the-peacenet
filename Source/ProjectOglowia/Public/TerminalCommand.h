@@ -6,6 +6,7 @@
 #include "CoreMinimal.h"
 #include "DocoptForUnrealBPLibrary.h"
 #include "UConsoleContext.h"
+#include "GameFramework/Actor.h"
 #include "USystemContext.h"
 #include "TerminalCommand.generated.h"
 
@@ -19,7 +20,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FCommandCompletedEvent);
  * A simple Unreal object containing functions needed to run a Peacegate OS Terminal command.
  */
 UCLASS(Blueprintable)
-class PROJECTOGLOWIA_API UTerminalCommand : public UObject
+class PROJECTOGLOWIA_API ATerminalCommand : public AActor
 {
 	GENERATED_BODY()
 

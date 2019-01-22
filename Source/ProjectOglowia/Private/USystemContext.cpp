@@ -134,7 +134,7 @@ UPeacegateFileSystem * USystemContext::GetFilesystem(const int UserID)
 	return this->RegisteredFilesystems[UserID];
 }
 
-bool USystemContext::TryGetTerminalCommand(FName CommandName, UTerminalCommand *& OutCommand, FString& InternalUsage, FString& FriendlyUsage)
+bool USystemContext::TryGetTerminalCommand(FName CommandName, ATerminalCommand *& OutCommand, FString& InternalUsage, FString& FriendlyUsage)
 {
 	check(Peacenet);
 
@@ -157,7 +157,11 @@ bool USystemContext::TryGetTerminalCommand(FName CommandName, UTerminalCommand *
 			}
 		}
 
-		UGraphicalTerminalCommand* GraphicalCommand = NewObject<UGraphicalTerminalCommand>(this);
+ 		FVector Location(0.0f, 0.0f, 0.0f);
+		 FRotator Rotation(0.0f, 0.0f, 0.0f);
+ 		FActorSpawnParameters SpawnInfo;
+
+		AGraphicalTerminalCommand* GraphicalCommand = this->GetPeacenet()->GetWorld()->SpawnActor<AGraphicalTerminalCommand>(Location, Rotation, SpawnInfo);
 		GraphicalCommand->ProgramAsset = Program;
 		GraphicalCommand->CommandInfo = Peacenet->CommandInfo[CommandName];
 		OutCommand = GraphicalCommand;
@@ -179,7 +183,11 @@ bool USystemContext::TryGetTerminalCommand(FName CommandName, UTerminalCommand *
 		}
 	}
 
-	OutCommand = NewObject<UTerminalCommand>(this, Info->Info.CommandClass);
+ 	FVector Location(0.0f, 0.0f, 0.0f);
+	FRotator Rotation(0.0f, 0.0f, 0.0f);
+ 	FActorSpawnParameters SpawnInfo;
+
+	OutCommand = this->GetPeacenet()->GetWorld()->SpawnActor<ATerminalCommand>(Info->Info.CommandClass, Location, Rotation, SpawnInfo);
 
 	OutCommand->CommandInfo = Info;
 

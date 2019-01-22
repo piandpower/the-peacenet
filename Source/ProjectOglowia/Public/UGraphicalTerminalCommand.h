@@ -13,13 +13,13 @@ class UProgram;
  * Encapsulates a graphical Terminal Command that, when run, runs a graphical program as the user ID of the current console context.
  */
 UCLASS()
-class PROJECTOGLOWIA_API UGraphicalTerminalCommand : public UTerminalCommand
+class PROJECTOGLOWIA_API AGraphicalTerminalCommand : public ATerminalCommand
 {
 	GENERATED_BODY()
 
 public:
-	UGraphicalTerminalCommand();
-	~UGraphicalTerminalCommand();
+	AGraphicalTerminalCommand();
+	~AGraphicalTerminalCommand();
 
 	UPROPERTY()
 	UPeacegateProgramAsset* ProgramAsset;

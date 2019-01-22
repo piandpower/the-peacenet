@@ -47,7 +47,7 @@ struct PROJECTOGLOWIA_API FCommandInfoS
 
 	// A C++ or Blueprint class inheriting from UTerminalCommand which holds the state of and handles running this command.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		TSubclassOf<UTerminalCommand> CommandClass;
+	TSubclassOf<ATerminalCommand> CommandClass;
 };
 
 UCLASS(Blueprintable)

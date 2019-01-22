@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UConsoleContext.h"
+#include "FPlaceboLatentAction.h"
 #include "UPiperContext.generated.h"
 
 /**

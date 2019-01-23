@@ -130,6 +130,35 @@ void UProceduralGenerationEngine::ClearNonPlayerEntities()
     this->Peacenet->SaveGame->FixEntityIDs();
 }
 
+void UProceduralGenerationEngine::GenerateAdjacentNodes(FPeacenetIdentity& InIdentity)
+{   
+    // Don't do this if the entity already has adjacent nodes.
+    if(this->Peacenet->SaveGame->GetAdjacents(InIdentity.ID).Num())
+        return;
+
+    const int MIN_ADJACENTS = 2;
+    const int MAX_ADJACENTS = 8;
+    const int MAX_SKILL_DIFFERENCE = 3;
+
+
+    int Adjacents = RNG.RandRange(MIN_ADJACENTS, MAX_ADJACENTS);
+
+    while(Adjacents)
+    {
+        FPeacenetIdentity& LinkedIdentity = this->Peacenet->SaveGame->Characters[RNG.RandRange(0, this->Peacenet->SaveGame->Characters.Num()-1)];
+
+        if(this->Peacenet->GameType->GameRules.DoSkillProgression)
+        {
+            int Difference = FMath::Abs(InIdentity.Skill - LinkedIdentity.Skill);
+            if(Difference > MAX_SKILL_DIFFERENCE)
+                continue;
+        }
+
+        this->Peacenet->SaveGame->AddAdjacent(InIdentity.ID, LinkedIdentity.ID);
+        Adjacents--;
+    }
+}
+
 void UProceduralGenerationEngine::GenerateNonPlayerCharacters()
 {
     this->ClearNonPlayerEntities();

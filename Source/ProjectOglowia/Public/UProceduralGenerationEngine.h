@@ -40,6 +40,9 @@ private:
 
 public:
     UFUNCTION()
+    void GenerateAdjacentNodes(FPeacenetIdentity& InIdentity);
+
+    UFUNCTION()
     void GenerateFirewallRules(FComputer& InComputer);
 
     UFUNCTION()

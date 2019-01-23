@@ -10,6 +10,7 @@
 #include "UDesktopWidget.h"
 #include "FAdjacentNode.h"
 #include "UWindow.h"
+#include "FEntityPosition.h"
 #include "UPeacenetSaveGame.generated.h"
 
 class UDesktopWidget;
@@ -43,6 +44,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, Category = "Entities")
 	TArray<FComputer> Computers;
+
+	UPROPERTY(VisibleAnywhere, Category = "Entities")
+	TArray<FEntityPosition> EntityPositions;
 
 	UPROPERTY(VisibleAnywhere, Category = "Entities")
 	TArray<FPeacenetIdentity> Characters;
@@ -108,4 +112,7 @@ public:
 
 	UFUNCTION()
 	bool GetComputerByID(int InEntityID, FComputer& OutComputer, int& OutIndex);
+
+	UFUNCTION()
+	bool LocationTooCloseToEntity(ECountry InCountry, FVector2D InLocation, float InMinimumDistance);
 };

@@ -265,3 +265,17 @@ bool UPeacenetSaveGame::AreAdjacent(int NodeA, int NodeB)
 	}
 	return false;
 }
+
+bool UPeacenetSaveGame::LocationTooCloseToEntity(ECountry InCountry, FVector2D InLocation, float InMinimumDistance)
+{
+	for(auto& Position : EntityPositions)
+	{
+		if(Position.Country == InCountry)
+		{
+			float dist = FMath::Abs(FVector2D::Distance(InLocation, Position.Position));
+			if(dist <= InMinimumDistance)
+				return true;
+		}
+	}
+	return false;
+}

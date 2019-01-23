@@ -153,6 +153,9 @@ void UPeacenetGameInstance::CreateWorld(FString InCharacterName, UPeacenetGameTy
 	// Add the character to the save file.
 	SaveGame->Characters.Add(PlayerIdentity);
 
+	// Set the player's location on the map to the origin.
+	SaveGame->SetEntityPosition(PlayerIdentity.ID, FVector2D(0.f, 0.f));
+
 	// This makes the game auto-possess the character we just created.
 	SaveGame->PlayerCharacterID = PlayerIdentity.ID;
 

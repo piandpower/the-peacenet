@@ -266,6 +266,29 @@ bool UPeacenetSaveGame::AreAdjacent(int NodeA, int NodeB)
 	return false;
 }
 
+void UPeacenetSaveGame::SetEntityPosition(int EntityID, FVector2D Position)
+{
+	for(auto& EntityPosition : EntityPositions)
+	{
+		if(EntityPosition.EntityID == EntityID)
+		{
+			EntityPosition.Position = Position;
+			return;
+		}
+	}
+
+	FPeacenetIdentity Identity;
+	int IdentityIndex;
+	bool result = this->GetCharacterByID(EntityID, Identity, IdentityIndex);
+	check(result);
+
+	FEntityPosition NewPos;
+	NewPos.EntityID = EntityID;
+	NewPos.Country = Identity.Country;
+	NewPos.Position = Position;
+	EntityPositions.Add(NewPos);
+}
+
 bool UPeacenetSaveGame::LocationTooCloseToEntity(ECountry InCountry, FVector2D InLocation, float InMinimumDistance)
 {
 	for(auto& Position : EntityPositions)

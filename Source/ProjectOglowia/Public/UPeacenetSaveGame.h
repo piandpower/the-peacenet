@@ -114,5 +114,8 @@ public:
 	bool GetComputerByID(int InEntityID, FComputer& OutComputer, int& OutIndex);
 
 	UFUNCTION()
+	void SetEntityPosition(int EntityID, FVector2D Position);
+
+	UFUNCTION()
 	bool LocationTooCloseToEntity(ECountry InCountry, FVector2D InLocation, float InMinimumDistance);
 };

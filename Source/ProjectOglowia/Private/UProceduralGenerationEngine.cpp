@@ -2,6 +2,7 @@
 #include "UPeacenetSaveGame.h"
 #include "Base64.h"
 #include "FFirewallRule.h"
+#include "FEntityPosition.h"
 #include "UComputerService.h"
 #include "CommonUtils.h"
 #include "WallpaperAsset.h"
@@ -129,6 +130,33 @@ void UProceduralGenerationEngine::ClearNonPlayerEntities()
     // Clear entity adjacentness.
     this->Peacenet->SaveGame->AdjacentNodes.Empty();
 
+    // Remove all entity positions that aren't player.
+    TArray<int> EntityPositionsToRemove;
+    int EntityPositionsRemoved=0;
+    for(int i = 0; i < this->Peacenet->SaveGame->EntityPositions.Num(); i++)
+    {
+        FPeacenetIdentity Identity;
+        int IdentityIndex;
+        bool result = this->Peacenet->SaveGame->GetCharacterByID(this->Peacenet->SaveGame->EntityPositions[i].EntityID, Identity, IdentityIndex);
+        if(result)
+        {
+           if(Identity.CharacterType != EIdentityType::Player) 
+           {
+               EntityPositionsToRemove.Add(i);
+           }
+        }
+        else
+        {
+            EntityPositionsToRemove.Add(i);
+        }
+    }
+    while(EntityPositionsToRemove.Num())
+    {
+        this->Peacenet->SaveGame->EntityPositions.RemoveAt(EntityPositionsToRemove[0] - EntityPositionsRemoved);
+        EntityPositionsRemoved++;
+        EntityPositionsToRemove.RemoveAt(0);
+    }
+
     // Fix up entity IDs.
     this->Peacenet->SaveGame->FixEntityIDs();
 }
@@ -151,6 +179,9 @@ void UProceduralGenerationEngine::GenerateAdjacentNodes(FPeacenetIdentity& InIde
         FPeacenetIdentity& LinkedIdentity = this->Peacenet->SaveGame->Characters[RNG.RandRange(0, this->Peacenet->SaveGame->Characters.Num()-1)];
 
         if(LinkedIdentity.ID == InIdentity.ID)
+            continue;
+
+        if(LinkedIdentity.Country != InIdentity.Country)
             continue;
 
         if(this->Peacenet->SaveGame->AreAdjacent(InIdentity.ID, LinkedIdentity.ID))

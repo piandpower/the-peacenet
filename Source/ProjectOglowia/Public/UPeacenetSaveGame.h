@@ -75,6 +75,9 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Master Password Table")
 	int WorldSeed = -1;
 
+	UPROPERTY(VisibleAnywhere, Category = "Adjacent nodes")
+	TArray<int> PlayerDiscoveredNodes;
+
 	const float SECONDS_DAY_LENGTH = 86400.f;
 
 	UFUNCTION()
@@ -115,6 +118,9 @@ public:
 
 	UFUNCTION()
 	void SetEntityPosition(int EntityID, FVector2D Position);
+
+	UFUNCTION()
+	bool GetPosition(int EntityID, FVector2D& OutPosition);
 
 	UFUNCTION()
 	bool LocationTooCloseToEntity(ECountry InCountry, FVector2D InLocation, float InMinimumDistance);

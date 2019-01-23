@@ -161,6 +161,32 @@ void UProceduralGenerationEngine::ClearNonPlayerEntities()
     this->Peacenet->SaveGame->FixEntityIDs();
 }
 
+void UProceduralGenerationEngine::GenerateIdentityPosition(FPeacenetIdentity& Pivot, FPeacenetIdentity& Identity)
+{
+    FVector2D Test;
+    if(this->Peacenet->SaveGame->GetPosition(Identity.ID, Test))
+        return;
+
+    FVector2D PivotPos;
+    bool PivotResult = this->Peacenet->SaveGame->GetPosition(Pivot.ID, PivotPos);
+    check(PivotResult);
+
+    const float MIN_DIST_FROM_PIVOT = 30.f;
+    const float MAX_DIST_FROM_PIVOT = 200.f;
+
+
+
+    FVector2D NewPos;
+    do
+    {
+        NewPos.X = PivotPos.X + (RNG.FRandRange(MIN_DIST_FROM_PIVOT, MAX_DIST_FROM_PIVOT) - (MAX_DIST_FROM_PIVOT/2.f));
+        NewPos.Y = PivotPos.Y + (RNG.FRandRange(MIN_DIST_FROM_PIVOT, MAX_DIST_FROM_PIVOT) - (MAX_DIST_FROM_PIVOT/2.f));
+    } while(this->Peacenet->SaveGame->LocationTooCloseToEntity(Pivot.Country, NewPos, MIN_DIST_FROM_PIVOT));
+
+    this->Peacenet->SaveGame->SetEntityPosition(Identity.ID, NewPos);
+
+}
+
 void UProceduralGenerationEngine::GenerateAdjacentNodes(FPeacenetIdentity& InIdentity)
 {   
     // Don't do this if the entity already has adjacent nodes.
@@ -195,6 +221,9 @@ void UProceduralGenerationEngine::GenerateAdjacentNodes(FPeacenetIdentity& InIde
         }
 
         this->Peacenet->SaveGame->AddAdjacent(InIdentity.ID, LinkedIdentity.ID);
+
+        this->GenerateIdentityPosition(InIdentity, LinkedIdentity);
+
         Adjacents--;
     }
 }

@@ -40,6 +40,9 @@ private:
 
 public:
     UFUNCTION()
+    void GenerateIdentityPosition(FPeacenetIdentity& Pivot, FPeacenetIdentity& Identity);
+
+    UFUNCTION()
     void GenerateAdjacentNodes(FPeacenetIdentity& InIdentity);
 
     UFUNCTION()

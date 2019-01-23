@@ -289,6 +289,19 @@ void UPeacenetSaveGame::SetEntityPosition(int EntityID, FVector2D Position)
 	EntityPositions.Add(NewPos);
 }
 
+bool UPeacenetSaveGame::GetPosition(int EntityID, FVector2D& OutPosition)
+{
+	for(auto& EntityPos : EntityPositions)
+	{
+		if(EntityPos.EntityID == EntityID)
+		{
+			OutPosition = EntityPos.Position;
+			return true;
+		}
+	}
+	return false;
+}
+
 bool UPeacenetSaveGame::LocationTooCloseToEntity(ECountry InCountry, FVector2D InLocation, float InMinimumDistance)
 {
 	for(auto& Position : EntityPositions)

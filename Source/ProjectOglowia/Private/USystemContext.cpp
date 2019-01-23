@@ -110,6 +110,11 @@ TArray<FAdjacentNodeInfo> USystemContext::ScanForAdjacentNodes()
 		Node.Link.NodeA = CharID;
 		Node.Link.NodeB = OtherIdentity.ID;
 		Ret.Add(Node);
+
+		if(!this->GetPeacenet()->SaveGame->PlayerDiscoveredNodes.Contains(OtherIdentity.ID))
+		{
+			this->GetPeacenet()->SaveGame->PlayerDiscoveredNodes.Add(OtherIdentity.ID);
+		}
 	}
 
 	return Ret;

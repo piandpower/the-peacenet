@@ -159,6 +159,9 @@ void UPeacenetGameInstance::CreateWorld(FString InCharacterName, UPeacenetGameTy
 	// This makes the game auto-possess the character we just created.
 	SaveGame->PlayerCharacterID = PlayerIdentity.ID;
 
+	// Player should know their own existence.
+	SaveGame->PlayerDiscoveredNodes.Add(PlayerIdentity.ID);
+
 	// Save the game.
 	UGameplayStatics::SaveGameToSlot(SaveGame, "PeacegateOS", 0);
 }

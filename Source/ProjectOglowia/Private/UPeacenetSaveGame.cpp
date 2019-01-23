@@ -96,6 +96,43 @@ void UPeacenetSaveGame::FixEntityIDs()
 			RelationshipsToRemove[i]--;
 		}
 	}
+
+	// Fix up adjacent nodes list.
+	TArray<int> AdjacentsToRemove;
+	for(int i = 0; i < AdjacentNodes.Num(); i++)
+	{
+		FAdjacentNode& Adjacent = this->AdjacentNodes[i];
+		if(CharacterIDMap.Contains(Adjacent.NodeA) && CharacterIDMap.Contains(Adjacent.NodeB))
+		{
+			Adjacent.NodeA = CharacterIDMap[Adjacent.NodeA];
+			Adjacent.NodeB = CharacterIDMap[Adjacent.NodeB];
+		}
+		else
+		{
+			AdjacentsToRemove.Add(i);
+		}
+	}
+
+	int AdjacentsRemoved = 0;
+	while(AdjacentsToRemove.Num())
+	{
+		AdjacentNodes.RemoveAt(AdjacentsToRemove[0] - AdjacentsRemoved);
+		AdjacentsToRemove.RemoveAt(0);
+		AdjacentsRemoved++;
+	}
+}
+
+TArray<int> UPeacenetSaveGame::GetAdjacents(int Node)
+{
+	TArray<int> Ret;
+	for(auto& Adjacent : this->AdjacentNodes)
+	{
+		if(Adjacent.NodeA == Node)
+			Ret.Add(Adjacent.NodeB);
+		else if(Adjacent.NodeB == Node)
+			Ret.Add(Adjacent.NodeA);
+	}
+	return Ret;
 }
 
 bool UPeacenetSaveGame::RelatesWith(int InFirstEntity, int InSecondEntity)
@@ -171,5 +208,49 @@ bool UPeacenetSaveGame::GetComputerByID(int InEntityID, FComputer& OutComputer, 
 		}
 	}
 
+	return false;
+}
+
+void UPeacenetSaveGame::AddAdjacent(int NodeA, int NodeB)
+{
+	check(!this->AreAdjacent(NodeA, NodeB));
+
+	int CharAIndex, CharBIndex;
+	FPeacenetIdentity CharA, CharB;
+	bool ResultA = GetCharacterByID(NodeA, CharA, CharAIndex);
+	bool ResultB = GetCharacterByID(NodeB, CharB, CharBIndex);
+	
+	check(ResultA && ResultB);
+
+	FAdjacentNode Adjacent;
+	Adjacent.NodeA = NodeA;
+	Adjacent.NodeB = NodeB;
+	AdjacentNodes.Add(Adjacent);
+}
+
+void UPeacenetSaveGame::RemoveAdjacent(int NodeA, int NodeB)
+{
+	check(this->AreAdjacent(NodeA, NodeB));
+
+	for(int i = 0; i < this->AdjacentNodes.Num(); i++)
+	{
+		FAdjacentNode& Adjacent = AdjacentNodes[i];
+
+		if((Adjacent.NodeA == NodeA && Adjacent.NodeB == NodeB) || (Adjacent.NodeA == NodeB && Adjacent.NodeB == NodeA))
+		{
+			AdjacentNodes.RemoveAt(i);
+			return;
+		}
+	}
+}
+
+bool UPeacenetSaveGame::AreAdjacent(int NodeA, int NodeB)
+{
+	for(int i = 0; i < AdjacentNodes.Num(); i++)
+	{
+		FAdjacentNode& Adjacent = AdjacentNodes[i];
+		if((Adjacent.NodeA == NodeA && Adjacent.NodeB == NodeB) || (Adjacent.NodeA == NodeB && Adjacent.NodeB == NodeA))
+			return true;
+	}
 	return false;
 }

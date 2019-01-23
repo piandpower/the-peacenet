@@ -8,6 +8,7 @@
 #include "FPeacenetIdentity.h"
 #include "FCharacterRelationship.h"
 #include "UDesktopWidget.h"
+#include "FAdjacentNode.h"
 #include "UWindow.h"
 #include "UPeacenetSaveGame.generated.h"
 
@@ -65,7 +66,7 @@ public:
 	TMap<FString, int> ComputerIPMap;
 	
 	UPROPERTY(VisibleAnywhere, Category = "Master Password Table")
-	TArray<FString> MPT;
+	TArray<FAdjacentNode> AdjacentNodes;
 
 	UPROPERTY(VisibleAnywhere, Category = "Master Password Table")
 	int WorldSeed = -1;
@@ -74,6 +75,18 @@ public:
 
 	UFUNCTION()
 	void FixEntityIDs();
+
+	UFUNCTION()
+	TArray<int> GetAdjacents(int Node);
+
+	UFUNCTION()
+	void AddAdjacent(int NodeA, int NodeB);
+
+	UFUNCTION()
+	void RemoveAdjacent(int NodeA, int NodeB);
+
+	UFUNCTION()
+	bool AreAdjacent(int NodeA, int NodeB);
 
 	UFUNCTION()
 	bool RelatesWith(int InFirstEntity, int InSecondEntity);

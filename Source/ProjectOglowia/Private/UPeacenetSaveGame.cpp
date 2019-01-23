@@ -244,6 +244,17 @@ void UPeacenetSaveGame::RemoveAdjacent(int NodeA, int NodeB)
 	}
 }
 
+TArray<int> UPeacenetSaveGame::GetAllEntitiesInCountry(ECountry InCountry)
+{
+	TArray<int> Ret;
+	for(auto& Identity : Characters)
+	{
+		if(Identity.Country == InCountry)
+			Ret.Add(Identity.ID);
+	}
+	return Ret;
+}
+
 bool UPeacenetSaveGame::AreAdjacent(int NodeA, int NodeB)
 {
 	for(int i = 0; i < AdjacentNodes.Num(); i++)

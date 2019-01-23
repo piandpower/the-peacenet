@@ -80,6 +80,9 @@ public:
 	TArray<int> GetAdjacents(int Node);
 
 	UFUNCTION()
+	TArray<int> GetAllEntitiesInCountry(ECountry InCountry);
+
+	UFUNCTION()
 	void AddAdjacent(int NodeA, int NodeB);
 
 	UFUNCTION()

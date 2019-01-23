@@ -12,4 +12,10 @@ UCLASS(Blueprintable, BlueprintType, Abstract)
 class PROJECTOGLOWIA_API UMapProgram : public UProgram
 {
     GENERATED_BODY()
+
+private:
+    TArray<int> NodeIDsToSpawn;
+
+protected:
+    virtual void NativeConstruct() override;
 };

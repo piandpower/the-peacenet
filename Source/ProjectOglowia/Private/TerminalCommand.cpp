@@ -36,5 +36,5 @@ void ATerminalCommand::Complete()
 	// terminal command. If we were a UObject we wouldn't
 	// have to manually destroy ourselves, but then we
 	// also wouldn't have access to "Delay" in Blueprint.
-	this->DestroyActor();
+	this->Destroy();
 }

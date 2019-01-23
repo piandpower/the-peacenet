@@ -126,6 +126,9 @@ void UProceduralGenerationEngine::ClearNonPlayerEntities()
             ComputersToRemove[i]--;
     }
 
+    // Clear entity adjacentness.
+    this->Peacenet->SaveGame->AdjacentNodes.Empty();
+
     // Fix up entity IDs.
     this->Peacenet->SaveGame->FixEntityIDs();
 }
@@ -146,6 +149,9 @@ void UProceduralGenerationEngine::GenerateAdjacentNodes(FPeacenetIdentity& InIde
     while(Adjacents)
     {
         FPeacenetIdentity& LinkedIdentity = this->Peacenet->SaveGame->Characters[RNG.RandRange(0, this->Peacenet->SaveGame->Characters.Num()-1)];
+
+        if(LinkedIdentity.ID == InIdentity.ID)
+            continue;
 
         if(this->Peacenet->GameType->GameRules.DoSkillProgression)
         {

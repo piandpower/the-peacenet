@@ -229,7 +229,7 @@ FPeacenetIdentity& UProceduralGenerationEngine::GenerateNonPlayerCharacter()
     
     Identity.ComputerID = IdentityComputer.ID;
 
-    Identity.Country = (ECountry)RNG.RandRange(0, (int)ECountry::Num_Countries);
+    Identity.Country = (ECountry)RNG.RandRange(0, (int)ECountry::Num_Countries - 1);
 
     FString IPAddress;
     do

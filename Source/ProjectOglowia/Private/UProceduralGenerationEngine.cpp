@@ -153,6 +153,9 @@ void UProceduralGenerationEngine::GenerateAdjacentNodes(FPeacenetIdentity& InIde
         if(LinkedIdentity.ID == InIdentity.ID)
             continue;
 
+        if(this->Peacenet->SaveGame->AreAdjacent(InIdentity.ID, LinkedIdentity.ID))
+            continue;
+
         if(this->Peacenet->GameType->GameRules.DoSkillProgression)
         {
             int Difference = FMath::Abs(InIdentity.Skill - LinkedIdentity.Skill);

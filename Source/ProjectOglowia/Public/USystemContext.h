@@ -6,6 +6,7 @@
 #include "FComputer.h"
 #include "UPeacegateFileSystem.h"
 #include "FPeacenetIdentity.h"
+#include "FAdjacentNodeInfo.h"
 #include "USystemContext.generated.h"
 
 class UDesktopWidget;
@@ -96,6 +97,9 @@ public: // Property getters
 public:
 	UFUNCTION()
 	void SetupDesktop(int InUserID);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Adjacent nodes")
+	TArray<FAdjacentNodeInfo> ScanForAdjacentNodes();
 
 	UFUNCTION()
 	TArray<UCommandInfo*> GetInstalledCommands();

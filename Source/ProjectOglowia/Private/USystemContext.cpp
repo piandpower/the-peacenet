@@ -8,6 +8,7 @@
 #include "CommonUtils.h"
 #include "UPeacegateProgramAsset.h"
 #include "UUserContext.h"
+#include "FAdjacentNode.h"
 #include "UProgram.h"
 #include "URainbowTable.h"
 #include "WallpaperAsset.h"
@@ -87,6 +88,28 @@ TArray<UCommandInfo*> USystemContext::GetInstalledCommands()
 				continue;
 		}
 		Ret.Add(Info);
+	}
+
+	return Ret;
+}
+
+TArray<FAdjacentNodeInfo> USystemContext::ScanForAdjacentNodes()
+{
+	check(this->GetPeacenet());
+
+	int CharID = this->GetCharacter().ID;
+
+	TArray<FAdjacentNodeInfo> Ret;
+
+	for(auto& OtherIdentity : this->GetPeacenet()->GetAdjacentNodes(this->GetCharacter()))
+	{
+		FAdjacentNodeInfo Node;
+		Node.NodeName = OtherIdentity.CharacterName;
+		Node.Country = OtherIdentity.Country;
+		Node.Link = FAdjacentNode();
+		Node.Link.NodeA = CharID;
+		Node.Link.NodeB = OtherIdentity.ID;
+		Ret.Add(Node);
 	}
 
 	return Ret;

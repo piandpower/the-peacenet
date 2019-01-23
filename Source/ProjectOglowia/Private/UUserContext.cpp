@@ -177,6 +177,12 @@ UTexture2D* UUserContext::GetCurrentWallpaper()
 	return this->GetOwningSystem()->GetComputer().CurrentWallpaper;
 }
 
+TArray<FAdjacentNodeInfo> UUserContext::ScanForAdjacentNodes()
+{
+	check(this->GetOwningSystem());
+	return this->GetOwningSystem()->ScanForAdjacentNodes();
+}
+
 void UUserContext::SetCurrentWallpaper(UWallpaperAsset* InWallpaperAsset)
 {
 	this->GetOwningSystem()->SetCurrentWallpaper(InWallpaperAsset);

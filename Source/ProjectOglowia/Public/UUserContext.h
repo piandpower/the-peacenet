@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "USystemContext.h"
 #include "EFileOpenResult.h"
+#include "FAdjacentNodeInfo.h"
 #include "UUserContext.generated.h"
 
 class UPeacegateFileSystem;
@@ -36,6 +37,9 @@ private:
     int UserID = 0;
 
 public:
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Adjacent nodes")
+    TArray<FAdjacentNodeInfo> ScanForAdjacentNodes();
+
     UFUNCTION(BlueprintCallable, BlueprintPure, Category = "User Context")
     TArray<UWallpaperAsset*> GetAvailableWallpapers();
 

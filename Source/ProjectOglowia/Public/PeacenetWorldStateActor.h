@@ -106,6 +106,9 @@ public:	// Functions
 	FString GetIPAddress(FComputer& InComputer);
 
 	UFUNCTION()
+	TArray<FPeacenetIdentity> GetAdjacentNodes(FPeacenetIdentity& InIdentity);
+
+	UFUNCTION()
 	bool FindProgramByName(FName InName, UPeacegateProgramAsset*& OutProgram);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Network Map")

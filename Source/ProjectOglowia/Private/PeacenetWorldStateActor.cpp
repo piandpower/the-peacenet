@@ -49,6 +49,27 @@ bool APeacenetWorldStateActor::ScanForServices(FString InIPAddress, TArray<FFire
 	return OutRules.Num();
 }
 
+TArray<FPeacenetIdentity> APeacenetWorldStateActor::GetAdjacentNodes(FPeacenetIdentity& InIdentity)
+{
+	check(this->SaveGame);
+	check(this->Procgen);
+
+	this->Procgen->GenerateAdjacentNodes(InIdentity);
+
+	TArray<FPeacenetIdentity> Ret;
+
+	for(auto EntityID : this->SaveGame->GetAdjacents(InIdentity.ID))
+	{
+		int LinkIndex = 0;
+		FPeacenetIdentity Link;
+		bool result = this->SaveGame->GetCharacterByID(EntityID, Link, LinkIndex);
+		check(result);
+		Ret.Add(Link);
+	}
+
+	return Ret;
+}
+
 TArray<UComputerService*> APeacenetWorldStateActor::GetServicesFor(EComputerType InComputerType)
 {
 	TArray<UComputerService*> Ret;

@@ -26,9 +26,6 @@ private:
 	bool JustOpened = true;
 
 public:
-	virtual void NativeConstruct() override;
-	virtual void NativePreConstruct() override;
-
 	UFUNCTION()
 	void ActiveProgramCloseEvent();
 

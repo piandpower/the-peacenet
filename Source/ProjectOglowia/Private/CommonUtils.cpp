@@ -202,3 +202,10 @@ void UCommonUtils::ParseCharacterName(const FString InCharacterName, FString & O
 	OutUsername = FirstName;
 	OutHostname = FirstName + TEXT("-pc");
 }
+
+float UCommonUtils::GetRotation(FVector2D InA, FVector2D InB)
+{
+	float adj = InA.X - InB.X;
+    float opp = InA.Y - InB.Y;
+    return FMath::RadiansToDegrees<float>(FMath::Atan2(opp, adj)/* - FMath::PI*/);
+}

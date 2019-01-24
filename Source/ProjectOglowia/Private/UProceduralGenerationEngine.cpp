@@ -157,6 +157,11 @@ void UProceduralGenerationEngine::ClearNonPlayerEntities()
         EntityPositionsToRemove.RemoveAt(0);
     }
 
+    // Clear out the player's known entities.
+    this->Peacenet->SaveGame->PlayerDiscoveredNodes.Empty();
+    this->Peacenet->SaveGame->PlayerDiscoveredNodes.Add(this->Peacenet->SaveGame->PlayerCharacterID);
+    
+
     // Fix up entity IDs.
     this->Peacenet->SaveGame->FixEntityIDs();
 }
@@ -171,12 +176,12 @@ void UProceduralGenerationEngine::GenerateIdentityPosition(FPeacenetIdentity& Pi
     bool PivotResult = this->Peacenet->SaveGame->GetPosition(Pivot.ID, PivotPos);
     check(PivotResult);
 
-    const float MIN_DIST_FROM_PIVOT = 30.f;
-    const float MAX_DIST_FROM_PIVOT = 200.f;
+    const float MIN_DIST_FROM_PIVOT = 50.f;
+    const float MAX_DIST_FROM_PIVOT = 400.f;
 
 
 
-    FVector2D NewPos;
+    FVector2D NewPos = FVector2D(0.f, 0.f);
     do
     {
         NewPos.X = PivotPos.X + (RNG.FRandRange(MIN_DIST_FROM_PIVOT, MAX_DIST_FROM_PIVOT) - (MAX_DIST_FROM_PIVOT/2.f));

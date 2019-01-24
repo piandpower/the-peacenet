@@ -53,6 +53,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Terminal")
 	static bool IsColorCode(FString InControlCode, ETerminalColor& OutColor);
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Trigonometry Bullshit")
+	static float GetRotation(FVector2D InA, FVector2D InB);
+
 	static void MeasureChar(const TCHAR InChar, const FSlateFontInfo& InSlateFont, float& OutWidth, float& OutHeight);
 
 	UFUNCTION(BlueprintCallable, Category = "Settings")

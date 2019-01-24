@@ -72,25 +72,6 @@ void UProgram::ActiveProgramCloseEvent()
 	}
 }
 
-void UProgram::NativeConstruct()
-{
-	if (JustOpened)
-	{
-		TScriptDelegate<> OnActiveProgramClose;
-		OnActiveProgramClose.BindUFunction(this, "ActiveProgramCloseEvent");
-		this->GetUserContext()->GetDesktop()->EventActiveProgramClose.Add(OnActiveProgramClose);
-
-		JustOpened = false;
-
-		Super::NativeConstruct();
-	}
-}
-
-void UProgram::NativePreConstruct()
-{
-	Super::NativePreConstruct();
-}
-
 void UProgram::ShowInfoWithCallbacks(const FText & InTitle, const FText & InMessage, const EInfoboxIcon InIcon, const EInfoboxButtonLayout ButtonLayout, const bool ShowTextInput, const FInfoboxDismissedEvent & OnDismissed, const FInfoboxInputValidator & ValidatorFunction)
 {
 	Window->ShowInfoWithCallbacks(InTitle, InMessage, InIcon, ButtonLayout, ShowTextInput, OnDismissed, ValidatorFunction);

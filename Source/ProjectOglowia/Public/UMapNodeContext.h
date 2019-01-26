@@ -23,6 +23,9 @@ private:
 
 protected:
     UFUNCTION()
+    FString CreateBooleanName(FString Extension);
+
+    UFUNCTION()
     FPeacenetIdentity& GetIdentity();
 
     UFUNCTION()
@@ -35,6 +38,15 @@ protected:
     FString GetNodeName();
 
 public:
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Map Node")
+    FString GetIPAddress();
+
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Map Node")
+    int GetSkill();
+
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Map Node")
+    float GetReputation();
+
     UFUNCTION()
     int GetNodeID();
 

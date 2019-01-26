@@ -55,7 +55,7 @@ public:
 	float EpochTime = 43200.f;
 
 	UPROPERTY(VisibleAnywhere, Category = "Unlocks and Game State")
-	TMap<FName, bool> Booleans;
+	TMap<FString, bool> Booleans;
 
 	UPROPERTY(VisibleAnywhere, Category = "Networking")
 	TMap<FString, FString> DomainNameMap;
@@ -79,6 +79,12 @@ public:
 	TArray<int> PlayerDiscoveredNodes;
 
 	const float SECONDS_DAY_LENGTH = 86400.f;
+
+	UFUNCTION()
+	bool IsTrue(FString InKey);
+
+	UFUNCTION()
+	void SetValue(FString InKey, bool InValue);
 
 	UFUNCTION()
 	void FixEntityIDs();

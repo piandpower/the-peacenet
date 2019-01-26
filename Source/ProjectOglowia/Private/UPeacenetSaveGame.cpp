@@ -122,6 +122,21 @@ void UPeacenetSaveGame::FixEntityIDs()
 	}
 }
 
+bool UPeacenetSaveGame::IsTrue(FString InKey)
+{
+	if(this->Booleans.Contains(InKey))
+		return this->Booleans[InKey];
+	return false;
+}
+
+void UPeacenetSaveGame::SetValue(FString InKey, bool InValue)
+{
+	if(this->Booleans.Contains(InKey))
+		this->Booleans[InKey] = InValue;
+	else
+		this->Booleans.Add(InKey, InValue);
+}
+
 TArray<int> UPeacenetSaveGame::GetAdjacents(int Node)
 {
 	TArray<int> Ret;

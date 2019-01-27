@@ -4,7 +4,19 @@
 #include "Engine/Font.h"
 #include "UPeacenetSaveGame.h"
 #include "Parse.h"
+#include "PlatformApplicationMisc.h"
 #include "USystemContext.h"
+
+bool UCommonUtils::GetClipboardText(FString& OutText)
+{
+	FPlatformApplicationMisc::ClipboardPaste(OutText);
+	return OutText.Len();
+}
+
+void UCommonUtils::PutClipboardText(FString InText)
+{
+	FPlatformApplicationMisc::ClipboardCopy(*InText);
+}
 
 FText UCommonUtils::GetFriendlyFilesystemStatusCode(const EFilesystemStatusCode InStatusCode)
 {

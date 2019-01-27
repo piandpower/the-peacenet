@@ -59,10 +59,10 @@ public:
 	static void MeasureChar(const TCHAR InChar, const FSlateFontInfo& InSlateFont, float& OutWidth, float& OutHeight);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Clipboard")
-	bool GetClipboardText(FString& OutText);
+	static bool GetClipboardText(FString& OutText);
 
 	UFUNCTION(BlueprintCallable, Category = "Clipboard")
-	void PutClipboardText(FString InText);
+	static void PutClipboardText(FString InText);
 
 	UFUNCTION(BlueprintCallable, Category = "Settings")
 	static void SetEnableBloom(UCameraComponent* InCamera, bool InEnableBloom);

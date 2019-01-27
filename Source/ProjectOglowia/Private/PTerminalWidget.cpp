@@ -8,6 +8,21 @@
 
 FReply UPTerminalWidget::NativeOnMouseButtonDown( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent )
 {
+		// Is this a right-click?
+	if(InMouseEvent.GetEffectingButton().GetFName() == TEXT("RightMouseButton"))
+	{
+		FString ClipboardContent;
+		if(UCommonUtils::GetClipboardText(ClipboardContent))
+		{
+			TextInputBuffer.Append(ClipboardContent);
+			if(this->EchoInputText)
+			{
+				TextBuffer.Append(ClipboardContent);
+				this->NewTextAdded=true;
+			}
+		}
+		return FReply::Handled().SetUserFocus(this->TakeWidget());
+	}
 	return FReply::Handled().SetUserFocus(this->TakeWidget());
 }
 

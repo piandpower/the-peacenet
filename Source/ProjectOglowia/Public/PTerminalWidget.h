@@ -100,9 +100,9 @@ public: //functions
 	virtual FReply NativeOnKeyChar(const FGeometry& InGeometry, const FCharacterEvent& InCharEvent) override;
 	virtual bool NativeIsInteractable() const override { return true; }
 	virtual bool NativeSupportsKeyboardFocus() const override { return true; }
+	virtual FReply NativeOnMouseButtonDown( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent ) override;
 	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
 	void ClearInput() { TextInputBuffer = TEXT(""); }
-	virtual FReply NativeOnMouseButtonDown( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent ) override;
 
 #if WITH_EDITOR
 	virtual const FText GetPaletteCategory() override;

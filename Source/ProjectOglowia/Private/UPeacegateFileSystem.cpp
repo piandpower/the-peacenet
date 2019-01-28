@@ -998,9 +998,12 @@ bool UPeacegateFileSystem::IsValidAsFileName(const FString & InFileName)
 	if (InFileName.IsEmpty())
 		return false;
 
+	if(InFileName.StartsWith("."))
+		return false;
+
 	TArray<TCHAR> CharsInString = InFileName.GetCharArray();
 
-	FString AllowedCharString = TEXT("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_- ");
+	FString AllowedCharString = TEXT("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_- .");
 
 	int index = 0;
 

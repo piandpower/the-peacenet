@@ -7,6 +7,28 @@
 #include "PlatformApplicationMisc.h"
 #include "USystemContext.h"
 
+void UCommonUtils::GetFriendlyFileOpenText(EFileOpenResult InResult, FString& OutTitle, FString& OutDescription)
+{
+	OutTitle = "";
+	OutDescription = "";
+
+	switch(InResult)
+	{
+		case EFileOpenResult::FileNotFound:
+			OutTitle = "File not found";
+			OutDescription = "The system could not find the file specified.";
+			break;
+		case EFileOpenResult::PermissionDenied:
+			OutTitle = "Access denied";
+			OutDescription = "You don't have permission to open this file.";
+			break;
+		case EFileOpenResult::NoSuitableProgram:
+			OutTitle = "Can't open file";
+			OutDescription = "There are no programs installed that can open this file.";
+			break;
+	}
+}
+
 bool UCommonUtils::GetClipboardText(FString& OutText)
 {
 	FPlatformApplicationMisc::ClipboardPaste(OutText);

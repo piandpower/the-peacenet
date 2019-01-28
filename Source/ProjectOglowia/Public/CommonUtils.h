@@ -6,6 +6,7 @@
 #include "UPeacegateFileSystem.h"
 #include "SlateFontInfo.h"
 #include "ETerminalColor.h"
+#include "EFileOpenResult.h"
 #include "Camera/CameraComponent.h"
 #include "CommonUtils.generated.h"
 
@@ -55,6 +56,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Trigonometry Bullshit")
 	static float GetRotation(FVector2D InA, FVector2D InB);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Common")
+	static void GetFriendlyFileOpenText(EFileOpenResult InResult, FString& OutTitle, FString& OutDescription);
 
 	static void MeasureChar(const TCHAR InChar, const FSlateFontInfo& InSlateFont, float& OutWidth, float& OutHeight);
 

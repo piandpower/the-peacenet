@@ -75,9 +75,7 @@ public:
 	UPROPERTY()
 	UFolderNavigator* Root;
 
-	UFUNCTION(BlueprintCallable, Category="Filesystem")
-	FString ResolveToAbsolute(const FString Path);
-
+	
 	UPROPERTY(BlueprintAssignable, BlueprintCallable)
 	FFilesystemOperationEvent FilesystemOperation;
 
@@ -138,6 +136,11 @@ private:
 
 	bool TraversePath(const TArray<FString>& PathParts, UFolderNavigator*& OutNavigator);
 	bool TraversePath(const TArray<FString>& PathParts, const int Count, UFolderNavigator*& OutNavigator);
-	TArray<FString> GetPathParts(FString InPath, FString& ResolvedPath);
 
+public:
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category="Filesystem")
+	static FString ResolveToAbsolute(const FString Path);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Filesystem")
+	static TArray<FString> GetPathParts(FString InPath, FString& ResolvedPath);
 };

@@ -116,6 +116,8 @@ public: //functions
 	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
 	void ClearInput() { TextInputBuffer = TEXT(""); }
 
+	FString Sanitize(FString InDirtyBitch);
+
 #if WITH_EDITOR
 	virtual const FText GetPaletteCategory() override;
 #endif

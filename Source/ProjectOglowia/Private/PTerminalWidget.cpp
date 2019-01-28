@@ -6,6 +6,34 @@
 #include "Rendering/DrawElements.h"
 #include "FTerminalSlowTypeLatentAction.h"
 
+FString UPTerminalWidget::Sanitize(FString InDirtyBitch)
+{
+	FString Ret;
+	TArray<TCHAR> Chars = InDirtyBitch.GetCharArray();
+	ETerminalColor CurrentColor;
+	FSlateFontInfo font;
+	bool invert;
+	bool attention;
+
+	for(int i = 0; i < Chars.Num(); i++)
+	{
+		if(Chars[i] == TEXT('\0'))
+			continue;
+
+		bool wasLiteral =false;
+		if (this->ParseControlCode(InDirtyBitch, i, CurrentColor, font, invert, attention, wasLiteral))
+		{
+			if(!wasLiteral)
+			{
+				continue;
+			}
+		}
+
+		Ret.AppendChar(Chars[i]);
+	}
+	return Ret;
+}
+
 FReply UPTerminalWidget::NativeOnMouseButtonUp( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent )
 {
 	this->Selecting = false;
@@ -200,7 +228,7 @@ FReply UPTerminalWidget::NativeOnMouseButtonDown( const FGeometry& InGeometry, c
 				{
 					FString substring = this->TextBuffer.RightChop(SelectionStart).LeftChop(selectionLen);
 
-					UCommonUtils::PutClipboardText(substring);
+					UCommonUtils::PutClipboardText(this->Sanitize(substring));
 
 					SelectionStart = SelectionEnd = -1;
 
@@ -212,7 +240,7 @@ FReply UPTerminalWidget::NativeOnMouseButtonDown( const FGeometry& InGeometry, c
 					FString substring = this->TextBuffer.RightChop(SelectionStart).LeftChop(endLen);
 
 					// Put it in the clipboard.
-					UCommonUtils::PutClipboardText(substring);
+					UCommonUtils::PutClipboardText(this->Sanitize(substring));
 
 					SelectionStart = SelectionEnd = -1;
 

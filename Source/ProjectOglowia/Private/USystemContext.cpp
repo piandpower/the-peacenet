@@ -322,13 +322,16 @@ bool USystemContext::Authenticate(const FString & Username, const FString & Pass
 
 bool USystemContext::GetSuitableProgramForFileExtension(const FString & InExtension, UPeacegateProgramAsset *& OutProgram)
 {
-	for (auto ProgramName : GetComputer().InstalledPrograms)
+	for(auto Program : this->GetPeacenet()->Programs)
 	{
-		UPeacegateProgramAsset* Program;
-		if (!GetPeacenet()->FindProgramByName(ProgramName, Program))
+		if(this->GetPeacenet()->GameType->GameRules.DoUnlockables)
 		{
-			continue;
+			if(!this->GetComputer().InstalledPrograms.Contains(Program->ExecutableName) && !Program->IsUnlockedByDefault)
+			{
+				continue;
+			}
 		}
+
 		if (Program->SupportedFileExtensions.Contains(InExtension))
 		{
 			OutProgram = Program;

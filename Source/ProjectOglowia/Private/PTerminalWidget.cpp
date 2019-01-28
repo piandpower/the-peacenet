@@ -6,11 +6,221 @@
 #include "Rendering/DrawElements.h"
 #include "FTerminalSlowTypeLatentAction.h"
 
+FReply UPTerminalWidget::NativeOnMouseButtonUp( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent )
+{
+	this->Selecting = false;
+	return FReply::Handled().SetUserFocus(this->TakeWidget());
+}
+
+FReply UPTerminalWidget::NativeOnMouseMove( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent )
+{
+	if(this->Selecting)
+	{
+		FVector2D MousePos = InGeometry.AbsoluteToLocal(InMouseEvent.GetScreenSpacePosition());
+
+		int end = GetCharIndexAtPosition(InGeometry, MousePos);
+
+		if(end == -1)
+		{
+			SelectionEnd = this->TextBuffer.Len();
+		}
+		else if(end < SelectionStart)
+		{
+			SelectionEnd = SelectionStart;
+			SelectionStart = end;
+		}
+		else
+		{
+			SelectionEnd = end;
+		}
+	}
+	return FReply::Handled().SetUserFocus(this->TakeWidget());
+}
+
+int UPTerminalWidget::GetCharIndexAtPosition(const FGeometry InGeometry, FVector2D InPosition)
+{
+	// Where are we?
+	float x = 0, y = 0;
+
+	y -= this->ScrollOffsetY;
+
+	// What's in the text buffer?
+	TArray<TCHAR> chars = this->TextBuffer.GetCharArray();
+
+	// How many chars are there?
+	int num = chars.Num();
+
+	// Get the size in pixels of the geometry so we know how big our widget is.
+	FVector2D size = InGeometry.GetLocalSize();
+	FSlateFontInfo font = this->RegularTextFont;
+	const UFont* FontPtr = Cast<UFont>(font.FontObject);
+	//The width of a character.
+	float char_w = CharacterWidth * ZoomFactor;
+	//The height of a character.
+	float char_h = CharacterHeight * ZoomFactor;
+	
+	TCHAR Last = TEXT('\0');
+	
+	ETerminalColor CurrentColor = ETerminalColor::White;
+	ETerminalColor CurrentBackgroundColor = ETerminalColor::Black;
+
+	bool invert = false;
+	bool attention = false;
+
+	// Go through every character in the array.
+	for(int i = 0; i < num; i++)
+	{
+		bool wasLiteral = false;
+
+		if(chars[i] == TEXT('\0'))
+			continue;
+
+		if (this->ParseControlCode(this->TextBuffer, i, CurrentColor, font, invert, attention, wasLiteral))
+		{
+			if (!wasLiteral)
+			{
+				continue;
+			}
+		}
+
+		bool IsInLine = (InPosition.Y >= y) && (InPosition.Y <= y + char_h);
+
+		//Get the character.
+		TCHAR c = chars[i];
+
+		float kerning = 0.f;
+
+		if (Last != TEXT('\0'))
+		{
+			kerning = FontPtr->GetCharKerning(Last, c) * ZoomFactor;
+		}
+
+		// If the character is a tab ('\t'), handle it.
+		if (c == TEXT('\t'))
+		{
+			// Get remainder of char_x divided by 8 * char_w.
+			float space = FMath::Fmod(x, char_w * 8);
+
+			if(IsInLine)
+			{
+				if(InPosition.X >= x && InPosition.X <= x + ((char_w * 8) - space))
+					return i;
+			}
+
+			// Realistically, truncating the value won't make much of a difference.
+			// But we'll store it as a float simply to make Unreal's life easier.
+			// All we need to do is add this value to char_x.
+			x += (char_w * 8) - space;
+
+			Last = TEXT('\0');
+
+			// Go to next char.
+			continue;
+		}
+
+		//return to char 0 if we're a \r
+		if (c == TEXT('\r'))
+		{
+			x = 0;
+			kerning = 0;
+			Last = TEXT('\0');
+			continue;
+		}
+
+		if (c == TEXT('\0'))
+			break; //Stop rendering at a null terminator because this is C++. I hate this.
+
+		//Drop down to a new line.
+		if (c == TEXT('\n'))
+		{
+			if(IsInLine && InPosition.X >= x)
+				return i;
+			x = 0;
+			y += char_h;
+			Last = TEXT('\0');
+			continue;
+		}
+
+		//Skip vertical tabs.
+		if (c == TEXT('\v'))
+			continue;
+
+		UCommonUtils::MeasureChar(c, font, char_w, char_h);
+		char_w = char_w * ZoomFactor;
+		char_h = char_h * ZoomFactor;
+
+		x += kerning;
+
+		//If char_x + char_w is greater than our width, drop down to a new line.
+		if (x + char_w > size.X)
+		{
+			kerning = 0;
+			Last = TEXT('\0');
+			x = 0;
+			y += char_h;
+
+			IsInLine = (InPosition.Y >= y) && (InPosition.Y <= y + char_h);
+		}
+
+		if(IsInLine)
+		{
+			if(InPosition.X >= x && InPosition.X <= x + char_w)
+				return i;
+		}
+
+		x += char_w;
+	}
+
+	// We didn't select anything...
+	return -1;
+}
+
 FReply UPTerminalWidget::NativeOnMouseButtonDown( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent )
 {
 		// Is this a right-click?
 	if(InMouseEvent.GetEffectingButton().GetFName() == TEXT("RightMouseButton"))
 	{
+		// Do we have a selection?
+		if(this->SelectionStart != -1 && this->SelectionEnd != -1)
+		{
+			// Get the length of the text.
+			int len = this->TextBuffer.Len();
+
+			// Get the length of the selection.
+			int selectionLen = SelectionEnd - SelectionStart;
+
+			// Get the length of the text starting from the selection start.
+			int endLen = len - SelectionStart;
+
+			// If the selection len is zsn't zero...
+			if(selectionLen > 0)
+			{
+				// If it's les than or equal to the end len...
+				if(selectionLen <= endLen)
+				{
+					FString substring = this->TextBuffer.RightChop(SelectionStart).LeftChop(selectionLen);
+
+					UCommonUtils::PutClipboardText(substring);
+
+					SelectionStart = SelectionEnd = -1;
+
+					return FReply::Handled().SetUserFocus(this->TakeWidget());
+				}
+				else
+				{
+					// We copy the text buffer from the start of the selection.
+					FString substring = this->TextBuffer.RightChop(SelectionStart).LeftChop(endLen);
+
+					// Put it in the clipboard.
+					UCommonUtils::PutClipboardText(substring);
+
+					SelectionStart = SelectionEnd = -1;
+
+					return FReply::Handled().SetUserFocus(this->TakeWidget());
+				}
+			}
+		}
+
 		FString ClipboardContent;
 		if(UCommonUtils::GetClipboardText(ClipboardContent))
 		{
@@ -22,6 +232,25 @@ FReply UPTerminalWidget::NativeOnMouseButtonDown( const FGeometry& InGeometry, c
 			}
 		}
 		return FReply::Handled().SetUserFocus(this->TakeWidget());
+	}
+	else if(InMouseEvent.GetEffectingButton().GetFName() == TEXT("LeftMouseButton"))
+	{
+		if(SelectionStart == -1)
+		{
+			FVector2D MousePos = InGeometry.AbsoluteToLocal(InMouseEvent.GetScreenSpacePosition());
+
+			SelectionStart = GetCharIndexAtPosition(InGeometry, MousePos);
+			SelectionEnd = SelectionStart;
+
+			this->Selecting = true;
+
+			return FReply::Handled().SetUserFocus(this->TakeWidget());			
+		}
+		else
+		{
+			SelectionStart = SelectionEnd = -1;
+			return FReply::Handled().SetUserFocus(this->TakeWidget());			
+		}
 	}
 	return FReply::Handled().SetUserFocus(this->TakeWidget());
 }
@@ -336,17 +565,45 @@ int32 UPTerminalWidget::NativePaint(const FPaintArgs& Args, const FGeometry& All
 		if (char_y >= size.Y)
 			break;
 
-		LayerId++;
+		if((SelectionStart > -1 && i >= SelectionStart) && (SelectionEnd > -1 && i <= SelectionEnd))
+		{
+			LayerId++;
 
-		FSlateDrawElement::MakeText(
-			OutDrawElements,
-			LayerId,
-			AllottedGeometry.ToOffsetPaintGeometry(FVector2D(char_x, char_y)),
-			FText::FromString(FString::Chr(c)),
-			this->ZoomText(font),
-			ESlateDrawEffect::None,
-			UCommonUtils::GetTerminalColor(CurrentColor));
+			FSlateDrawElement::MakeBox(
+				OutDrawElements,
+				LayerId,
+				AllottedGeometry.ToPaintGeometry(FVector2D(char_x, char_y), FVector2D(char_w, char_h)),
+				&TerminalBrush->Brush,
+				ESlateDrawEffect::None,
+				UCommonUtils::GetTerminalColor(ETerminalColor::White));
 
+
+
+			LayerId++;
+
+			FSlateDrawElement::MakeText(
+				OutDrawElements,
+				LayerId,
+				AllottedGeometry.ToOffsetPaintGeometry(FVector2D(char_x, char_y)),
+				FText::FromString(FString::Chr(c)),
+				this->ZoomText(font),
+				ESlateDrawEffect::None,
+				UCommonUtils::GetTerminalColor(ETerminalColor::Black));
+
+		}
+		else
+		{
+			LayerId++;
+
+			FSlateDrawElement::MakeText(
+				OutDrawElements,
+				LayerId,
+				AllottedGeometry.ToOffsetPaintGeometry(FVector2D(char_x, char_y)),
+				FText::FromString(FString::Chr(c)),
+				this->ZoomText(font),
+				ESlateDrawEffect::None,
+				UCommonUtils::GetTerminalColor(CurrentColor));
+		}
 
 		Last = c;
 

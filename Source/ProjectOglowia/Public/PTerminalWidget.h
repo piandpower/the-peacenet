@@ -44,6 +44,15 @@ public: //variables
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Fonts and Colors")
 		FSlateFontInfo BoldItalicTextFont;
 
+	UFUNCTION()
+	int GetCharIndexAtPosition(const FGeometry InGeometry, FVector2D InPosition);
+
+	UPROPERTY()
+	int SelectionStart = -1;
+
+	UPROPERTY()
+	int SelectionEnd = -1;
+
 	/** The time in milliseconds between each cursor blink. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cursor")
 		float CursorBlinkTimeMS;
@@ -75,6 +84,7 @@ private: //variables
 	float cursorTime = 0;
 	FString TextBuffer;
 	FString TextInputBuffer;
+	bool Selecting = false;
 	bool NewTextAdded = false;
 	float ScrollOffsetY;
 	float MaxScrollOffset;
@@ -100,6 +110,8 @@ public: //functions
 	virtual FReply NativeOnKeyChar(const FGeometry& InGeometry, const FCharacterEvent& InCharEvent) override;
 	virtual bool NativeIsInteractable() const override { return true; }
 	virtual bool NativeSupportsKeyboardFocus() const override { return true; }
+	virtual FReply NativeOnMouseButtonUp( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent ) override;
+	virtual FReply NativeOnMouseMove( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent ) override;
 	virtual FReply NativeOnMouseButtonDown( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent ) override;
 	virtual FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
 	void ClearInput() { TextInputBuffer = TEXT(""); }

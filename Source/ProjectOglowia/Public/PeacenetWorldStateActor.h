@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "UDesktopWidget.h"
+#include "EConnectionError.h"
 #include "FManPage.h"
 #include "EGovernmentAlertStatus.h"
 #include "UPeacenetSaveGame.h"
@@ -47,6 +48,9 @@ private: // Properties
 	TMap<int, FGovernmentAlertInfo> GovernmentAlertInfo;
 
 public: //Properties
+	UFUNCTION()
+	bool ResolveHost(FString InHost, FComputer& OutComputer, EConnectionError& OutError);
+
 	UPROPERTY()
 	TArray<UMarkovTrainingDataAsset*> MarkovData;
 
@@ -91,6 +95,12 @@ public:	// Functions
 	FText GetTimeOfDay();
 
 	UFUNCTION()
+	bool GetOwningIdentity(FComputer& InComputer, int& OutIdentityID);
+
+	UFUNCTION()
+	USystemContext* GetSystemContext(int InIdentityID);
+
+	UFUNCTION()
 	TArray<UComputerService*> GetServicesFor(EComputerType InComputerType);
 
 	UFUNCTION()
@@ -110,6 +120,9 @@ public:	// Functions
 
 	UFUNCTION()
 	bool FindProgramByName(FName InName, UPeacegateProgramAsset*& OutProgram);
+
+	UFUNCTION()
+	bool IsPortOpen(FString InIPAddress, int InPort);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Network Map")
 	bool ScanForServices(FString InIPAddress, TArray<FFirewallRule>& OutRules);

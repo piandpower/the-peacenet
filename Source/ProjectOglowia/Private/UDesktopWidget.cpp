@@ -165,6 +165,11 @@ void UDesktopWidget::ResetAppLauncher()
 	}
 }
 
+int UDesktopWidget::GetOpenConnectionCount()
+{
+	return this->SystemContext->GetOpenConnectionCount();
+}
+
 FString UDesktopWidget::GetIPAddress()
 {
 	return this->GetSystemContext()->GetIPAddress();

@@ -3,8 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UComputerService.h"
 #include "FFirewallRule.generated.h"
+
+class UComputerService;
 
 USTRUCT(BlueprintType)
 struct PROJECTOGLOWIA_API FFirewallRule

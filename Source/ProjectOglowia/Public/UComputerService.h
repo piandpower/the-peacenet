@@ -6,6 +6,7 @@
 #include "Engine/Texture2D.h"
 #include "Engine/DataAsset.h"
 #include "EComputerType.h"
+#include "UHackable.h"
 #include "UComputerService.generated.h"
 
 UENUM(BlueprintType)
@@ -46,5 +47,8 @@ public:
 
     UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Spawning")
     int Port;
+
+    UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Behaviour")
+    TSubclassOf<UHackable> Hackable;
 
 };

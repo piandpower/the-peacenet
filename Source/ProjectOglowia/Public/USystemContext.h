@@ -9,12 +9,15 @@
 #include "FAdjacentNodeInfo.h"
 #include "USystemContext.generated.h"
 
+class UHackable;
 class UDesktopWidget;
 class UProgram;
 class URainbowTable;
 class APeacenetWorldStateActor;
 class UPeacegateProgramAsset;
 
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FSystemConnectedEvent, UHackable*, InConnection, bool, IsInbound);
 
 USTRUCT(BlueprintType)
 struct PROJECTOGLOWIA_API FUserInfo
@@ -62,6 +65,16 @@ protected:
 	UPROPERTY()
 	TMap<int, UUserContext*> Users;
 
+	UPROPERTY()
+	TArray<UHackable*> OutboundConnections;
+
+	UPROPERTY()
+	TArray<UHackable*> InboundConnections;
+
+public:
+	UPROPERTY(BlueprintAssignable, Category = "Networking")
+	FSystemConnectedEvent SystemConnected;
+
 protected:
 	UFUNCTION()
 	void HandleFileSystemEvent(EFilesystemEventType InType, FString InPath);
@@ -95,6 +108,18 @@ public: // Property getters
 	TArray<UPeacegateProgramAsset*> GetInstalledPrograms();
 
 public:
+	UFUNCTION()
+	int GetOpenConnectionCount();
+
+	UFUNCTION()
+	void AddConnection(UHackable* InConnection, bool IsInbound);
+
+	UFUNCTION()
+	void Disconnect(UHackable* InConnection);
+
+	UFUNCTION()
+	bool IsIPAddress(FString InIPAddress);
+
 	UFUNCTION()
 	void SetupDesktop(int InUserID);
 

@@ -5,6 +5,7 @@
 #include "PeacenetWorldStateActor.h"
 #include "UDesktopWidget.h"
 #include "UPeacegateFileSystem.h"
+#include "UHackable.h"
 #include "CommonUtils.h"
 #include "UPeacegateProgramAsset.h"
 #include "UUserContext.h"
@@ -14,6 +15,36 @@
 #include "WallpaperAsset.h"
 #include "UGraphicalTerminalCommand.h"
 #include "CommandInfo.h"
+
+int USystemContext::GetOpenConnectionCount()
+{
+	return this->InboundConnections.Num() + this->OutboundConnections.Num();
+}
+
+void USystemContext::AddConnection(UHackable* InConnection, bool IsInbound)
+{
+	check(InConnection);
+	check(!InboundConnections.Contains(InConnection));
+	check(!OutboundConnections.Contains(InConnection));
+	
+	if(IsInbound)
+		InboundConnections.Add(InConnection);
+	else
+		OutboundConnections.Add(InConnection);
+
+	// This lets anything running on this system know that something has connected.
+	this->SystemConnected.Broadcast(InConnection, IsInbound);
+}
+
+void USystemContext::Disconnect(UHackable* InConnection)
+{
+	check(InConnection);
+
+	if(InboundConnections.Contains(InConnection))
+		InboundConnections.Remove(InConnection);
+	if(OutboundConnections.Contains(InConnection))
+		OutboundConnections.Remove(InConnection);
+}
 
 FString ReadFirstLine(FString InText)
 {
@@ -339,6 +370,11 @@ bool USystemContext::GetSuitableProgramForFileExtension(const FString & InExtens
 		}
 	}
 	return false;
+}
+
+bool USystemContext::IsIPAddress(FString InIPAddress)
+{
+	return this->GetPeacenet()->SaveGame->ComputerIPMap.Contains(InIPAddress);
 }
 
 UDesktopWidget* USystemContext::GetDesktop()

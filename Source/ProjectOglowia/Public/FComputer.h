@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "FFolder.h"
 #include "Engine/Texture2D.h"
+#include "EComputerType.h"
 #include "FFirewallRule.h"
 #include "FComputer.generated.h"
 

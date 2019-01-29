@@ -24,6 +24,90 @@ APeacenetWorldStateActor::APeacenetWorldStateActor()
 
 }
 
+bool APeacenetWorldStateActor::IsPortOpen(FString InIPAddress, int InPort)
+{
+	check(this->SaveGame);
+	check(this->Procgen);
+
+	check(this->SaveGame->ComputerIPMap.Contains(InIPAddress));
+
+	int EntityID = this->SaveGame->ComputerIPMap[InIPAddress];
+
+	FComputer Computer;
+	int ComputerIndex;
+	bool result = this->SaveGame->GetComputerByID(EntityID, Computer, ComputerIndex);
+	check(result);
+
+	this->Procgen->GenerateFirewallRules(this->SaveGame->Computers[ComputerIndex]);
+
+	for(FFirewallRule& Rule : this->SaveGame->Computers[ComputerIndex].FirewallRules)
+	{
+		if(Rule.Port == InPort)
+			return !Rule.IsFiltered;
+	}
+
+	return false;
+}
+
+USystemContext* APeacenetWorldStateActor::GetSystemContext(int InIdentityID)
+{
+	for(auto Context : this->SystemContexts)
+	{
+		if(Context->GetCharacter().ID == InIdentityID)
+			return Context;
+	}
+
+	check(this->SaveGame);
+
+	FPeacenetIdentity Identity;
+	int IdentityIndex;
+	bool result = this->SaveGame->GetCharacterByID(InIdentityID, Identity, IdentityIndex);
+	check(result);
+
+	FComputer Computer;
+	int ComputerIndex;
+	result = this->SaveGame->GetComputerByID(Identity.ComputerID, Computer, ComputerIndex);
+	check(result);
+
+	USystemContext* NewContext = NewObject<USystemContext>(this);
+
+	NewContext->Setup(Computer.ID, Identity.ID, this);
+
+	SystemContexts.Add(NewContext);
+
+	return NewContext;
+}
+
+bool APeacenetWorldStateActor::GetOwningIdentity(FComputer& InComputer, int& OutIdentityID)
+{
+	check(this->SaveGame);
+
+	for(auto& Identity : this->SaveGame->Characters)
+	{
+		if(Identity.ComputerID == InComputer.ID)
+		{
+			OutIdentityID = Identity.ID;
+			return true;
+		}
+	}
+	return false;
+}
+
+bool APeacenetWorldStateActor::ResolveHost(FString InHost, FComputer& OutComputer, EConnectionError& OutError)
+{
+	// TODO: Host -> IP (a.k.a DNS).
+	if(!this->SaveGame->ComputerIPMap.Contains(InHost))
+	{
+		OutError = EConnectionError::ConnectionTimedOut;
+		return false;
+	}
+
+	int Index = 0;
+	bool result = this->SaveGame->GetComputerByID(this->SaveGame->ComputerIPMap[InHost], OutComputer, Index);
+	OutError = (result) ? EConnectionError::None : EConnectionError::ConnectionTimedOut;
+	return result;
+}
+
 bool APeacenetWorldStateActor::ScanForServices(FString InIPAddress, TArray<FFirewallRule>& OutRules)
 {
 	check(this->SaveGame);

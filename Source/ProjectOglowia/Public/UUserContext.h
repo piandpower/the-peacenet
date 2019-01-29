@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "USystemContext.h"
 #include "EFileOpenResult.h"
+#include "SecureShell.h"
 #include "FAdjacentNodeInfo.h"
 #include "UUserContext.generated.h"
 

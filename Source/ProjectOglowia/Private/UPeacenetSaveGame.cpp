@@ -1,6 +1,7 @@
 // Copyright (c) 2018 The Peacenet & Alkaline Thunder.
 
 #include "UPeacenetSaveGame.h"
+#include "FComputer.h"
 
 bool UPeacenetSaveGame::CharacterNameExists(FString CharacterName)
 {

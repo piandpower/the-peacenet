@@ -58,9 +58,12 @@ FString UProceduralGenerationEngine::GenerateIPAddress(ECountry InCountry)
 
         do
         {
+            // Reset the taken value so that we don't infinite-loop.
+            taken = false;
+
             // Generate a new one!
             Byte1 = (uint8)RNG.RandRange(0, 255);
-        
+
             for(auto Elem : this->Peacenet->SaveGame->CountryIPRanges)
             {
                 if(Elem.Value == Byte1)

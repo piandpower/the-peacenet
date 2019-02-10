@@ -6,6 +6,66 @@
 #include "UComputerService.h"
 #include "UPeacenetSaveGame.h"
 
+void UHackable::NativeHackCompleted()
+{
+
+}
+
+void UHackable::CompleteHack()
+{
+    this->NativeHackCompleted();
+    this->HackCompleted();
+}
+
+void UHackable::StartAuth(FAuthenticationRequiredEvent InCallback)
+{
+    if(this->NeedsAuthentication())
+    {
+        InCallback.Execute(this->GetAuthenticationType(), this);
+    }
+    else
+    {
+        this->CompleteHack();
+    }
+}
+
+bool UHackable::NeedsAuthentication()
+{
+    return this->GetAuthenticationType() == EAuthenticationType::None;
+}
+
+bool UHackable::AuthenticateWithPassword(FString InPassword)
+{
+    if(this->GetAuthenticationType() != EAuthenticationType::Basic)
+        return false;
+
+    // todo: fuck me
+    return true;
+}
+    
+bool UHackable::AuthenticateWithUsernameAndPassword(FString InUsername, FString InPassword)
+{
+    if(this->GetAuthenticationType() != EAuthenticationType::Credential)
+        return false;
+
+    // todo: fuck me
+    return true;
+}
+
+bool UHackable::AuthenticateWithPrivateKeyFile(FString InPrivateKeyPath)
+{
+    if(this->GetAuthenticationType() != EAuthenticationType::Crypto)
+        return false;
+
+    // todo: fuck me
+    return true;
+}
+
+EAuthenticationType UHackable::GetAuthenticationType()
+{
+    return this->Service->AuthenticationType;
+}
+
 bool UHackable::OpenConnection(FString InHost, int InPort, UComputerService* TargetServiceType, UUserContext* OriginUser, EConnectionError& OutError, UHackable*& OutConnection)
 {
     // The origin User Context has a reference to Peacenet, so we better not get nullptr.

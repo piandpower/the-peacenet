@@ -7,7 +7,12 @@
 #include "FPeacenetIdentity.h"
 #include "FFirewallRule.h"
 #include "EConnectionError.h"
+#include "EAuthenticationType.h"
 #include "UHackable.generated.h"
+
+class UHackable;
+
+DECLARE_DYNAMIC_DELEGATE_TwoParams(FAuthenticationRequiredEvent, EAuthenticationType, AuthType, UHackable*, Hackable);
 
 class UComputerService;
 class UPeacenetSaveGame;
@@ -31,6 +36,15 @@ private:
     UPROPERTY()
     USystemContext* RemoteSystem;
 
+protected:
+    UFUNCTION()
+    void CompleteHack();
+
+    UFUNCTION(BlueprintImplementableEvent, Category = "Hackable")
+    void HackCompleted();
+
+    virtual void NativeHackCompleted();
+
 public:
     UFUNCTION()
     void SetRemoteSystem(USystemContext* InSystem);
@@ -40,6 +54,24 @@ public:
 
     UFUNCTION()
     void SetService(UComputerService* InService);
+
+    UFUNCTION()
+    void StartAuth(FAuthenticationRequiredEvent InCallback);
+
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Networking")
+    EAuthenticationType GetAuthenticationType();
+
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Networking")
+    bool NeedsAuthentication();
+
+    UFUNCTION(BlueprintCallable, Category = "Networking")
+    bool AuthenticateWithPassword(FString InPassword);
+    
+    UFUNCTION(BlueprintCallable, Category = "Networking")
+    bool AuthenticateWithUsernameAndPassword(FString InUsername, FString InPassword);
+
+    UFUNCTION(BlueprintCallable, Category = "Networking")
+    bool AuthenticateWithPrivateKeyFile(FString InPrivateKeyPath);
 
 public:
     UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Hackable")

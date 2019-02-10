@@ -6,17 +6,9 @@
 #include "Engine/Texture2D.h"
 #include "Engine/DataAsset.h"
 #include "EComputerType.h"
+#include "EAuthenticationType.h"
 #include "UHackable.h"
 #include "UComputerService.generated.h"
-
-UENUM(BlueprintType)
-enum class EAuthenticationType : uint8
-{
-    None,
-    Basic,
-    Credential,
-    Crypto
-};
 
 UCLASS(BlueprintType, Blueprintable)
 class PROJECTOGLOWIA_API UComputerService : public UDataAsset

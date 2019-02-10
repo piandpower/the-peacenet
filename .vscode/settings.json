@@ -1,12 +1,10 @@
 {
 	"files.exclude": {
-		"C:/Users/Alkaline/Documents/peacenet-ue/.git": true,
-		"C:/Users/Alkaline/Documents/peacenet-ue/.vs": true,
-		"C:/Users/Alkaline/Documents/peacenet-ue/.vscode": true,
-		"C:/Users/Alkaline/Documents/peacenet-ue/Content": true,
-		"C:/Users/Alkaline/Documents/peacenet-ue/Intermediate": true,
-		"C:/Users/Alkaline/Documents/peacenet-ue/Saved": true
-	},
-	"C_Cpp.errorSquiggles": "Disabled",
-	"C_Cpp.intelliSenseEngineFallback": "Disabled"
+		"D:/Projects/Unreal/peacenet-ue/.git": true,
+		"D:/Projects/Unreal/peacenet-ue/.vs": true,
+		"D:/Projects/Unreal/peacenet-ue/.vscode": true,
+		"D:/Projects/Unreal/peacenet-ue/Content": true,
+		"D:/Projects/Unreal/peacenet-ue/Intermediate": true,
+		"D:/Projects/Unreal/peacenet-ue/Saved": true
+	}
 }

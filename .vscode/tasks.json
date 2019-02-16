@@ -2,571 +2,581 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "ProjectOglowia Win32 Debug Build",
+			"label": "ProjectOglowia Mac Debug Build",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
 				"ProjectOglowia",
-				"Win32",
+				"Mac",
 				"Debug",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
 				"-waitmutex"
 			],
 			"problemMatcher": "$msCompile",
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		},
 		{
-			"label": "ProjectOglowia Win32 Debug Rebuild",
+			"label": "ProjectOglowia Mac Debug Rebuild",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
 				"ProjectOglowia",
-				"Win32",
+				"Mac",
 				"Debug",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
 				"-waitmutex"
 			],
 			"problemMatcher": "$msCompile",
 			"dependsOn": [
-				"ProjectOglowia Win32 Debug Clean"
+				"ProjectOglowia Mac Debug Clean"
 			],
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		},
 		{
-			"label": "ProjectOglowia Win32 Debug Clean",
+			"label": "ProjectOglowia Mac Debug Clean",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
 				"ProjectOglowia",
-				"Win32",
+				"Mac",
 				"Debug",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
-				"-waitmutex"
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex",
+				"-clean"
 			],
 			"problemMatcher": "$msCompile",
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		},
 		{
-			"label": "ProjectOglowia Win32 DebugGame Build",
+			"label": "ProjectOglowia Mac DebugGame Build",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
 				"ProjectOglowia",
-				"Win32",
+				"Mac",
 				"DebugGame",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
 				"-waitmutex"
 			],
 			"problemMatcher": "$msCompile",
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		},
 		{
-			"label": "ProjectOglowia Win32 DebugGame Rebuild",
+			"label": "ProjectOglowia Mac DebugGame Rebuild",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
 				"ProjectOglowia",
-				"Win32",
+				"Mac",
 				"DebugGame",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
 				"-waitmutex"
 			],
 			"problemMatcher": "$msCompile",
 			"dependsOn": [
-				"ProjectOglowia Win32 DebugGame Clean"
+				"ProjectOglowia Mac DebugGame Clean"
 			],
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		},
 		{
-			"label": "ProjectOglowia Win32 DebugGame Clean",
+			"label": "ProjectOglowia Mac DebugGame Clean",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
 				"ProjectOglowia",
-				"Win32",
+				"Mac",
 				"DebugGame",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex",
+				"-clean"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowia Mac Development Build",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowia",
+				"Mac",
+				"Development",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
 				"-waitmutex"
 			],
 			"problemMatcher": "$msCompile",
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		},
 		{
-			"label": "ProjectOglowia Win32 Development Build",
+			"label": "ProjectOglowia Mac Development Rebuild",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
 				"ProjectOglowia",
-				"Win32",
+				"Mac",
 				"Development",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
-				"-waitmutex"
-			],
-			"problemMatcher": "$msCompile",
-			"type": "shell",
-			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
-			}
-		},
-		{
-			"label": "ProjectOglowia Win32 Development Rebuild",
-			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Build.bat",
-			"args": [
-				"ProjectOglowia",
-				"Win32",
-				"Development",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
 				"-waitmutex"
 			],
 			"problemMatcher": "$msCompile",
 			"dependsOn": [
-				"ProjectOglowia Win32 Development Clean"
+				"ProjectOglowia Mac Development Clean"
 			],
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		},
 		{
-			"label": "ProjectOglowia Win32 Development Clean",
+			"label": "ProjectOglowia Mac Development Clean",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
 				"ProjectOglowia",
-				"Win32",
+				"Mac",
 				"Development",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex",
+				"-clean"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowia Mac Shipping Build",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowia",
+				"Mac",
+				"Shipping",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
 				"-waitmutex"
 			],
 			"problemMatcher": "$msCompile",
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		},
 		{
-			"label": "ProjectOglowia Win32 Shipping Build",
+			"label": "ProjectOglowia Mac Shipping Rebuild",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
 				"ProjectOglowia",
-				"Win32",
+				"Mac",
 				"Shipping",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
-				"-waitmutex"
-			],
-			"problemMatcher": "$msCompile",
-			"type": "shell",
-			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
-			}
-		},
-		{
-			"label": "ProjectOglowia Win32 Shipping Rebuild",
-			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Build.bat",
-			"args": [
-				"ProjectOglowia",
-				"Win32",
-				"Shipping",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
 				"-waitmutex"
 			],
 			"problemMatcher": "$msCompile",
 			"dependsOn": [
-				"ProjectOglowia Win32 Shipping Clean"
+				"ProjectOglowia Mac Shipping Clean"
 			],
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		},
 		{
-			"label": "ProjectOglowia Win32 Shipping Clean",
+			"label": "ProjectOglowia Mac Shipping Clean",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
 				"ProjectOglowia",
-				"Win32",
+				"Mac",
 				"Shipping",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex",
+				"-clean"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowia Mac Test Build",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowia",
+				"Mac",
+				"Test",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
 				"-waitmutex"
 			],
 			"problemMatcher": "$msCompile",
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		},
 		{
-			"label": "ProjectOglowia Win32 Test Build",
+			"label": "ProjectOglowia Mac Test Rebuild",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
 				"ProjectOglowia",
-				"Win32",
+				"Mac",
 				"Test",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
-				"-waitmutex"
-			],
-			"problemMatcher": "$msCompile",
-			"type": "shell",
-			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
-			}
-		},
-		{
-			"label": "ProjectOglowia Win32 Test Rebuild",
-			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Build.bat",
-			"args": [
-				"ProjectOglowia",
-				"Win32",
-				"Test",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
 				"-waitmutex"
 			],
 			"problemMatcher": "$msCompile",
 			"dependsOn": [
-				"ProjectOglowia Win32 Test Clean"
+				"ProjectOglowia Mac Test Clean"
 			],
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		},
 		{
-			"label": "ProjectOglowia Win32 Test Clean",
+			"label": "ProjectOglowia Mac Test Clean",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
 				"ProjectOglowia",
-				"Win32",
+				"Mac",
 				"Test",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
-				"-waitmutex"
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex",
+				"-clean"
 			],
 			"problemMatcher": "$msCompile",
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		},
 		{
-			"label": "ProjectOglowia Win64 Debug Build",
+			"label": "ProjectOglowia IOS Debug Build",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
 				"ProjectOglowia",
-				"Win64",
+				"IOS",
 				"Debug",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
 				"-waitmutex"
 			],
 			"problemMatcher": "$msCompile",
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		},
 		{
-			"label": "ProjectOglowia Win64 Debug Rebuild",
+			"label": "ProjectOglowia IOS Debug Rebuild",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
 				"ProjectOglowia",
-				"Win64",
+				"IOS",
 				"Debug",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
 				"-waitmutex"
 			],
 			"problemMatcher": "$msCompile",
 			"dependsOn": [
-				"ProjectOglowia Win64 Debug Clean"
+				"ProjectOglowia IOS Debug Clean"
 			],
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		},
 		{
-			"label": "ProjectOglowia Win64 Debug Clean",
+			"label": "ProjectOglowia IOS Debug Clean",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
 				"ProjectOglowia",
-				"Win64",
+				"IOS",
 				"Debug",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
-				"-waitmutex"
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex",
+				"-clean"
 			],
 			"problemMatcher": "$msCompile",
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		},
 		{
-			"label": "ProjectOglowia Win64 DebugGame Build",
+			"label": "ProjectOglowia IOS DebugGame Build",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
 				"ProjectOglowia",
-				"Win64",
+				"IOS",
 				"DebugGame",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
 				"-waitmutex"
 			],
 			"problemMatcher": "$msCompile",
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		},
 		{
-			"label": "ProjectOglowia Win64 DebugGame Rebuild",
+			"label": "ProjectOglowia IOS DebugGame Rebuild",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
 				"ProjectOglowia",
-				"Win64",
+				"IOS",
 				"DebugGame",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
 				"-waitmutex"
 			],
 			"problemMatcher": "$msCompile",
 			"dependsOn": [
-				"ProjectOglowia Win64 DebugGame Clean"
+				"ProjectOglowia IOS DebugGame Clean"
 			],
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		},
 		{
-			"label": "ProjectOglowia Win64 DebugGame Clean",
+			"label": "ProjectOglowia IOS DebugGame Clean",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
 				"ProjectOglowia",
-				"Win64",
+				"IOS",
 				"DebugGame",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex",
+				"-clean"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowia IOS Development Build",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowia",
+				"IOS",
+				"Development",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
 				"-waitmutex"
 			],
 			"problemMatcher": "$msCompile",
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		},
 		{
-			"label": "ProjectOglowia Win64 Development Build",
+			"label": "ProjectOglowia IOS Development Rebuild",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
 				"ProjectOglowia",
-				"Win64",
+				"IOS",
 				"Development",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
-				"-waitmutex"
-			],
-			"problemMatcher": "$msCompile",
-			"type": "shell",
-			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
-			}
-		},
-		{
-			"label": "ProjectOglowia Win64 Development Rebuild",
-			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Build.bat",
-			"args": [
-				"ProjectOglowia",
-				"Win64",
-				"Development",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
 				"-waitmutex"
 			],
 			"problemMatcher": "$msCompile",
 			"dependsOn": [
-				"ProjectOglowia Win64 Development Clean"
+				"ProjectOglowia IOS Development Clean"
 			],
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		},
 		{
-			"label": "ProjectOglowia Win64 Development Clean",
+			"label": "ProjectOglowia IOS Development Clean",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
 				"ProjectOglowia",
-				"Win64",
+				"IOS",
 				"Development",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex",
+				"-clean"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowia IOS Shipping Build",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowia",
+				"IOS",
+				"Shipping",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
 				"-waitmutex"
 			],
 			"problemMatcher": "$msCompile",
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		},
 		{
-			"label": "ProjectOglowia Win64 Shipping Build",
+			"label": "ProjectOglowia IOS Shipping Rebuild",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
 				"ProjectOglowia",
-				"Win64",
+				"IOS",
 				"Shipping",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
-				"-waitmutex"
-			],
-			"problemMatcher": "$msCompile",
-			"type": "shell",
-			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
-			}
-		},
-		{
-			"label": "ProjectOglowia Win64 Shipping Rebuild",
-			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Build.bat",
-			"args": [
-				"ProjectOglowia",
-				"Win64",
-				"Shipping",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
 				"-waitmutex"
 			],
 			"problemMatcher": "$msCompile",
 			"dependsOn": [
-				"ProjectOglowia Win64 Shipping Clean"
+				"ProjectOglowia IOS Shipping Clean"
 			],
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		},
 		{
-			"label": "ProjectOglowia Win64 Shipping Clean",
+			"label": "ProjectOglowia IOS Shipping Clean",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
 				"ProjectOglowia",
-				"Win64",
+				"IOS",
 				"Shipping",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex",
+				"-clean"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowia IOS Test Build",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowia",
+				"IOS",
+				"Test",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
 				"-waitmutex"
 			],
 			"problemMatcher": "$msCompile",
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		},
 		{
-			"label": "ProjectOglowia Win64 Test Build",
+			"label": "ProjectOglowia IOS Test Rebuild",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
 				"ProjectOglowia",
-				"Win64",
+				"IOS",
 				"Test",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
-				"-waitmutex"
-			],
-			"problemMatcher": "$msCompile",
-			"type": "shell",
-			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
-			}
-		},
-		{
-			"label": "ProjectOglowia Win64 Test Rebuild",
-			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Build.bat",
-			"args": [
-				"ProjectOglowia",
-				"Win64",
-				"Test",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
 				"-waitmutex"
 			],
 			"problemMatcher": "$msCompile",
 			"dependsOn": [
-				"ProjectOglowia Win64 Test Clean"
+				"ProjectOglowia IOS Test Clean"
 			],
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		},
 		{
-			"label": "ProjectOglowia Win64 Test Clean",
+			"label": "ProjectOglowia IOS Test Clean",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
 				"ProjectOglowia",
-				"Win64",
+				"IOS",
 				"Test",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
-				"-waitmutex"
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex",
+				"-clean"
 			],
 			"problemMatcher": "$msCompile",
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		},
 		{
 			"label": "ProjectOglowia HTML5 Debug Build",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
 				"ProjectOglowia",
 				"HTML5",
 				"Debug",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
 				"-waitmutex"
 			],
 			"problemMatcher": "$msCompile",
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		},
 		{
 			"label": "ProjectOglowia HTML5 Debug Rebuild",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
 				"ProjectOglowia",
 				"HTML5",
 				"Debug",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
 				"-waitmutex"
 			],
 			"problemMatcher": "$msCompile",
@@ -575,52 +585,53 @@
 			],
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		},
 		{
 			"label": "ProjectOglowia HTML5 Debug Clean",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
 				"ProjectOglowia",
 				"HTML5",
 				"Debug",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
-				"-waitmutex"
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex",
+				"-clean"
 			],
 			"problemMatcher": "$msCompile",
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		},
 		{
 			"label": "ProjectOglowia HTML5 DebugGame Build",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
 				"ProjectOglowia",
 				"HTML5",
 				"DebugGame",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
 				"-waitmutex"
 			],
 			"problemMatcher": "$msCompile",
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		},
 		{
 			"label": "ProjectOglowia HTML5 DebugGame Rebuild",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
 				"ProjectOglowia",
 				"HTML5",
 				"DebugGame",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
 				"-waitmutex"
 			],
 			"problemMatcher": "$msCompile",
@@ -629,52 +640,53 @@
 			],
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		},
 		{
 			"label": "ProjectOglowia HTML5 DebugGame Clean",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
 				"ProjectOglowia",
 				"HTML5",
 				"DebugGame",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
-				"-waitmutex"
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex",
+				"-clean"
 			],
 			"problemMatcher": "$msCompile",
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		},
 		{
 			"label": "ProjectOglowia HTML5 Development Build",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
 				"ProjectOglowia",
 				"HTML5",
 				"Development",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
 				"-waitmutex"
 			],
 			"problemMatcher": "$msCompile",
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		},
 		{
 			"label": "ProjectOglowia HTML5 Development Rebuild",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
 				"ProjectOglowia",
 				"HTML5",
 				"Development",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
 				"-waitmutex"
 			],
 			"problemMatcher": "$msCompile",
@@ -683,52 +695,53 @@
 			],
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		},
 		{
 			"label": "ProjectOglowia HTML5 Development Clean",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
 				"ProjectOglowia",
 				"HTML5",
 				"Development",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
-				"-waitmutex"
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex",
+				"-clean"
 			],
 			"problemMatcher": "$msCompile",
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		},
 		{
 			"label": "ProjectOglowia HTML5 Shipping Build",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
 				"ProjectOglowia",
 				"HTML5",
 				"Shipping",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
 				"-waitmutex"
 			],
 			"problemMatcher": "$msCompile",
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		},
 		{
 			"label": "ProjectOglowia HTML5 Shipping Rebuild",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
 				"ProjectOglowia",
 				"HTML5",
 				"Shipping",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
 				"-waitmutex"
 			],
 			"problemMatcher": "$msCompile",
@@ -737,52 +750,53 @@
 			],
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		},
 		{
 			"label": "ProjectOglowia HTML5 Shipping Clean",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
 				"ProjectOglowia",
 				"HTML5",
 				"Shipping",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
-				"-waitmutex"
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex",
+				"-clean"
 			],
 			"problemMatcher": "$msCompile",
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		},
 		{
 			"label": "ProjectOglowia HTML5 Test Build",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
 				"ProjectOglowia",
 				"HTML5",
 				"Test",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
 				"-waitmutex"
 			],
 			"problemMatcher": "$msCompile",
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		},
 		{
 			"label": "ProjectOglowia HTML5 Test Rebuild",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
 				"ProjectOglowia",
 				"HTML5",
 				"Test",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
 				"-waitmutex"
 			],
 			"problemMatcher": "$msCompile",
@@ -791,186 +805,905 @@
 			],
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		},
 		{
 			"label": "ProjectOglowia HTML5 Test Clean",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
 				"ProjectOglowia",
 				"HTML5",
 				"Test",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex",
+				"-clean"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowia Linux Debug Build",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowia",
+				"Linux",
+				"Debug",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
 				"-waitmutex"
 			],
 			"problemMatcher": "$msCompile",
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		},
 		{
-			"label": "ProjectOglowiaEditor Win64 Debug Build",
+			"label": "ProjectOglowia Linux Debug Rebuild",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
-				"ProjectOglowiaEditor",
-				"Win64",
+				"ProjectOglowia",
+				"Linux",
 				"Debug",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
-				"-waitmutex"
-			],
-			"problemMatcher": "$msCompile",
-			"type": "shell",
-			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
-			}
-		},
-		{
-			"label": "ProjectOglowiaEditor Win64 Debug Rebuild",
-			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Build.bat",
-			"args": [
-				"ProjectOglowiaEditor",
-				"Win64",
-				"Debug",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
 				"-waitmutex"
 			],
 			"problemMatcher": "$msCompile",
 			"dependsOn": [
-				"ProjectOglowiaEditor Win64 Debug Clean"
+				"ProjectOglowia Linux Debug Clean"
 			],
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		},
 		{
-			"label": "ProjectOglowiaEditor Win64 Debug Clean",
+			"label": "ProjectOglowia Linux Debug Clean",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
-				"ProjectOglowiaEditor",
-				"Win64",
+				"ProjectOglowia",
+				"Linux",
 				"Debug",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex",
+				"-clean"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowia Linux DebugGame Build",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowia",
+				"Linux",
+				"DebugGame",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
 				"-waitmutex"
 			],
 			"problemMatcher": "$msCompile",
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		},
 		{
-			"label": "ProjectOglowiaEditor Win64 DebugGame Build",
+			"label": "ProjectOglowia Linux DebugGame Rebuild",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
-				"ProjectOglowiaEditor",
-				"Win64",
+				"ProjectOglowia",
+				"Linux",
 				"DebugGame",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
-				"-waitmutex"
-			],
-			"problemMatcher": "$msCompile",
-			"type": "shell",
-			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
-			}
-		},
-		{
-			"label": "ProjectOglowiaEditor Win64 DebugGame Rebuild",
-			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Build.bat",
-			"args": [
-				"ProjectOglowiaEditor",
-				"Win64",
-				"DebugGame",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
 				"-waitmutex"
 			],
 			"problemMatcher": "$msCompile",
 			"dependsOn": [
-				"ProjectOglowiaEditor Win64 DebugGame Clean"
+				"ProjectOglowia Linux DebugGame Clean"
 			],
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		},
 		{
-			"label": "ProjectOglowiaEditor Win64 DebugGame Clean",
+			"label": "ProjectOglowia Linux DebugGame Clean",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
-				"ProjectOglowiaEditor",
-				"Win64",
+				"ProjectOglowia",
+				"Linux",
 				"DebugGame",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex",
+				"-clean"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowia Linux Development Build",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowia",
+				"Linux",
+				"Development",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
 				"-waitmutex"
 			],
 			"problemMatcher": "$msCompile",
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		},
 		{
-			"label": "ProjectOglowiaEditor Win64 Development Build",
+			"label": "ProjectOglowia Linux Development Rebuild",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Build.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
-				"ProjectOglowiaEditor",
-				"Win64",
+				"ProjectOglowia",
+				"Linux",
 				"Development",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
-				"-waitmutex"
-			],
-			"problemMatcher": "$msCompile",
-			"type": "shell",
-			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
-			}
-		},
-		{
-			"label": "ProjectOglowiaEditor Win64 Development Rebuild",
-			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Build.bat",
-			"args": [
-				"ProjectOglowiaEditor",
-				"Win64",
-				"Development",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
 				"-waitmutex"
 			],
 			"problemMatcher": "$msCompile",
 			"dependsOn": [
-				"ProjectOglowiaEditor Win64 Development Clean"
+				"ProjectOglowia Linux Development Clean"
 			],
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		},
 		{
-			"label": "ProjectOglowiaEditor Win64 Development Clean",
+			"label": "ProjectOglowia Linux Development Clean",
 			"group": "build",
-			"command": "Engine\\Build\\BatchFiles\\Clean.bat",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
 			"args": [
-				"ProjectOglowiaEditor",
-				"Win64",
+				"ProjectOglowia",
+				"Linux",
 				"Development",
-				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex",
+				"-clean"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowia Linux Shipping Build",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowia",
+				"Linux",
+				"Shipping",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
 				"-waitmutex"
 			],
 			"problemMatcher": "$msCompile",
 			"type": "shell",
 			"options": {
-				"cwd": "D:\\Epic Games\\UE_4.20"
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowia Linux Shipping Rebuild",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowia",
+				"Linux",
+				"Shipping",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"dependsOn": [
+				"ProjectOglowia Linux Shipping Clean"
+			],
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowia Linux Shipping Clean",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowia",
+				"Linux",
+				"Shipping",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex",
+				"-clean"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowia Linux Test Build",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowia",
+				"Linux",
+				"Test",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowia Linux Test Rebuild",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowia",
+				"Linux",
+				"Test",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"dependsOn": [
+				"ProjectOglowia Linux Test Clean"
+			],
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowia Linux Test Clean",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowia",
+				"Linux",
+				"Test",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex",
+				"-clean"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowia TVOS Debug Build",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowia",
+				"TVOS",
+				"Debug",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowia TVOS Debug Rebuild",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowia",
+				"TVOS",
+				"Debug",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"dependsOn": [
+				"ProjectOglowia TVOS Debug Clean"
+			],
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowia TVOS Debug Clean",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowia",
+				"TVOS",
+				"Debug",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex",
+				"-clean"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowia TVOS DebugGame Build",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowia",
+				"TVOS",
+				"DebugGame",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowia TVOS DebugGame Rebuild",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowia",
+				"TVOS",
+				"DebugGame",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"dependsOn": [
+				"ProjectOglowia TVOS DebugGame Clean"
+			],
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowia TVOS DebugGame Clean",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowia",
+				"TVOS",
+				"DebugGame",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex",
+				"-clean"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowia TVOS Development Build",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowia",
+				"TVOS",
+				"Development",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowia TVOS Development Rebuild",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowia",
+				"TVOS",
+				"Development",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"dependsOn": [
+				"ProjectOglowia TVOS Development Clean"
+			],
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowia TVOS Development Clean",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowia",
+				"TVOS",
+				"Development",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex",
+				"-clean"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowia TVOS Shipping Build",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowia",
+				"TVOS",
+				"Shipping",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowia TVOS Shipping Rebuild",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowia",
+				"TVOS",
+				"Shipping",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"dependsOn": [
+				"ProjectOglowia TVOS Shipping Clean"
+			],
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowia TVOS Shipping Clean",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowia",
+				"TVOS",
+				"Shipping",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex",
+				"-clean"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowia TVOS Test Build",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowia",
+				"TVOS",
+				"Test",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowia TVOS Test Rebuild",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowia",
+				"TVOS",
+				"Test",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"dependsOn": [
+				"ProjectOglowia TVOS Test Clean"
+			],
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowia TVOS Test Clean",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowia",
+				"TVOS",
+				"Test",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex",
+				"-clean"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowiaEditor Linux Debug Build",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowiaEditor",
+				"Linux",
+				"Debug",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowiaEditor Linux Debug Rebuild",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowiaEditor",
+				"Linux",
+				"Debug",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"dependsOn": [
+				"ProjectOglowiaEditor Linux Debug Clean"
+			],
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowiaEditor Linux Debug Clean",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowiaEditor",
+				"Linux",
+				"Debug",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex",
+				"-clean"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowiaEditor Linux DebugGame Build",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowiaEditor",
+				"Linux",
+				"DebugGame",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowiaEditor Linux DebugGame Rebuild",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowiaEditor",
+				"Linux",
+				"DebugGame",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"dependsOn": [
+				"ProjectOglowiaEditor Linux DebugGame Clean"
+			],
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowiaEditor Linux DebugGame Clean",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowiaEditor",
+				"Linux",
+				"DebugGame",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex",
+				"-clean"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowiaEditor Linux Development Build",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowiaEditor",
+				"Linux",
+				"Development",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowiaEditor Linux Development Rebuild",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowiaEditor",
+				"Linux",
+				"Development",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"dependsOn": [
+				"ProjectOglowiaEditor Linux Development Clean"
+			],
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowiaEditor Linux Development Clean",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowiaEditor",
+				"Linux",
+				"Development",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex",
+				"-clean"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowiaEditor Mac Debug Build",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowiaEditor",
+				"Mac",
+				"Debug",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowiaEditor Mac Debug Rebuild",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowiaEditor",
+				"Mac",
+				"Debug",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"dependsOn": [
+				"ProjectOglowiaEditor Mac Debug Clean"
+			],
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowiaEditor Mac Debug Clean",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowiaEditor",
+				"Mac",
+				"Debug",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex",
+				"-clean"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowiaEditor Mac DebugGame Build",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowiaEditor",
+				"Mac",
+				"DebugGame",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowiaEditor Mac DebugGame Rebuild",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowiaEditor",
+				"Mac",
+				"DebugGame",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"dependsOn": [
+				"ProjectOglowiaEditor Mac DebugGame Clean"
+			],
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowiaEditor Mac DebugGame Clean",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowiaEditor",
+				"Mac",
+				"DebugGame",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex",
+				"-clean"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowiaEditor Mac Development Build",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowiaEditor",
+				"Mac",
+				"Development",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowiaEditor Mac Development Rebuild",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowiaEditor",
+				"Mac",
+				"Development",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex"
+			],
+			"problemMatcher": "$msCompile",
+			"dependsOn": [
+				"ProjectOglowiaEditor Mac Development Clean"
+			],
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
+			}
+		},
+		{
+			"label": "ProjectOglowiaEditor Mac Development Clean",
+			"group": "build",
+			"command": "Engine/Build/BatchFiles/Linux/Build.sh",
+			"args": [
+				"ProjectOglowiaEditor",
+				"Mac",
+				"Development",
+				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"-waitmutex",
+				"-clean"
+			],
+			"problemMatcher": "$msCompile",
+			"type": "shell",
+			"options": {
+				"cwd": "/home/alkaline/Documents/UnrealEngine"
 			}
 		}
 	]

@@ -1,3 +1,6 @@
+// NOTE: This code was not written by anyone on Bit Phoenix Software.
+// See below. (FIXME: Should we move this to a ue4 plugin?)
+
 /*
 The MIT License (MIT)
 Copyright (C) 2017 okdshin

@@ -1,3 +1,35 @@
+/********************************************************************************
+ * The Peacenet - bit::phoenix("software");
+ * 
+ * MIT License
+ *
+ * Copyright (c) 2018-2019 Michael VanOverbeek, Declan Hoare, Ian Clary, 
+ * Trey Smith, Richard Moch, Victor Tran and Warren Harris
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ * 
+ * Contributors:
+ *  - Michael VanOverbeek <alkaline@bitphoenixsoftware.com>
+ *
+ ********************************************************************************/
+
+
 #include "UProceduralGenerationEngine.h"
 #include "UPeacenetSaveGame.h"
 #include "Base64.h"
@@ -17,10 +49,17 @@ void UProceduralGenerationEngine::GenerateFirewallRules(FComputer& InComputer)
 
     TArray<UComputerService*> Services = this->Peacenet->GetServicesFor(InComputer.ComputerType);
 
+    // This gets the skill level of this computer's owning entity if any.
+    int Skill = this->Peacenet->SaveGame->GetSkillOf(InComputer);
+
     for(int i = 0; i < Services.Num(); i++)
     {
         if(Services[i]->IsDefault || RNG.RandRange(0, 6) % 2)
         {
+            // Don't spawn if the service's minimum skill level is above our skill.
+            if(Skill < Services[i]->MinimumSkillLevel)
+                continue;
+
             FFirewallRule Rule;
             Rule.Port = Services[i]->Port;
             Rule.Service = Services[i];

@@ -59,6 +59,12 @@ class PROJECTOGLOWIA_API UHackable : public UObject
 
 private:
     UPROPERTY()
+    FString RemoteUsername;
+
+    UPROPERTY()
+    int UserID = 0;
+
+    UPROPERTY()
     UComputerService* Service;
 
     UPROPERTY()
@@ -84,6 +90,9 @@ public:
     void SetOriginUser(UUserContext* InOriginUser);
 
     UFUNCTION()
+    bool SetRemoteUsername(FString InUsername);
+
+    UFUNCTION()
     void SetService(UComputerService* InService);
 
     UFUNCTION()
@@ -99,9 +108,6 @@ public:
     bool AuthenticateWithPassword(FString InPassword);
     
     UFUNCTION(BlueprintCallable, Category = "Networking")
-    bool AuthenticateWithUsernameAndPassword(FString InUsername, FString InPassword);
-
-    UFUNCTION(BlueprintCallable, Category = "Networking")
     void Disconnect();
 
     UFUNCTION(BlueprintCallable, Category = "Networking")
@@ -112,5 +118,5 @@ public:
     static FString GetConnectionErrorText(EConnectionError InError);
 
     UFUNCTION(BlueprintCallable, Category = "Hackable")
-    static bool OpenConnection(FString InHost, int InPort, UComputerService* TargetServiceType, UUserContext* OriginUser, EConnectionError& OutError, UHackable*& OutConnection);
+    static bool OpenConnection(FString InHost, int InPort, UComputerService* TargetServiceType, FString InRemoteUser, UUserContext* OriginUser, EConnectionError& OutError, UHackable*& OutConnection);
 };

@@ -51,11 +51,11 @@ void UHackable::Disconnect()
 
 void UHackable::CompleteHack(EHackCompletionType InCompletionType)
 {
-    // TODO: Support non-root connections.
+    // Create a user context object for the new connection.
     UUserContext* RootUserContext = NewObject<UUserContext>(this);
 
-    // assign the user context to the remote system and remote uid.
-    RootUserContext->Setup(this->RemoteSystem, 0);
+    // Assign it to the remote system and user ID.
+    RootUserContext->Setup(this->RemoteSystem, this->UserID);
 
     // propagate the event out to subclasses and Blueprint.
     this->NativeHackCompleted(RootUserContext);
@@ -84,7 +84,11 @@ bool UHackable::AuthenticateWithPassword(FString InPassword)
     if(this->GetAuthenticationType() != EAuthenticationType::Basic)
         return false;
 
-    // todo: fuck me
+    // Try to authenticate with the remote system context.
+    if(!this->RemoteSystem->Authenticate(this->RemoteUsername, InPassword, UserID))
+    {
+        return false;
+    }
 
         // Complete the hack.
     this->CompleteHack(EHackCompletionType::Proper);
@@ -92,19 +96,6 @@ bool UHackable::AuthenticateWithPassword(FString InPassword)
     return true;
 }
     
-bool UHackable::AuthenticateWithUsernameAndPassword(FString InUsername, FString InPassword)
-{
-    if(this->GetAuthenticationType() != EAuthenticationType::Credential)
-        return false;
-
-    // todo: fuck me
-
-        // Complete the hack.
-    this->CompleteHack(EHackCompletionType::Proper);
-
-    return true;
-}
-
 bool UHackable::AuthenticateWithPrivateKeyFile(FString InPrivateKeyPath)
 {
     if(this->GetAuthenticationType() != EAuthenticationType::Crypto)
@@ -123,7 +114,20 @@ EAuthenticationType UHackable::GetAuthenticationType()
     return this->Service->AuthenticationType;
 }
 
-bool UHackable::OpenConnection(FString InHost, int InPort, UComputerService* TargetServiceType, UUserContext* OriginUser, EConnectionError& OutError, UHackable*& OutConnection)
+bool UHackable::SetRemoteUsername(FString InUsername)
+{
+    // Can we resolve the username to a user ID?
+    if(this->RemoteSystem->UsernameExists(InUsername))
+    {
+        // Set the user and return true.
+        this->RemoteUsername = InUsername;
+        return true;
+    }
+
+    return false;
+}
+
+bool UHackable::OpenConnection(FString InHost, int InPort, UComputerService* TargetServiceType, FString InRemoteUser, UUserContext* OriginUser, EConnectionError& OutError, UHackable*& OutConnection)
 {
     // The origin User Context has a reference to Peacenet, so we better not get nullptr.
     check(OriginUser);
@@ -212,6 +216,19 @@ bool UHackable::OpenConnection(FString InHost, int InPort, UComputerService* Tar
 
             // Should be fully set up.
             OutConnection->SetRemoteSystem(RemoteContext);
+
+            // Try to attach the connection to a remote username.
+            // If this fails, we refuse connection.
+            // We only need to do this if the service requires authentication.
+            if(OutConnection->NeedsAuthentication())
+            {
+                if(!OutConnection->SetRemoteUsername(InRemoteUser))
+                {
+                    OutError = EConnectionError::ConnectionRefused;
+                    return false;
+                }
+            }
+
 
             // All done!
             OutError = EConnectionError::None;

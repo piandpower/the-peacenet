@@ -145,6 +145,9 @@ public:
 	void AddConnection(UHackable* InConnection, bool IsInbound);
 
 	UFUNCTION()
+	bool UsernameExists(FString InUsername);
+
+	UFUNCTION()
 	void Disconnect(UHackable* InConnection);
 
 	UFUNCTION()

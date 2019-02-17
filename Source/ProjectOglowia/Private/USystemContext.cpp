@@ -66,6 +66,19 @@ void USystemContext::AddConnection(UHackable* InConnection, bool IsInbound)
 	this->SystemConnected.Broadcast(InConnection, IsInbound);
 }
 
+bool USystemContext::UsernameExists(FString InUsername)
+{
+	auto Computer = this->GetComputer();
+
+	for(auto& User : Computer.Users)
+	{
+		if(User.Username == InUsername)
+			return true;
+	}
+
+	return false;
+}
+
 void USystemContext::Disconnect(UHackable* InConnection)
 {
 	check(InConnection);

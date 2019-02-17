@@ -38,6 +38,7 @@
 #include "FFirewallRule.h"
 #include "EConnectionError.h"
 #include "EAuthenticationType.h"
+#include "EHackCompletionType.h"
 #include "UHackable.generated.h"
 
 class UHackable;
@@ -68,12 +69,12 @@ private:
 
 protected:
     UFUNCTION()
-    void CompleteHack();
+    void CompleteHack(EHackCompletionType InCompletionType);
 
     UFUNCTION(BlueprintImplementableEvent, Category = "Hackable")
-    void HackCompleted();
+    void HackCompleted(UUserContext* HackedUserContext);
 
-    virtual void NativeHackCompleted();
+    virtual void NativeHackCompleted(UUserContext* HackedUserContext);
 
 public:
     UFUNCTION()
@@ -99,6 +100,9 @@ public:
     
     UFUNCTION(BlueprintCallable, Category = "Networking")
     bool AuthenticateWithUsernameAndPassword(FString InUsername, FString InPassword);
+
+    UFUNCTION(BlueprintCallable, Category = "Networking")
+    void Disconnect();
 
     UFUNCTION(BlueprintCallable, Category = "Networking")
     bool AuthenticateWithPrivateKeyFile(FString InPrivateKeyPath);

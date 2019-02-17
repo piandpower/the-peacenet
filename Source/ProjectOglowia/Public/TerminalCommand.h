@@ -81,6 +81,7 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Terminal Command")
 	void OnRunCommand(const UConsoleContext* InConsole, const TMap<FString, UDocoptValue*>& InArguments);
 
+public:
 	UFUNCTION(BlueprintCallable, Category = "Terminal Command")
 	void Complete();
 };

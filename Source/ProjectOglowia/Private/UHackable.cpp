@@ -38,15 +38,28 @@
 #include "UComputerService.h"
 #include "UPeacenetSaveGame.h"
 
-void UHackable::NativeHackCompleted()
+void UHackable::NativeHackCompleted(UUserContext* HackedUserContext)
 {
 
 }
 
-void UHackable::CompleteHack()
+void UHackable::Disconnect()
 {
-    this->NativeHackCompleted();
-    this->HackCompleted();
+    this->RemoteSystem->Disconnect(this);
+    this->OriginUserContext->GetOwningSystem()->Disconnect(this);
+}
+
+void UHackable::CompleteHack(EHackCompletionType InCompletionType)
+{
+    // TODO: Support non-root connections.
+    UUserContext* RootUserContext = NewObject<UUserContext>(this);
+
+    // assign the user context to the remote system and remote uid.
+    RootUserContext->Setup(this->RemoteSystem, 0);
+
+    // propagate the event out to subclasses and Blueprint.
+    this->NativeHackCompleted(RootUserContext);
+    this->HackCompleted(RootUserContext);
 }
 
 void UHackable::StartAuth(FAuthenticationRequiredEvent InCallback)
@@ -57,7 +70,7 @@ void UHackable::StartAuth(FAuthenticationRequiredEvent InCallback)
     }
     else
     {
-        this->CompleteHack();
+        this->CompleteHack(EHackCompletionType::Proper);
     }
 }
 
@@ -72,6 +85,10 @@ bool UHackable::AuthenticateWithPassword(FString InPassword)
         return false;
 
     // todo: fuck me
+
+        // Complete the hack.
+    this->CompleteHack(EHackCompletionType::Proper);
+
     return true;
 }
     
@@ -81,6 +98,10 @@ bool UHackable::AuthenticateWithUsernameAndPassword(FString InUsername, FString 
         return false;
 
     // todo: fuck me
+
+        // Complete the hack.
+    this->CompleteHack(EHackCompletionType::Proper);
+
     return true;
 }
 
@@ -90,6 +111,10 @@ bool UHackable::AuthenticateWithPrivateKeyFile(FString InPrivateKeyPath)
         return false;
 
     // todo: fuck me
+
+    // Complete the hack.
+    this->CompleteHack(EHackCompletionType::Proper);
+
     return true;
 }
 

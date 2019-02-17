@@ -56,8 +56,13 @@ private:
     UPROPERTY()
     UConsoleContext* ShellConsole;
 
+protected:
+    virtual void NativeHackCompleted(UUserContext* HackedUserContext) override;
+
 public:
     UFUNCTION(BlueprintCallable, Category = "Secure Shell")
     void StartTelnet(ATerminalCommand* InCaller, FName InShellCommand, FAuthenticationRequiredEvent InCallback);
 
+    UFUNCTION()
+    void CompleteAndDisconnect();
 };

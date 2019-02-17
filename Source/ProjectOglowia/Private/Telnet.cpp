@@ -31,6 +31,9 @@
 
 
 #include "Telnet.h"
+#include "UConsoleContext.h"
+#include "UNetworkedConsoleContext.h"
+#include "UUserContext.h"
 
 void UTelnet::StartTelnet(ATerminalCommand* InCaller, FName InShellCommand, FAuthenticationRequiredEvent InCallback)
 {
@@ -41,4 +44,57 @@ void UTelnet::StartTelnet(ATerminalCommand* InCaller, FName InShellCommand, FAut
     this->Shell = InShellCommand;
 
     this->StartAuth(InCallback);
+}
+
+void UTelnet::NativeHackCompleted(UUserContext* HackedUserContext)
+{
+    // This console context will be where the game grabs user input
+    // and puts console output.
+    UConsoleContext* OutputConsole = this->OwningCommand->GetConsole();
+
+    // Create a new console on top of the origin console and
+    // the hacked user context.
+    UNetworkedConsoleContext* NetworkedContext = NewObject<UNetworkedConsoleContext>(this);
+
+    // Assign the origin console and user context.
+    NetworkedContext->SetupNetworkedConsole(OutputConsole, HackedUserContext);
+
+    // Next part is to get a terminal command to run.
+    // First we need the hacked system.
+    USystemContext* HackedSystem = HackedUserContext->GetOwningSystem();
+
+    // Prevent UE4 from collecting our hacked console.
+    this->ShellConsole = NetworkedContext;
+
+    // Try to get the terminal command specified by the caller.
+    FString InternalUsage;
+    FString FriendlyUsage;
+    ATerminalCommand* ShellCommand;
+
+    if(HackedSystem->TryGetTerminalCommand(this->Shell, ShellCommand, InternalUsage, FriendlyUsage))
+    {
+        // Now we can bind the command's completion event to our caller's,
+        // so when the command ends, we disconnect.
+        TScriptDelegate<> CompleteDelegate;
+        CompleteDelegate.BindUFunction(this, "CompleteAndDisconnect");
+        ShellCommand->Completed.Add(CompleteDelegate);
+
+        // Now we run the shell command.
+        ShellCommand->RunCommand(NetworkedContext, TMap<FString, UDocoptValue*>());
+    }
+    else
+    {
+        OutputConsole->WriteLine("error: could not start shell, command not found.");
+        this->CompleteAndDisconnect();
+    }
+    
+}
+
+void UTelnet::CompleteAndDisconnect()
+{
+    // Complete our calling command.
+    this->OwningCommand->Complete();
+
+    // Disconnect the two systems.
+    this->Disconnect();
 }

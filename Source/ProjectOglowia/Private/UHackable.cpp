@@ -36,7 +36,17 @@
 #include "UPeacegateFileSystem.h"
 #include "PeacenetWorldStateActor.h"
 #include "UComputerService.h"
+#include "TerminalCommand.h"
 #include "UPeacenetSaveGame.h"
+
+void UHackable::HackFromTerminalCommand(ATerminalCommand* InCommand, EHackCompletionType HackType)
+{
+    // Causes our state to update if we need it to. Doesn't actually say the hack is completed.
+    this->OnHackedByTerminalCommand(InCommand);
+
+    // This actually says we completed the hack.
+    this->CompleteHack(HackType);
+}
 
 void UHackable::NativeHackCompleted(UUserContext* HackedUserContext)
 {
@@ -51,6 +61,12 @@ void UHackable::Disconnect()
 
 void UHackable::CompleteHack(EHackCompletionType InCompletionType)
 {
+    // If the hack type was LOUD, then we do Government Alert stuff.
+    if(InCompletionType == EHackCompletionType::Loud)
+    {
+        // TODO: Government alert.
+    }
+
     // Create a user context object for the new connection.
     UUserContext* RootUserContext = NewObject<UUserContext>(this);
 
@@ -238,6 +254,11 @@ bool UHackable::OpenConnection(FString InHost, int InPort, UComputerService* Tar
 
     OutError = EConnectionError::ConnectionRefused;
     return false;
+}
+
+int UHackable::GetSkillLevel()
+{
+    return RemoteSystem->GetCharacter().Skill;
 }
 
 FString UHackable::GetConnectionErrorText(EConnectionError InError)

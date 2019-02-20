@@ -50,6 +50,7 @@ class UPeacenetSaveGame;
 class USystemContext;
 class UUserContext;
 class APeacenetWorldStateActor;
+class ATerminalCommand;
 class UPeacegateFileSystem;
 
 UCLASS(Blueprintable, BlueprintType, Abstract)
@@ -82,6 +83,8 @@ protected:
 
     virtual void NativeHackCompleted(UUserContext* HackedUserContext);
 
+    virtual void OnHackedByTerminalCommand(ATerminalCommand* InCommand) {}
+
 public:
     UFUNCTION()
     void SetRemoteSystem(USystemContext* InSystem);
@@ -112,6 +115,12 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = "Networking")
     bool AuthenticateWithPrivateKeyFile(FString InPrivateKeyPath);
+
+    UFUNCTION()
+    int GetSkillLevel();
+
+    UFUNCTION()
+    void HackFromTerminalCommand(ATerminalCommand* InCommand, EHackCompletionType HackType);
 
 public:
     UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Hackable")

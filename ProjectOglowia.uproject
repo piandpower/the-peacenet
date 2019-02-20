@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "{0003FA2D-3602-0E0C-0038-0068D3B061CA}",
+	"EngineAssociation": "{0003E6A5-2D02-1413-0009-03BF0377CD66}",
 	"Category": "",
 	"Description": "",
 	"Modules": [
@@ -284,10 +284,6 @@
 		{
 			"Name": "Paper2D",
 			"Enabled": false
-		},
-		{
-			"Name": "MediaFrameworkUtilities",
-			"Enabled": true
 		},
 		{
 			"Name": "MfMedia",

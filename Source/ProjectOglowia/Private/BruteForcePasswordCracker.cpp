@@ -39,7 +39,59 @@
 
 void ABruteForcePasswordCracker::Crack(UConsoleContext* InConsole, UHackable* InHackable)
 {
+    // We need the skill of the remote hackable.
+    int RemoteSkill = InHackable->GetSkillLevel();
 
+    // And our local skill.
+    int LocalSkill = InConsole->GetUserContext()->GetOwningSystem()->GetCharacter().Skill;
+
+    // If the local skill is greater than the remote skill then we always complete the hack.
+    if(LocalSkill > RemoteSkill)
+    {
+        // This automatically handles the rest of the hack.
+        InHackable->HackFromTerminalCommand(this, EHackCompletionType::Loud);
+    }
+    else if(LocalSkill == RemoteSkill)
+    {
+        // If we have the same skill, the chance is 50/50.
+        if(FMath::RandRange(0, 100) % 2 == 0)
+        {
+            // This automatically handles the rest of the hack.
+            InHackable->HackFromTerminalCommand(this, EHackCompletionType::Loud);            
+        }
+        else
+        {
+            // We couldn't hack.
+            InConsole->WriteLine("&*Error:&r Connection closed by remote host.");
+            InHackable->Disconnect();
+            this->Complete();
+            return;
+        }
+    }
+    else
+    {
+        // Get the average of the two skills.
+        int Average = (LocalSkill + RemoteSkill) / 2;
+
+        // If the average is 0 then it becomes 1.
+        if(Average == 0) Average = 1;
+
+        // Check if a value between 0 and 100 is divisible by that average.
+        // If it is, then we are successful.
+        if(FMath::RandRange(0, 100) % Average == 0)
+        {
+            // This automatically handles the rest of the hack.
+            InHackable->HackFromTerminalCommand(this, EHackCompletionType::Loud);            
+        }
+        else
+        {
+            // We couldn't hack.
+            InConsole->WriteLine("&*Error:&r Connection closed by remote host.");
+            InHackable->Disconnect();
+            this->Complete();
+            return;
+        }
+    }
 }
 
 void ABruteForcePasswordCracker::NativeRunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments)
@@ -85,13 +137,14 @@ void ABruteForcePasswordCracker::NativeRunCommand(UConsoleContext* InConsole, co
     InConsole->WriteLine("Connecting to &*" + Hostname + "&r on port &*" + FString::FromInt(Port) + "&r as &*" + Username + "&r...");
 
     // Create a timer delegate that runs this->Connect() when the timer completes.
-    FTimerDelegate ConnectionDelegate;
+    FTimerDelegate ConnectionDelegate = FTimerDelegate();
     ConnectionDelegate.BindUFunction(this, "Connect", InConsole, Username, Hostname, Port);
 
     // Wait a second and try to actually connect.
     TimerManager.SetTimer(this->ConnectionTimerHandle, ConnectionDelegate, 1.f, false, 1.f);
 
     // That's all we can do for now.
+    
 }
 
 void ABruteForcePasswordCracker::Connect(UConsoleContext* InConsole, FString Username, FString Hostname, int Port)
@@ -198,7 +251,7 @@ void ABruteForcePasswordCracker::Connect(UConsoleContext* InConsole, FString Use
     InConsole->WriteLine("Starting crack...");
 
     // Create a timer delegate to run when the crack is "finished."
-    FTimerDelegate CrackDelegate;
+    FTimerDelegate CrackDelegate = FTimerDelegate();
     CrackDelegate.BindUFunction(this, "Crack", InConsole, Hackable);
 
     // Start the crack!

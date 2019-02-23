@@ -47,13 +47,16 @@ class PROJECTOGLOWIA_API ABruteForcePasswordCracker : public ATerminalCommand
     GENERATED_BODY()
 
 private:
+    UPROPERTY()
     FTimerHandle ConnectionTimerHandle;
+
+    UPROPERTY()
     FTimerHandle CrackTimerHandle;
 
 protected:
 	virtual void NativeRunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments) override;
 
-protected:
+public:
     UFUNCTION()
     void Crack(UConsoleContext* InConsole, UHackable* InHackable);
 

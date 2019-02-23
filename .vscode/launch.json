@@ -4,103 +4,127 @@
 		{
 			"name": "ProjectOglowia (Debug)",
 			"request": "launch",
-			"preLaunchTask": "ProjectOglowia Linux Debug Build",
-			"program": "/media/alkaline/Projects/Projects/Unreal/peacenet-ue/Binaries/Linux/ProjectOglowia-Linux-Debug",
+			"preLaunchTask": "ProjectOglowia Win64 Debug Build",
+			"program": "D:\\Projects\\Unreal\\peacenet-ue\\Binaries\\Win64\\ProjectOglowia-Win64-Debug.exe",
 			"args": [
 			],
-			"cwd": "/home/alkaline/Documents/UnrealEngine",
-			"type": "gdb"
+			"cwd": "D:\\EpicGames\\Epic Games\\UE_4.20",
+			"stopAtEntry": false,
+			"externalConsole": true,
+			"type": "cppvsdbg",
+			"visualizerFile": "D:\\EpicGames\\Epic Games\\UE_4.20\\Engine\\Extras\\VisualStudioDebugging\\UE4.natvis"
 		},
 		{
 			"name": "ProjectOglowia (DebugGame)",
 			"request": "launch",
-			"preLaunchTask": "ProjectOglowia Linux DebugGame Build",
-			"program": "/media/alkaline/Projects/Projects/Unreal/peacenet-ue/Binaries/Linux/ProjectOglowia-Linux-DebugGame",
+			"preLaunchTask": "ProjectOglowia Win64 DebugGame Build",
+			"program": "D:\\Projects\\Unreal\\peacenet-ue\\Binaries\\Win64\\ProjectOglowia-Win64-DebugGame.exe",
 			"args": [
 			],
-			"cwd": "/home/alkaline/Documents/UnrealEngine",
-			"type": "lldb"
+			"cwd": "D:\\EpicGames\\Epic Games\\UE_4.20",
+			"stopAtEntry": false,
+			"externalConsole": true,
+			"type": "cppvsdbg",
+			"visualizerFile": "D:\\EpicGames\\Epic Games\\UE_4.20\\Engine\\Extras\\VisualStudioDebugging\\UE4.natvis"
 		},
 		{
 			"name": "ProjectOglowia (Development)",
 			"request": "launch",
-			"preLaunchTask": "ProjectOglowia Linux Development Build",
-			"program": "/media/alkaline/Projects/Projects/Unreal/peacenet-ue/Binaries/Linux/ProjectOglowia",
+			"preLaunchTask": "ProjectOglowia Win64 Development Build",
+			"program": "D:\\Projects\\Unreal\\peacenet-ue\\Binaries\\Win64\\ProjectOglowia.exe",
 			"args": [
 			],
-			"cwd": "/home/alkaline/Documents/UnrealEngine",
-			"type": "lldb"
+			"cwd": "D:\\EpicGames\\Epic Games\\UE_4.20",
+			"stopAtEntry": false,
+			"externalConsole": true,
+			"type": "cppvsdbg",
+			"visualizerFile": "D:\\EpicGames\\Epic Games\\UE_4.20\\Engine\\Extras\\VisualStudioDebugging\\UE4.natvis"
 		},
 		{
 			"name": "ProjectOglowia (Shipping)",
 			"request": "launch",
-			"preLaunchTask": "ProjectOglowia Linux Shipping Build",
-			"program": "/media/alkaline/Projects/Projects/Unreal/peacenet-ue/Binaries/Linux/ProjectOglowia-Linux-Shipping",
+			"preLaunchTask": "ProjectOglowia Win64 Shipping Build",
+			"program": "D:\\Projects\\Unreal\\peacenet-ue\\Binaries\\Win64\\ProjectOglowia-Win64-Shipping.exe",
 			"args": [
 			],
-			"cwd": "/home/alkaline/Documents/UnrealEngine",
-			"type": "lldb"
+			"cwd": "D:\\EpicGames\\Epic Games\\UE_4.20",
+			"stopAtEntry": false,
+			"externalConsole": true,
+			"type": "cppvsdbg",
+			"visualizerFile": "D:\\EpicGames\\Epic Games\\UE_4.20\\Engine\\Extras\\VisualStudioDebugging\\UE4.natvis"
 		},
 		{
 			"name": "ProjectOglowia (Test)",
 			"request": "launch",
-			"preLaunchTask": "ProjectOglowia Linux Test Build",
-			"program": "/media/alkaline/Projects/Projects/Unreal/peacenet-ue/Binaries/Linux/ProjectOglowia-Linux-Test",
+			"preLaunchTask": "ProjectOglowia Win64 Test Build",
+			"program": "D:\\Projects\\Unreal\\peacenet-ue\\Binaries\\Win64\\ProjectOglowia-Win64-Test.exe",
 			"args": [
 			],
-			"cwd": "/home/alkaline/Documents/UnrealEngine",
-			"type": "lldb"
+			"cwd": "D:\\EpicGames\\Epic Games\\UE_4.20",
+			"stopAtEntry": false,
+			"externalConsole": true,
+			"type": "cppvsdbg",
+			"visualizerFile": "D:\\EpicGames\\Epic Games\\UE_4.20\\Engine\\Extras\\VisualStudioDebugging\\UE4.natvis"
 		},
 		{
 			"name": "ProjectOglowiaEditor (Debug)",
 			"request": "launch",
-			"preLaunchTask": "ProjectOglowiaEditor Linux Debug Build",
-			"program": "/home/alkaline/Documents/UnrealEngine/Engine/Binaries/Linux/UE4Editor-Linux-Debug",
+			"preLaunchTask": "ProjectOglowiaEditor Win64 Debug Build",
+			"program": "D:\\EpicGames\\Epic Games\\UE_4.20\\Engine\\Binaries\\Win64\\UE4Editor-Win64-Debug.exe",
 			"args": [
-				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
 				"-debug"
 			],
-			"cwd": "/home/alkaline/Documents/UnrealEngine",
-			"type": "lldb"
+			"cwd": "D:\\EpicGames\\Epic Games\\UE_4.20",
+			"stopAtEntry": false,
+			"externalConsole": true,
+			"type": "cppvsdbg",
+			"visualizerFile": "D:\\EpicGames\\Epic Games\\UE_4.20\\Engine\\Extras\\VisualStudioDebugging\\UE4.natvis"
 		},
 		{
 			"name": "ProjectOglowiaEditor (DebugGame)",
 			"request": "launch",
-			"preLaunchTask": "ProjectOglowiaEditor Linux DebugGame Build",
-			"program": "/home/alkaline/Documents/UnrealEngine/Engine/Binaries/Linux/UE4Editor",
+			"preLaunchTask": "ProjectOglowiaEditor Win64 DebugGame Build",
+			"program": "D:\\EpicGames\\Epic Games\\UE_4.20\\Engine\\Binaries\\Win64\\UE4Editor.exe",
 			"args": [
-				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject",
+				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject",
 				"-debug"
 			],
-			"cwd": "/home/alkaline/Documents/UnrealEngine",
-			"type": "lldb"
+			"cwd": "D:\\EpicGames\\Epic Games\\UE_4.20",
+			"stopAtEntry": false,
+			"externalConsole": true,
+			"type": "cppvsdbg",
+			"visualizerFile": "D:\\EpicGames\\Epic Games\\UE_4.20\\Engine\\Extras\\VisualStudioDebugging\\UE4.natvis"
 		},
 		{
 			"name": "ProjectOglowiaEditor (Development)",
 			"request": "launch",
-			"preLaunchTask": "ProjectOglowiaEditor Linux Development Build",
-			"program": "/home/alkaline/Documents/UnrealEngine/Engine/Binaries/Linux/UE4Editor",
+			"preLaunchTask": "ProjectOglowiaEditor Win64 Development Build",
+			"program": "D:\\EpicGames\\Epic Games\\UE_4.20\\Engine\\Binaries\\Win64\\UE4Editor.exe",
 			"args": [
-				"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject"
+				"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject"
 			],
-			"cwd": "/home/alkaline/Documents/UnrealEngine",
-			"type": "lldb"
+			"cwd": "D:\\EpicGames\\Epic Games\\UE_4.20",
+			"stopAtEntry": false,
+			"externalConsole": true,
+			"type": "cppvsdbg",
+			"visualizerFile": "D:\\EpicGames\\Epic Games\\UE_4.20\\Engine\\Extras\\VisualStudioDebugging\\UE4.natvis"
 		},
 		{
 			"name": "Generate Project Files",
-			"type": "mono",
+			"type": "clr",
 			"request": "launch",
-			"program": "/home/alkaline/Documents/UnrealEngine/Engine/Binaries/DotNET/UnrealBuildTool.exe",
-			"console": "internalConsole",
+			"program": "D:\\EpicGames\\Epic Games\\UE_4.20\\Engine\\Binaries\\DotNET\\UnrealBuildTool.exe",
+			"console": "externalTerminal",
 			"args": [
 				"-projectfiles",
 				"-vscode",
-				"-project=\"/media/alkaline/Projects/Projects/Unreal/peacenet-ue/ProjectOglowia.uproject\"",
+				"-project=\"D:\\Projects\\Unreal\\peacenet-ue\\ProjectOglowia.uproject\"",
 				"-game",
 				"-engine"
 			],
 			"internalConsoleOptions": "openOnSessionStart",
-			"cwd": "/home/alkaline/Documents/UnrealEngine"
+			"cwd": "D:\\EpicGames\\Epic Games\\UE_4.20"
 		}
 	]
 }

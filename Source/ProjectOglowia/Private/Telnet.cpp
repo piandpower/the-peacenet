@@ -35,6 +35,11 @@
 #include "UNetworkedConsoleContext.h"
 #include "UUserContext.h"
 
+void UTelnet::OnHackedByTerminalCommand(ATerminalCommand* InCommand)
+{
+    this->OwningCommand = InCommand;
+}
+
 void UTelnet::StartTelnet(ATerminalCommand* InCaller, FName InShellCommand, FAuthenticationRequiredEvent InCallback)
 {
     check(InCaller);

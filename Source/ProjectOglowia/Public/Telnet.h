@@ -58,6 +58,7 @@ private:
 
 protected:
     virtual void NativeHackCompleted(UUserContext* HackedUserContext) override;
+    virtual void OnHackedByTerminalCommand(ATerminalCommand* InCommand) override;
 
 public:
     UFUNCTION(BlueprintCallable, Category = "Secure Shell")

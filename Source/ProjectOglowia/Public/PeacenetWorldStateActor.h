@@ -43,6 +43,7 @@
 #include "UGameTypeAsset.h"
 #include "PeacenetWorldStateActor.generated.h"
 
+class UChatManager;
 class USystemContext;
 class UWallpaperAsset;
 class UComputerService;
@@ -65,6 +66,9 @@ public: // Constructors
 	APeacenetWorldStateActor();
 
 private: // Properties
+	UPROPERTY()
+	UChatManager* ChatManager;
+
 	UPROPERTY()
 	TArray<UComputerService*> ComputerServices;
 

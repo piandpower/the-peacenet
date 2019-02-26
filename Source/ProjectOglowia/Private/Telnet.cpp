@@ -76,7 +76,7 @@ void UTelnet::NativeHackCompleted(UUserContext* HackedUserContext)
     FString FriendlyUsage;
     ATerminalCommand* ShellCommand;
 
-    if(HackedSystem->TryGetTerminalCommand(this->Shell, ShellCommand, InternalUsage, FriendlyUsage))
+    if(HackedSystem->TryGetTerminalCommand("bash", ShellCommand, InternalUsage, FriendlyUsage))
     {
         // Now we can bind the command's completion event to our caller's,
         // so when the command ends, we disconnect.

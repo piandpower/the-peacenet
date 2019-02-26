@@ -46,6 +46,17 @@
 #include "UGraphicalTerminalCommand.h"
 #include "CommandInfo.h"
 
+int USystemContext::GetUserIDFromUsername(FString InUsername)
+{
+	for(auto User : this->GetComputer().Users)
+	{
+		if(User.Username == InUsername)
+			return User.ID;
+	}
+
+	return -1;
+}
+
 int USystemContext::GetOpenConnectionCount()
 {
 	return this->InboundConnections.Num() + this->OutboundConnections.Num();

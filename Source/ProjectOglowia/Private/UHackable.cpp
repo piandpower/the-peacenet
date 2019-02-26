@@ -41,6 +41,9 @@
 
 void UHackable::HackFromTerminalCommand(ATerminalCommand* InCommand, EHackCompletionType HackType)
 {
+    // Set our user ID from the remote system.
+    this->UserID = this->RemoteSystem->GetUserIDFromUsername(this->RemoteUsername);
+
     // Causes our state to update if we need it to. Doesn't actually say the hack is completed.
     this->OnHackedByTerminalCommand(InCommand);
 

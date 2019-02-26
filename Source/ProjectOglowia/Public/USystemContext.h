@@ -187,6 +187,9 @@ public:
 	FString GetIPAddress();
 
 	UFUNCTION()
+	int GetUserIDFromUsername(FString InUsername);
+
+	UFUNCTION()
 	FUserInfo GetUserInfo(const int InUserID);
 
 	UFUNCTION()

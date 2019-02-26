@@ -638,7 +638,47 @@ void USystemContext::Setup(int InComputerID, int InCharacterID, APeacenetWorldSt
 {
 	check(InPeacenet);
 
+	// assign all our IDs and Peacenet.
 	this->ComputerID = InComputerID;
 	this->CharacterID = InCharacterID;
 	this->Peacenet = InPeacenet;
+
+	// Now we need a filesystem.
+	UPeacegateFileSystem* fs = this->GetFilesystem(0);
+
+	// Any FS errors are reported here.
+	EFilesystemStatusCode fsStatus = EFilesystemStatusCode::OK;
+
+	// Create /home if it doesn't exist.
+	if(!fs->DirectoryExists("/home"))
+		fs->CreateDirectory("/home", fsStatus);
+
+	// Go through every user on the system.
+	for(auto& user : this->GetComputer().Users)
+	{
+		// Get the home directory for the user.
+		FString home = this->GetUserHomeDirectory(user.ID);
+
+		// If the user's home directory doesn't exist, create it.
+		if(!fs->DirectoryExists(home))
+		{
+			fs->CreateDirectory(home, fsStatus);
+		}
+
+		// These sub-directories are important too.
+		TArray<FString> homeDirs = {
+			"Desktop",
+			"Documents",
+			"Downloads",
+			"Music",
+			"Pictures",
+			"Videos"
+		};
+
+		for(auto subDir : homeDirs)
+		{
+			if(!fs->DirectoryExists(home + "/" + subDir))
+				fs->CreateDirectory(home + "/" + subDir, fsStatus);
+		}
+	}
 }

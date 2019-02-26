@@ -45,6 +45,9 @@ void UConsoleContext::Setup(UUserContext* InUserContext)
 
 	// Set our user context.
 	this->UserContext = InUserContext;
+
+	// Set the working directory to the user's home.
+	this->WorkingDirectory = this->UserContext->GetHomeDirectory();
 }
 
 FString UConsoleContext::GetWorkingDirectory()

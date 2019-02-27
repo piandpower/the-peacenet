@@ -40,6 +40,16 @@
 #include "UProgram.h"
 #include "UPeacegateFileSystem.h"
 
+FString UUserContext::GetProcessUsername(FPeacegateProcess InProcess)
+{
+	return this->GetOwningSystem()->GetProcessUsername(InProcess);
+}
+
+TArray<FPeacegateProcess> UUserContext::GetRunningProcesses()
+{
+	return this->GetOwningSystem()->GetRunningProcesses();
+}
+
 void UUserContext::ParseURL(FString InURL, int InDefaultPort, FString& OutUsername, FString& OutHost, int& OutPort, FString& OutPath)
 {
 	bool HasPort = false;

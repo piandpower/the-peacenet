@@ -35,6 +35,7 @@
 #include "CoreMinimal.h"
 #include "USystemContext.h"
 #include "EFileOpenResult.h"
+#include "FPeacegateProcess.h"
 #include "SecureShell.h"
 #include "FAdjacentNodeInfo.h"
 #include "UUserContext.generated.h"
@@ -82,6 +83,9 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = "User Context")
     void SetCurrentWallpaper(UWallpaperAsset* InWallpaperAsset);
+
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Process List")
+    TArray<FPeacegateProcess> GetRunningProcesses();
 
     UFUNCTION()
     FUserInfo GetUserInfo();
@@ -133,4 +137,7 @@ public:
 
     UFUNCTION(BlueprintCallable, BlueprintPure, Category = "User Context")
     bool IsAdministrator();
+
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Process List")
+    FString GetProcessUsername(FPeacegateProcess InProcess);
 };

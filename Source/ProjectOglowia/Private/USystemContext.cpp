@@ -46,6 +46,11 @@
 #include "UGraphicalTerminalCommand.h"
 #include "CommandInfo.h"
 
+FString USystemContext::GetProcessUsername(FPeacegateProcess InProcess)
+{
+	return this->GetUserInfo(InProcess.UID).Username;
+}
+
 int USystemContext::GetUserIDFromUsername(FString InUsername)
 {
 	for(auto User : this->GetComputer().Users)
@@ -681,4 +686,9 @@ void USystemContext::Setup(int InComputerID, int InCharacterID, APeacenetWorldSt
 				fs->CreateDirectory(home + "/" + subDir, fsStatus);
 		}
 	}
+}
+
+TArray<FPeacegateProcess> USystemContext::GetRunningProcesses()
+{
+	return this->Processes;
 }

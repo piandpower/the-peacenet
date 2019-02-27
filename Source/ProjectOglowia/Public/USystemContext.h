@@ -37,6 +37,7 @@
 #include "UPeacegateFileSystem.h"
 #include "FPeacenetIdentity.h"
 #include "FAdjacentNodeInfo.h"
+#include "FPeacegateProcess.h"
 #include "USystemContext.generated.h"
 
 class UHackable;
@@ -78,6 +79,9 @@ protected:
 	TMap<int, UPeacegateFileSystem*> RegisteredFilesystems;
 
 	UPROPERTY()
+	TArray<FPeacegateProcess> Processes;
+
+	UPROPERTY()
 	URainbowTable* RainbowTable;
 
 	UPROPERTY()
@@ -113,6 +117,9 @@ public: // Property getters
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "System Context")
 	APeacenetWorldStateActor* GetPeacenet();
 
+    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Process List")
+    FString GetProcessUsername(FPeacegateProcess InProcess);
+
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "System Context")
 	TArray<UWallpaperAsset*> GetAvailableWallpapers();
 
@@ -138,6 +145,9 @@ public: // Property getters
 	TArray<UPeacegateProgramAsset*> GetInstalledPrograms();
 
 public:
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Process List")
+	TArray<FPeacegateProcess> GetRunningProcesses();
+
 	UFUNCTION()
 	int GetOpenConnectionCount();
 

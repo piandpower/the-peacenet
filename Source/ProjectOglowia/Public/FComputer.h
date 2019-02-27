@@ -116,6 +116,9 @@ public:
 	int ID;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Computer")
+	TMap<FString, FString> EnvironmentVariables;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Computer")
 	EComputerOwnerType OwnerType = EComputerOwnerType::NPC;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Computer")

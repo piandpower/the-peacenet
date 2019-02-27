@@ -723,3 +723,43 @@ void USystemContext::FinishProcess(int ProcessID)
 		}
 	}
 }
+
+bool USystemContext::IsEnvironmentVariableSet(FString InVariable)
+{
+	// Simply returns whether the computer has an environment variable set.
+	return this->GetComputer().EnvironmentVariables.Contains(InVariable);
+}
+
+bool USystemContext::GetEnvironmentVariable(FString InVariable, FString& OutValue)
+{
+	// Check if we have the variable:
+	if(this->IsEnvironmentVariableSet(InVariable))
+	{
+		// Retrieve the value.
+		OutValue = this->GetComputer().EnvironmentVariables[InVariable];
+		return true;
+	}
+	return false;
+}
+
+void USystemContext::SetEnvironmentVariable(FString InVariable, FString InValue)
+{
+	// If we have a variable with the same name, we set it. Else, we add it.
+	if(this->IsEnvironmentVariableSet(InVariable))
+	{
+		this->GetComputer().EnvironmentVariables[InVariable] = InValue;
+	}
+	else
+	{
+		this->GetComputer().EnvironmentVariables.Add(InVariable, InValue);
+	}
+}
+
+void USystemContext::UnsetEnvironmentVariable(FString InVariable)
+{
+	// If we have the variable set, remove it.
+	if(this->IsEnvironmentVariableSet(InVariable))
+	{
+		this->GetComputer().EnvironmentVariables.Remove(InVariable);
+	}
+}

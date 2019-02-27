@@ -115,6 +115,18 @@ protected:
 
 public: // Property getters
 	UFUNCTION()
+	bool IsEnvironmentVariableSet(FString InVariable);
+
+	UFUNCTION()
+	bool GetEnvironmentVariable(FString InVariable, FString& OutValue);
+
+	UFUNCTION()
+	void SetEnvironmentVariable(FString InVariable, FString InValue);
+
+	UFUNCTION()
+	void UnsetEnvironmentVariable(FString InVariable);
+
+	UFUNCTION()
 	int StartProcess(FString Name, FString FilePath, int UserID);
 	
 	UFUNCTION()

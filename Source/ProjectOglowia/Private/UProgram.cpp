@@ -56,7 +56,7 @@ void UProgram::RequestPlayerAttention(bool PlaySound)
 	this->PlayerAttentionNeeded.Broadcast(PlaySound);
 }
 
-UProgram* UProgram::CreateProgram(const TSubclassOf<UWindow> InWindow, const TSubclassOf<UProgram> InProgramClass, USystemContext* InSystem, const int InUserID, UWindow*& OutWindow, bool DoContextSetup)
+UProgram* UProgram::CreateProgram(const TSubclassOf<UWindow> InWindow, const TSubclassOf<UProgram> InProgramClass, USystemContext* InSystem, const int InUserID, UWindow*& OutWindow, FString InProcessName, bool DoContextSetup)
 {
 	// Preventative: make sure the system context isn't null.
 	check(InSystem);
@@ -83,6 +83,15 @@ UProgram* UProgram::CreateProgram(const TSubclassOf<UWindow> InWindow, const TSu
 	// Window gets our user context.
 	Window->SetUserContext(User);
 
+	// Start the process for the program.
+	ProgramInstance->ProcessID = User->StartProcess(InProcessName, InProcessName);
+
+	// Make sure we get notified when the window closes.
+	TScriptDelegate<> CloseDelegate;
+	CloseDelegate.BindUFunction(ProgramInstance, "OwningWindowClosed");
+
+	Window->NativeWindowClosed.Add(CloseDelegate);
+
 	// Set up the program's contexts if we're told to.
 	if (DoContextSetup)
 	{
@@ -95,6 +104,13 @@ UProgram* UProgram::CreateProgram(const TSubclassOf<UWindow> InWindow, const TSu
 
 	return ProgramInstance;
 }
+
+void UProgram::OwningWindowClosed()
+{
+    // Finish up our process.
+    this->GetUserContext()->GetOwningSystem()->FinishProcess(this->ProcessID);
+}
+
 
 void UProgram::ActiveProgramCloseEvent()
 {

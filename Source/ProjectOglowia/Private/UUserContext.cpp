@@ -222,7 +222,7 @@ bool UUserContext::OpenFile(const FString& InPath, EFileOpenResult& OutResult)
 	TSubclassOf<UWindow> WindowClass = this->GetPeacenet()->WindowClass;
 
 	UWindow* NewWindow;
-	UProgram* NewProgram = UProgram::CreateProgram(WindowClass, ProgramAsset->ProgramClass, this->GetOwningSystem(), this->UserID, NewWindow);
+	UProgram* NewProgram = UProgram::CreateProgram(WindowClass, ProgramAsset->ProgramClass, this->GetOwningSystem(), this->UserID, NewWindow, ProgramAsset->ExecutableName.ToString());
 
 	NewWindow->WindowTitle = ProgramAsset->AppLauncherItem.Name;
 	NewWindow->Icon = ProgramAsset->AppLauncherItem.Icon;

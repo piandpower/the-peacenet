@@ -55,6 +55,9 @@ private:
 	// Learned this hack from the ShiftOS Visual Basic days.
 	bool JustOpened = true;
 
+	UPROPERTY()
+	int ProcessID = 0;
+
 public:
 	UFUNCTION()
 	void ActiveProgramCloseEvent();
@@ -74,7 +77,7 @@ public:
 	FPlayerAttentionNeededEvent PlayerAttentionNeeded;
 
 	UFUNCTION(BlueprintCallable, Category = "Peacegate")
-	static UProgram* CreateProgram(const TSubclassOf<UWindow> InWindowClass, const TSubclassOf<UProgram> InProgramClass, USystemContext* InSystem, const int InUserID, UWindow*& OutWindow, bool DoContextSetup = true);
+	static UProgram* CreateProgram(const TSubclassOf<UWindow> InWindowClass, const TSubclassOf<UProgram> InProgramClass, USystemContext* InSystem, const int InUserID, UWindow*& OutWindow, FString InProcessName, bool DoContextSetup = true);
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (ExposeOnSpawn = "true"))
 	UWindow* Window;
@@ -84,6 +87,9 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = "Infobox")
 	void ShowInfo(const FText& InTitle, const FText& InMessage, const EInfoboxIcon InIcon);
+
+	UFUNCTION()
+	void OwningWindowClosed();
 
 	UFUNCTION(BlueprintCallable, Category = "File Management")
 	void AskForFile(const FString InBaseDirectory, const FString InFilter, const EFileDialogType InDialogType, const FFileDialogDismissedEvent& OnDismissed);

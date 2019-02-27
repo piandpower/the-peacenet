@@ -114,6 +114,12 @@ protected:
 	void HandleFileSystemEvent(EFilesystemEventType InType, FString InPath);
 
 public: // Property getters
+	UFUNCTION()
+	int StartProcess(FString Name, FString FilePath, int UserID);
+	
+	UFUNCTION()
+	void FinishProcess(int ProcessID);
+
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "System Context")
 	APeacenetWorldStateActor* GetPeacenet();
 

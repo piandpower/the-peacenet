@@ -40,6 +40,11 @@
 #include "UProgram.h"
 #include "UPeacegateFileSystem.h"
 
+int UUserContext::StartProcess(FString Name, FString FilePath)
+{
+	return this->GetOwningSystem()->StartProcess(Name, FilePath, this->UserID);
+}
+
 FString UUserContext::GetProcessUsername(FPeacegateProcess InProcess)
 {
 	return this->GetOwningSystem()->GetProcessUsername(InProcess);

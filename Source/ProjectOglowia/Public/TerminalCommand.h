@@ -58,6 +58,9 @@ private:
 	UPROPERTY()
 	UConsoleContext* Console;
 
+	UPROPERTY()
+	int ProcessID = 0;
+
 public:
 	UPROPERTY(BlueprintReadOnly, Category = "Terminal Command")
 	UCommandInfo* CommandInfo;

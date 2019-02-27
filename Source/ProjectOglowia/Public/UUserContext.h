@@ -124,6 +124,9 @@ public:
     bool OpenProgram(FName InExecutableName, UProgram*& OutProgram, bool InCheckForExistingWindow = true);
 
     UFUNCTION()
+    int StartProcess(FString Name, FString FilePath);
+
+    UFUNCTION()
     void ShowProgramOnWorkspace(UProgram* InProgram);
 
     UFUNCTION(BlueprintCallable, Category = "User Context")

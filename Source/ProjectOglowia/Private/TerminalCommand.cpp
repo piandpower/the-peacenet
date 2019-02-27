@@ -49,6 +49,7 @@ UConsoleContext* ATerminalCommand::GetConsole()
 void ATerminalCommand::RunCommand(UConsoleContext* InConsole, const TMap<FString, UDocoptValue*> InArguments)
 {
 	this->Console = InConsole;	
+	this->ProcessID = this->Console->GetUserContext()->StartProcess(this->CommandInfo->Info.CommandName.ToString(), this->CommandInfo->Info.CommandName.ToString());
 	NativeRunCommand(InConsole, InArguments);
 }
 
@@ -60,6 +61,9 @@ void ATerminalCommand::NativeRunCommand(UConsoleContext * InConsole, const TMap<
 
 void ATerminalCommand::Complete()
 {
+	// Tell Peacegate OS that the process has finished.
+	this->Console->GetUserContext()->GetOwningSystem()->FinishProcess(this->ProcessID);
+
 	this->Completed.Broadcast();
 	
 	// Despawn the actor and clean up memory used by the

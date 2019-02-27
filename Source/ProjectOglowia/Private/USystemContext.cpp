@@ -692,3 +692,34 @@ TArray<FPeacegateProcess> USystemContext::GetRunningProcesses()
 {
 	return this->Processes;
 }
+
+int USystemContext::StartProcess(FString Name, FString FilePath, int UserID)
+{
+	int NewPID = 0;
+	for(auto Process : this->GetRunningProcesses())
+	{
+		if(NewPID <= Process.PID)
+			NewPID = Process.PID + 1;
+	}
+
+	FPeacegateProcess NewProcess;
+	NewProcess.PID = NewPID;
+	NewProcess.UID = UserID;
+	NewProcess.ProcessName = Name;
+	NewProcess.FilePath = FilePath;
+	this->Processes.Add(NewProcess);
+	return NewProcess.PID;
+}
+
+void USystemContext::FinishProcess(int ProcessID)
+{
+	for(int i = 0; i < Processes.Num(); i++)
+	{
+		FPeacegateProcess p = Processes[i];
+		if(p.PID == ProcessID)
+		{
+			this->Processes.RemoveAt(i);
+			return;
+		}
+	}
+}

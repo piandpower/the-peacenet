@@ -1,14 +1,14 @@
 {
 	"files.exclude": {
-		"D:/Projects/Unreal/peacenet-ue/.git": true,
-		"D:/Projects/Unreal/peacenet-ue/.idea": true,
-		"D:/Projects/Unreal/peacenet-ue/.kdev4": true,
-		"D:/Projects/Unreal/peacenet-ue/.vs": true,
-		"D:/Projects/Unreal/peacenet-ue/.vscode": true,
-		"D:/Projects/Unreal/peacenet-ue/Content": true,
-		"D:/Projects/Unreal/peacenet-ue/DerivedDataCache": true,
-		"D:/Projects/Unreal/peacenet-ue/Intermediate": true,
-		"D:/Projects/Unreal/peacenet-ue/Readme": true,
-		"D:/Projects/Unreal/peacenet-ue/Saved": true
+		"E:/Projects/Unreal/peacenet-ue/.git": true,
+		"E:/Projects/Unreal/peacenet-ue/.idea": true,
+		"E:/Projects/Unreal/peacenet-ue/.kdev4": true,
+		"E:/Projects/Unreal/peacenet-ue/.vs": true,
+		"E:/Projects/Unreal/peacenet-ue/.vscode": true,
+		"E:/Projects/Unreal/peacenet-ue/Content": true,
+		"E:/Projects/Unreal/peacenet-ue/DerivedDataCache": true,
+		"E:/Projects/Unreal/peacenet-ue/Intermediate": true,
+		"E:/Projects/Unreal/peacenet-ue/Readme": true,
+		"E:/Projects/Unreal/peacenet-ue/Saved": true
 	}
 }
